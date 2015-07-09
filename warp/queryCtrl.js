@@ -8,12 +8,12 @@ function (angular, _, kbn) {
 
   var module = angular.module('grafana.controllers');
 
-  module.controller('EinsteinQueryCtrl', function($scope) {
+  module.controller('WarpQueryCtrl', function($scope) {
 
     $scope.init = function() {
 
       console.log("Init called");
-      
+
       $scope.target.errors = validateTarget();
       $scope.target.datasourceErrors = {};
 
@@ -22,7 +22,7 @@ function (angular, _, kbn) {
       }
       $scope.target.metric = '';
 
-      $scope.target.einsteinLink = $scope.linkToEinstein();
+      $scope.target.einsteinLink = $scope.linkToWarp();
 
       $scope.$on('typeahead-updated', function() {
         $scope.$apply($scope.inputMetric);
@@ -37,7 +37,7 @@ function (angular, _, kbn) {
 
     $scope.refreshMetricData = function() {
       $scope.target.errors = validateTarget($scope.target);
-      $scope.target.einsteinLink = $scope.linkToEinstein();
+      $scope.target.einsteinLink = $scope.linkToWarp();
 
       // this does not work so good
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
@@ -60,11 +60,11 @@ function (angular, _, kbn) {
       $scope.panel.targets.push(clone);
     };
 
-    $scope.linkToEinstein = function() {
+    $scope.linkToWarp = function() {
       var from = kbn.parseDate($scope.dashboard.time.from);
       var to = kbn.parseDate($scope.dashboard.time.to);
 
-      
+
 
       return $scope.datasource.url;
     };

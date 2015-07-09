@@ -10,11 +10,11 @@ function (angular, _, kbn) {
 
   var module = angular.module('grafana.services');
 
-  module.factory('EinsteinDatasource', function($q, $http, templateSrv) {
+  module.factory('WarpDatasource', function($q, $http, templateSrv) {
 
-    function EinsteinDatasource(datasource) {
+    function WarpDatasource(datasource) {
       this.type = 'einstein';
-      this.editorSrc = 'app/features/einstein/partials/query.editor.html';
+      this.editorSrc = 'app/features/warp/partials/query.editor.html';
       this.name = datasource.name;
       this.supportMetrics = true;
 
@@ -28,12 +28,12 @@ function (angular, _, kbn) {
     }
 
     // Called once per panel (graph)
-    EinsteinDatasource.prototype.query = function(options) {
+    WarpDatasource.prototype.query = function(options) {
 
       console.log("Query begin");
 
-      var end = convertToEinsteinTime(options.range.to);
-      var start = convertToEinsteinTime(options.range.from);
+      var end = convertToWarpTime(options.range.to);
+      var start = convertToWarpTime(options.range.from);
 
       console.log("From: "+start+ " To: "+end);
 
@@ -103,7 +103,7 @@ function (angular, _, kbn) {
     /***********************************************************************************
     *Puts into the Einstein script a header to place start and end ont the stack
     ***********************************************************************************/
-    EinsteinDatasource.prototype.prepareEinsteinQuery = function(query, start, end) {
+    WarpDatasource.prototype.prepareEinsteinQuery = function(query, start, end) {
 
       var endISO = convertToISO(end);
       var startISO = convertToISO(start);
@@ -119,7 +119,7 @@ function (angular, _, kbn) {
     /***********************************************************************************
     * Generate @query Einstein http query to the Einstein API entry point
     ***********************************************************************************/
-    EinsteinDatasource.prototype.performTimeSeriesQuery = function(query, start, end) {
+    WarpDatasource.prototype.performTimeSeriesQuery = function(query, start, end) {
 
 
       var einsteinScript = this.prepareEinsteinQuery(query, start, end);
@@ -194,7 +194,7 @@ function (angular, _, kbn) {
     /***********************************************************************************
     * Converts @date into µs since Epoch time (Einstein tick format)
     ***********************************************************************************/
-    function convertToEinsteinTime(date) {
+    function convertToWarpTime(date) {
       date = kbn.parseDate(date);
       return date.getTime() * 1000;
     }
@@ -207,7 +207,7 @@ function (angular, _, kbn) {
       return date.toISOString();
     }
 
-    return EinsteinDatasource;
+    return WarpDatasource;
   });
 
 });
