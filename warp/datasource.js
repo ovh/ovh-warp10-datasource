@@ -161,7 +161,7 @@ function (angular, _, kbn) {
 
       var labels =
         _.map(gts.l, function(value, key){
-          return key+":"+value
+          return key+"="+value
         }).join(",");
 
 
