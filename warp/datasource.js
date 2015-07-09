@@ -159,7 +159,13 @@ function (angular, _, kbn) {
 
       var className = gts.c + JSON.stringify(gts.l);
 
+      var labels =
+        _.map(gts.l, function(value, key){
+          return key+":"+value
+        }).join(",");
 
+
+      var metricName = className+"{"+labels+"}"
       var dps = [];
 
       _.each(gts.v, function(value) {
@@ -169,8 +175,8 @@ function (angular, _, kbn) {
 
       // Metric format {target: "Label text", datapoints: [ datapoints objects] }
 
-      console.debug({ target: className, datapoints: dps });
-      return { target: className, datapoints: dps };
+      console.debug({ target: metricName , datapoints: dps });
+      return { target: metricName, datapoints: dps };
     }
 
     /***********************************************************************************
