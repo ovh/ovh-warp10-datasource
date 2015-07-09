@@ -157,7 +157,7 @@ function (angular, _, kbn) {
         return;
       }
 
-      var className = gts.c + JSON.stringify(gts.l);
+      var className = gts.c;
 
       var labels =
         _.map(gts.l, function(value, key){
