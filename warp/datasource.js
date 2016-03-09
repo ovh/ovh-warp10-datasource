@@ -202,7 +202,7 @@ function (angular, _, datemath) {
     ***********************************************************************************/
     function convertToWarpTime(date) {
       date = datemath.parse(date);
-      return date.getTime() * 1000;
+      return date * 1000;
     }
 
     /***********************************************************************************
