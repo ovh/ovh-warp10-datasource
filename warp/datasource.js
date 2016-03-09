@@ -1,11 +1,11 @@
 define([
   'angular',
   'lodash',
-  'app/core/utils/kbn',
+  'app/core/utils/datemath',
   'moment',
   './queryCtrl'
 ],
-function (angular, _, kbn) {
+function (angular, _, datemath) {
   'use strict';
 
   var module = angular.module('grafana.services');
@@ -201,8 +201,8 @@ function (angular, _, kbn) {
     * Converts @date into µs since Epoch time (Warpscript tick format)
     ***********************************************************************************/
     function convertToWarpTime(date) {
-      date = kbn.parseDate(date);
-      return date.getTime() * 1000;
+      date = datemath.parse(date);
+      return date * 1000;
     }
 
     /***********************************************************************************
