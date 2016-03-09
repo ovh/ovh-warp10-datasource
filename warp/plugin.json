@@ -5,7 +5,7 @@
   "type": "warpscript",
   "serviceName": "WarpDatasource",
 
-  "module": "plugins/datasource/warp/datasource",
+  "module": "app/plugins/datasource/warp/datasource",
 
   "partials": {
     "config": "app/plugins/datasource/warp/partials/config.html",
