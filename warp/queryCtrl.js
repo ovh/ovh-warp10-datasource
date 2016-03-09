@@ -22,7 +22,7 @@ function (angular, _, kbn) {
       }
       $scope.target.metric = '';
 
-      $scope.target.einsteinLink = $scope.linkToWarp();
+      $scope.target.warpscriptLink = $scope.linkToWarp();
 
       $scope.$on('typeahead-updated', function() {
         $scope.$apply($scope.inputMetric);
@@ -37,7 +37,7 @@ function (angular, _, kbn) {
 
     $scope.refreshMetricData = function() {
       $scope.target.errors = validateTarget($scope.target);
-      $scope.target.einsteinLink = $scope.linkToWarp();
+      $scope.target.warpscriptLink = $scope.linkToWarp();
 
       // this does not work so good
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {

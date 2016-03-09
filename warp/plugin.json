@@ -2,7 +2,7 @@
   "pluginType": "datasource",
   "name": "Warp",
 
-  "type": "einstein",
+  "type": "warpscript",
   "serviceName": "WarpDatasource",
 
   "module": "plugins/datasource/warp/datasource",

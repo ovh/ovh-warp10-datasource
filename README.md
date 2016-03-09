@@ -1,12 +1,12 @@
-Grafana - Einstein Datasource Plugin
+Grafana - Warpscript Datasource Plugin
 ======================================
 
-This is a plugin that allows Grafana 2 to support Einstein as datasource.
+This is a plugin that allows Grafana 2 to support Warpscript as datasource.
 
 Installation:
 =============
 
-Copy the plugin folder **einstein** inside the folder for plugins in Grafana 2.
+Copy the plugin folder **warpscript** inside the folder for plugins in Grafana 2.
 In most cases,  this path is located at [GRAFANA_INSTALL_DIR]/public/app/plugins/datasource/
 
 Use
@@ -15,7 +15,7 @@ Use
 It works more or less like any other Grafana datasource.
 
 Grafana will push to the plugin the `start` and `end` values of the graph.
-The plugin will push those values onto the Einstein stack some variables you can use on your Einstein scripts:
+The plugin will push those values onto the Warpscript stack some variables you can use on your Warpscript scripts:
 
 * `$start` and `$end`, corresponding to the `start` and `end` values of the graph in microseconds
 * `$startISO` and `$endISO`, corresponding to the `start` and `end` values in the graph as ISO date format
@@ -23,10 +23,10 @@ The plugin will push those values onto the Einstein stack some variables you can
 * `$interval`, corresponding to `$end - $start`
 
 
-Then you can use these variables in your Einstein script, for example
+Then you can use these variables in your Warpscript script, for example
 for a FETCH.
 
-Examples of Einstein scripts:
+Examples of Warpscript scripts:
 
 1. Generated sinusoids
 
