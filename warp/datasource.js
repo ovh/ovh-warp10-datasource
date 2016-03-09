@@ -1,7 +1,7 @@
 define([
   'angular',
   'lodash',
-  'kbn',
+  'app/core/utils/kbn',
   'moment',
   './queryCtrl'
 ],
@@ -13,7 +13,7 @@ function (angular, _, kbn) {
   module.factory('WarpDatasource', function($q, $http, templateSrv) {
 
     function WarpDatasource(datasource) {
-      this.type = 'einstein';
+      this.type = 'warpscript';
       this.editorSrc = 'app/features/warp/partials/query.editor.html';
       this.name = datasource.name;
       this.supportMetrics = true;
@@ -85,11 +85,11 @@ function (angular, _, kbn) {
               return {};
             }
 
-            var einsteinJsonResponse = response.data[0];
+            var warpscriptJsonResponse = response.data[0];
 
-            console.log("Response data", einsteinJsonResponse)
+            console.log("Response data", warpscriptJsonResponse)
 
-            _.each(einsteinJsonResponse, function(metricData) {
+            _.each(warpscriptJsonResponse, function(metricData) {
               console.log("Metric data",metricData);
 
               result.push(transformMetricData(metricData, options.targets[index]));
@@ -101,28 +101,28 @@ function (angular, _, kbn) {
     };
 
     /***********************************************************************************
-    *Puts into the Einstein script a header to place start and end ont the stack
+    *Puts into the Warpscript script a header to place start and end ont the stack
     ***********************************************************************************/
-    WarpDatasource.prototype.prepareEinsteinQuery = function(query, start, end) {
+    WarpDatasource.prototype.prepareWarpscriptQuery = function(query, start, end) {
 
       var endISO = convertToISO(end);
       var startISO = convertToISO(start);
       var interval = end - start;
 
-      var einsteinScript =
+      var warpscriptScript =
             "" + start + " 'start' STORE " + end + " 'end' STORE " +
             "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " +
             interval + " 'interval' STORE " + query.expr;
-      return einsteinScript;
+      return warpscriptScript;
     }
 
     /***********************************************************************************
-    * Generate @query Einstein http query to the Einstein API entry point
+    * Generate @query Warpscript http query to the Warpscript API entry point
     ***********************************************************************************/
     WarpDatasource.prototype.performTimeSeriesQuery = function(query, start, end) {
 
 
-      var einsteinScript = this.prepareEinsteinQuery(query, start, end);
+      var warpscriptScript = this.prepareWarpscriptQuery(query, start, end);
 
       var backend = this.url;
       // If we have defined a backend in the query editor, it takes preecedence
@@ -131,12 +131,12 @@ function (angular, _, kbn) {
         backend = query.backend;
       }
 
-      var url = backend + '/api/v0/exec/einstein'
+      var url = backend + '/api/v0/exec/warpscript'
 
       var options = {
         method: 'POST',
         url: url,
-        data: einsteinScript,
+        data: warpscriptScript,
         headers: {
             'Accept': undefined,
             'Content-Type': undefined,
@@ -148,7 +148,7 @@ function (angular, _, kbn) {
     };
 
     /***********************************************************************************
-    * Transform from Einstein JSON to Grafana dps
+    * Transform from Warpscript JSON to Grafana dps
     ***********************************************************************************/
     function transformMetricData(gts, options) {
 
@@ -198,7 +198,7 @@ function (angular, _, kbn) {
     };
 
     /***********************************************************************************
-    * Converts @date into µs since Epoch time (Einstein tick format)
+    * Converts @date into µs since Epoch time (Warpscript tick format)
     ***********************************************************************************/
     function convertToWarpTime(date) {
       date = kbn.parseDate(date);
