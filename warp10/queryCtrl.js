@@ -8,7 +8,7 @@ function (angular, _, datemath) {
 
   var module = angular.module('grafana.controllers');
 
-  module.controller('WarpQueryCtrl', function($scope) {
+  module.controller('Warp10QueryCtrl', function($scope) {
 
     $scope.init = function() {
 

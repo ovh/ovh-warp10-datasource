@@ -2,19 +2,20 @@ define([
   'angular',
   'lodash',
   'app/core/utils/datemath',
+  'app/core/utils/kbn',
   'moment',
-  './queryCtrl'
+  './queryCtrl',
+  './directives'
 ],
-function (angular, _, datemath) {
+function (angular, _, datemath, kbn) {
   'use strict';
 
   var module = angular.module('grafana.services');
 
-  module.factory('WarpDatasource', function($q, $http, templateSrv) {
+  module.factory('Warp10Datasource', function($q, $http, templateSrv) {
 
-    function WarpDatasource(datasource) {
-      this.type = 'warpscript';
-      this.editorSrc = 'app/features/warp/partials/query.editor.html';
+    function Warp10Datasource(datasource) {
+      this.type = 'warp10';
       this.name = datasource.name;
       this.supportMetrics = true;
 
@@ -28,12 +29,12 @@ function (angular, _, datemath) {
     }
 
     // Called once per panel (graph)
-    WarpDatasource.prototype.query = function(options) {
+    Warp10Datasource.prototype.query = function(options) {
 
       console.log("Query begin");
 
-      var end = convertToWarpTime(options.range.to);
-      var start = convertToWarpTime(options.range.from);
+      var end = convertToWarp10Time(options.range.to);
+      var start = convertToWarp10Time(options.range.from);
 
       console.log("From: "+start+ " To: "+end);
 
@@ -103,7 +104,7 @@ function (angular, _, datemath) {
     /***********************************************************************************
     *Puts into the Warpscript script a header to place start and end ont the stack
     ***********************************************************************************/
-    WarpDatasource.prototype.prepareWarpscriptQuery = function(query, start, end) {
+    Warp10Datasource.prototype.prepareWarpscriptQuery = function(query, start, end) {
 
       var endISO = convertToISO(end);
       var startISO = convertToISO(start);
@@ -112,14 +113,17 @@ function (angular, _, datemath) {
       var warpscriptScript =
             "" + start + " 'start' STORE " + end + " 'end' STORE " +
             "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " +
-            interval + " 'interval' STORE " + query.expr;
+            interval + " 'interval' STORE";
+      if (query.expr !== undefined) {
+         warpscriptScript += " " + query.expr;
+      }
       return warpscriptScript;
     }
 
     /***********************************************************************************
     * Generate @query Warpscript http query to the Warpscript API entry point
     ***********************************************************************************/
-    WarpDatasource.prototype.performTimeSeriesQuery = function(query, start, end) {
+    Warp10Datasource.prototype.performTimeSeriesQuery = function(query, start, end) {
 
 
       var warpscriptScript = this.prepareWarpscriptQuery(query, start, end);
@@ -200,7 +204,7 @@ function (angular, _, datemath) {
     /***********************************************************************************
     * Converts @date into µs since Epoch time (Warpscript tick format)
     ***********************************************************************************/
-    function convertToWarpTime(date) {
+    function convertToWarp10Time(date) {
       date = datemath.parse(date);
       return date * 1000;
     }
@@ -213,7 +217,7 @@ function (angular, _, datemath) {
       return date.toISOString();
     }
 
-    return WarpDatasource;
+    return Warp10Datasource;
   });
 
 });
