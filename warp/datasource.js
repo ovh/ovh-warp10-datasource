@@ -131,7 +131,7 @@ function (angular, _, kbn) {
         backend = query.backend;
       }
 
-      var url = backend + '/api/v0/exec/warpscript'
+      var url = backend + '/api/v0/exec'
 
       var options = {
         method: 'POST',
@@ -140,7 +140,7 @@ function (angular, _, kbn) {
         headers: {
             'Accept': undefined,
             'Content-Type': undefined,
-            'X-CityzenData-Token': 'token'
+            'X-Warp10-Token': 'token'
         }
       };
 
