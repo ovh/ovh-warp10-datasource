@@ -7,7 +7,7 @@ define([
   './queryCtrl',
   './directives'
 ],
-function (angular, _, datemath, kbn) {
+function (angular, _, dateMath, kbn) {
   'use strict';
 
   var module = angular.module('grafana.services');
@@ -205,7 +205,7 @@ function (angular, _, datemath, kbn) {
     * Converts @date into µs since Epoch time (Warpscript tick format)
     ***********************************************************************************/
     function convertToWarp10Time(date) {
-      date = datemath.parse(date);
+      date = dateMath.parse(date);
       return date * 1000;
     }
 
