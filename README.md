@@ -72,6 +72,8 @@ Examples of Warpscript scripts:
           $end $interval
           FETCH  
 
+![Warp10-grafana plugin](warp10-grafana.png)
+
 
 TODO
 ====
