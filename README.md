@@ -43,7 +43,7 @@ Examples of Warpscript scripts:
 
 
         $end $start - 'interval' STORE
-        $interval 50 / TOLONG 'step' STORE  
+        $interval 20 / TOLONG 'step' STORE  
 
         <% $step + %> 'stepMacro' STORE
         <% 'index' STORE $sinus $index NaN NaN NaN $index SIN  ADDVALUE DROP %> 'execMacroSinus' STORE
