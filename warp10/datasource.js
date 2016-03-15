@@ -19,12 +19,7 @@ function (angular, _, dateMath, kbn) {
       this.name = datasource.name;
       this.supportMetrics = true;
 
-      var url = datasource.url;
-      if (url[url.length-1] === '/') {
-        // remove trailing slash
-        url = url.substr(0, url.length - 1);
-      }
-      this.url = url;
+      this.url = datasource.url;
       this.lastErrors = {};
     }
 
@@ -133,6 +128,11 @@ function (angular, _, dateMath, kbn) {
       // over the datasource
       if ((query.backend !== undefined) && (query.backend.length >0)) {
         backend = query.backend;
+      }
+
+      while (backend[backend.length-1] === '/') {
+        // remove trailing slash
+        backend = backend.substr(0, backend.length - 1);
       }
 
       var url = backend + '/api/v0/exec'
