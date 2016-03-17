@@ -109,6 +109,9 @@ function (angular, _, dateMath, kbn) {
             "" + start + " 'start' STORE " + end + " 'end' STORE " +
             "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " +
             interval + " 'interval' STORE";
+      _.each(templateSrv.variables, function(variable) {
+         warpscriptScript += "\n'" + variable.current.value + "' '"+variable.name+"' STORE";
+      });
       if (query.expr !== undefined) {
          warpscriptScript += " " + query.expr;
       }
