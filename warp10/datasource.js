@@ -2,12 +2,11 @@ define([
   'angular',
   'lodash',
   'app/core/utils/datemath',
-  'app/core/utils/kbn',
   'moment',
   './queryCtrl',
   './directives'
 ],
-function (angular, _, dateMath, kbn) {
+function (angular, _, dateMath) {
   'use strict';
 
   var module = angular.module('grafana.services');
@@ -68,7 +67,6 @@ function (angular, _, dateMath, kbn) {
 
           _.each(allResponse, function(response, index) {
 
-
             console.log("Response", response);
             if (response.data.type === 'error') {
               self.lastErrors.query = response.data.value;
@@ -76,14 +74,14 @@ function (angular, _, dateMath, kbn) {
             }
             delete self.lastErrors.query;
 
-            if (!isArray(response.data) || (response.data.length != 1)) {
+            if (!isArray(response.data) || (response.data.length !== 1)) {
               console.debug("Response isn't an Array or it has more than 1 element", response.data);
               return {};
             }
 
             var warpscriptJsonResponse = response.data[0];
 
-            console.log("Response data", warpscriptJsonResponse)
+            console.log("Response data", warpscriptJsonResponse);
 
             _.each(warpscriptJsonResponse, function(metricData) {
               console.log("Metric data",metricData);
@@ -106,23 +104,22 @@ function (angular, _, dateMath, kbn) {
       var interval = end - start;
 
       var warpscriptScript =
-            "" + start + " 'start' STORE " + end + " 'end' STORE " +
+            " " + start + " 'start' STORE " + end + " 'end' STORE " +
             "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " +
             interval + " 'interval' STORE";
       _.each(templateSrv.variables, function(variable) {
-         warpscriptScript += "\n'" + variable.current.value + "' '"+variable.name+"' STORE";
+        warpscriptScript += "\n'" + variable.current.value + "' '"+variable.name+"' STORE";
       });
       if (query.expr !== undefined) {
-         warpscriptScript += " " + query.expr;
+        warpscriptScript += " " + query.expr;
       }
       return warpscriptScript;
-    }
+    };
 
     /***********************************************************************************
     * Generate @query Warpscript http query to the Warpscript API entry point
     ***********************************************************************************/
     Warp10Datasource.prototype.performTimeSeriesQuery = function(query, start, end) {
-
 
       var warpscriptScript = this.prepareWarpscriptQuery(query, start, end);
 
@@ -138,7 +135,7 @@ function (angular, _, dateMath, kbn) {
         backend = backend.substr(0, backend.length - 1);
       }
 
-      var url = backend + '/api/v0/exec'
+      var url = backend + '/api/v0/exec';
 
       var options = {
         method: 'POST',
@@ -157,7 +154,7 @@ function (angular, _, dateMath, kbn) {
     /***********************************************************************************
     * Transform from Warpscript JSON to Grafana dps
     ***********************************************************************************/
-    function transformMetricData(gts, options) {
+    function transformMetricData(gts) {
 
       if (!isGts(gts)) {
         console.debug("Response item isn't a gts",gts);
@@ -167,12 +164,11 @@ function (angular, _, dateMath, kbn) {
       var className = gts.c;
 
       var labels =
-        _.map(gts.l, function(value, key){
-          return key+"="+value
+        _.map(gts.l, function(value, key) {
+          return key+"="+value;
         }).join(",");
 
-
-      var metricName = className+"{"+labels+"}"
+      var metricName = className+"{"+labels+"}";
       var dps = [];
 
       _.each(gts.v, function(value) {
@@ -192,7 +188,7 @@ function (angular, _, dateMath, kbn) {
     function isArray(value) {
       return value && typeof value === 'object' && value instanceof Array && typeof value.length === 'number'
         && typeof value.splice === 'function' && !(value.propertyIsEnumerable('length'));
-    };
+    }
 
     /***********************************************************************************
     * Returns true if @gts is a JSON object version of a GTS
@@ -202,7 +198,7 @@ function (angular, _, dateMath, kbn) {
         return false;
       }
       return true;
-    };
+    }
 
     /***********************************************************************************
     * Converts @date into µs since Epoch time (Warpscript tick format)
