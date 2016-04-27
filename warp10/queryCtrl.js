@@ -1,9 +1,8 @@
 define([
   'angular',
   'lodash',
-  'app/core/utils/datemath',
 ],
-function (angular, _, dateMath) {
+function (angular, _) {
   'use strict';
 
   var module = angular.module('grafana.controllers');
@@ -61,11 +60,6 @@ function (angular, _, dateMath) {
     };
 
     $scope.linkToWarp = function() {
-      var from = dateMath.parse($scope.dashboard.time.from);
-      var to = dateMath.parse($scope.dashboard.time.to);
-
-
-
       return $scope.datasource.url;
     };
 
