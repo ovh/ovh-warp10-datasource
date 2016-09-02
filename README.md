@@ -1,13 +1,13 @@
 Grafana - Warp 10 Datasource Plugin
 ======================================
 
-This is a plugin that allows Grafana 2 to support Warp 10 as datasource.
+This is a plugin that allows Grafana 3 to support Warp 10 as datasource.
 
 Installation:
 =============
 
-Copy the plugin folder **warp10** inside the folder for plugins in Grafana 2.
-In most cases,  this path is located at [GRAFANA_INSTALL_DIR]/public/app/plugins/datasource/
+Copy the content of the folder `dist` to a folder `warp10` inside the folder for plugins in Grafana 3.
+In most cases,  this path is located at `[GRAFANA_INSTALL_DIR]/data/plugins`.
 
 Use
 ===
@@ -87,6 +87,6 @@ TODO
 License
 =======
 
-Copyright &copy; 2015 Cityzen Data
+Copyright &copy; 2016 Cityzen Data
 
 APACHE LICENSE Version 2.0, January 2004
