@@ -1,71 +1,92 @@
-## Simple JSON Datasource - a generic backend datasource
+Grafana - Warp 10 Datasource Plugin
+======================================
 
-More documentation about datasource plugins can be found in the [Docs](https://github.com/grafana/grafana/blob/master/docs/sources/plugins/datasources.md).
+This is a plugin that allows Grafana 3 to support Warp 10 as datasource.
 
-This also serves as a living example implementation of a datasource.
+Installation:
+=============
 
-Your backend needs to implement 4 urls:
+Copy the content of the folder `dist` to a folder `warp10` inside the folder for plugins in Grafana 3.
+In most cases,  this path is located at `[GRAFANA_INSTALL_DIR]/data/plugins`.
 
- * / should return 200 ok. Used for "Test connection" on the datasource config page.
- * /search used by the find metric options on the query tab in panels.
- * /query should return metrics based on input.
- * /annotations should return annotations.
+Use
+===
 
-### Example backend implementations
-- https://github.com/bergquist/fake-simple-json-datasource
-- https://gist.github.com/tral/1fe649455fe2de9fb8fe
+It works more or less like any other Grafana datasource.
 
-### Annotation API
+Grafana will push to the plugin the `start` and `end` values of the graph.
+The plugin will push those values onto the WarpScript stack some variables you can use on your Warpscript scripts:
 
-The annotation request from the Simple JSON Datasource is a POST request to
-the /annotations endpoint in your datasource. The JSON request body looks like this:
-``` javascript
-{
-  "range": {
-    "from": "2016-04-15T13:44:39.070Z",
-    "to": "2016-04-15T14:44:39.070Z"
-  },
-  "rangeRaw": {
-    "from": "now-1h",
-    "to": "now"
-  },
-  "annotation": {
-    "name": "deploy",
-    "datasource": "Simple JSON Datasource",
-    "iconColor": "rgba(255, 96, 96, 1)",
-    "enable": true,
-    "query": "#deploy"
-  }
-}
-```
+* `$start` and `$end`, corresponding to the `start` and `end` values of the graph in microseconds
+* `$startISO` and `$endISO`, corresponding to the `start` and `end` values in the graph as ISO date format
+(useful for the FETCH function, for example)
+* `$interval`, corresponding to `$end - $start`
 
-Grafana expects a response containing an array of annotation objects in the
-following format:
 
-``` javascript
-[
-  {
-    annotation: annotation, // The original annotation sent from Grafana.
-    time: time, // Time since UNIX Epoch in milliseconds. (required)
-    title: title, // The title for the annotation tooltip. (required)
-    tags: tags, // Tags for the annotation. (optional)
-    text: text // Text for the annotation. (optional)
-  }
-]
-```
+Then you can use these variables in your WarpScript script, for example
+for a FETCH.
 
-Note: If the datasource is configured to connect directly to the backend, you
-also need to implement an OPTIONS endpoint at /annotations that responds
-with the correct CORS headers:
+Examples of WarpScript scripts:
 
-```
-Access-Control-Allow-Headers:accept, content-type
-Access-Control-Allow-Methods:POST
-Access-Control-Allow-Origin:*
-```
+1. Generated sinusoids
 
-### If using Grafana 2.6
-NOTE!
-for grafana 2.6 please use [this version](https://github.com/grafana/simple-json-datasource/commit/b78720f6e00c115203d8f4c0e81ccd3c16001f94)
 
-Copy the data source you want to /public/app/plugins/datasource/. Then restart grafana-server. The new data source should now be available in the data source type dropdown in the Add Data Source View.
+        NEWGTS  
+        'com.cityzendata.grafana.testmetric' RENAME
+        'func' 'sinus' 2 ->MAP RELABEL  
+        'sinus' STORE  
+
+        NEWGTS  
+        'com.cityzendata.grafana.testmetric' RENAME
+        'func' 'cosinus' 2 ->MAP RELABEL  
+        'cosinus' STORE  
+
+
+        $end $start - 'interval' STORE
+        $interval 20 / TOLONG 'step' STORE  
+
+        <% $step + %> 'stepMacro' STORE
+        <% 'index' STORE $sinus $index NaN NaN NaN $index SIN  ADDVALUE DROP %> 'execMacroSinus' STORE
+        <% 'index' STORE $cosinus $index NaN NaN NaN $index COS  ADDVALUE DROP %> 'execMacroCoinus' STORE  
+
+        $start $end $stepMacro $execMacroSinus FORSTEP
+        $start $end $stepMacro $execMacroCoinus FORSTEP
+        $sinus $cosinus 2 ->LIST  
+
+
+1. Classic FETCH query
+
+
+        'YOUR_TOKEN_HERE'
+        'classname'
+        'labelKey' 'labelValue' ->MAP
+        $startISO $endISO
+        FETCH
+
+  or  
+
+
+          'YOUR_TOKEN_HERE'
+          'classname'
+          'labelKey' 'labelValue' ->MAP
+          $end $interval
+          FETCH  
+
+![Warp10-grafana plugin](warp10-grafana.png)
+
+
+TODO
+====
+
+* UI redesign for query editor
+* Click-by-click FETCH and BUCKETIZE
+* Almost no testing has been done yet, except for metrics support.
+* Missing support for Annotations
+
+
+License
+=======
+
+Copyright &copy; 2016 Cityzen Data
+
+APACHE LICENSE Version 2.0, January 2004
