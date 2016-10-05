@@ -84,7 +84,6 @@ System.register(['lodash', 'moment'], function (_export, _context) {
         }, {
           key: 'parseTemplatingResult',
           value: function parseTemplatingResult(o) {
-            console.log(o);
             return _.map(o.data, function (d, i) {
               return { text: d, value: i };
             });

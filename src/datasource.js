@@ -36,7 +36,6 @@ export class Warp10Datasource {
     return this.backendSrv.datasourceRequest(options).then(this.parseTemplatingResult);
   }
   parseTemplatingResult(o) {
-    console.log(o);
      return _.map(o.data, (d, i) => {
       return { text: d, value: i};
     });
