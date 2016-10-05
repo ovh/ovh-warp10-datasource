@@ -21,7 +21,7 @@ System.register(['lodash', 'moment'], function (_export, _context) {
       _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
         return typeof obj;
       } : function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
       };
 
       _createClass = function () {
@@ -55,10 +55,41 @@ System.register(['lodash', 'moment'], function (_export, _context) {
           this.lastErrors = {};
         }
 
-        // Called once per panel (graph)
+        // Optional
+        // Required for templating
 
 
         _createClass(Warp10Datasource, [{
+          key: 'metricFindQuery',
+          value: function metricFindQuery(options) {
+
+            var backend = this.url;
+            while (backend[backend.length - 1] === '/') {
+              // remove trailing slash
+              backend = backend.substr(0, backend.length - 1);
+            }
+            var url = backend + '/api/v0/exec';
+
+            var options = {
+              method: 'POST',
+              url: url,
+              data: options,
+              headers: {
+                'Accept': undefined,
+                'Content-Type': undefined
+              }
+            };
+            return this.backendSrv.datasourceRequest(options).then(this.parseTemplatingResult);
+          }
+        }, {
+          key: 'parseTemplatingResult',
+          value: function parseTemplatingResult(o) {
+            console.log(o);
+            return _.map(o.data, function (d, i) {
+              return { text: d, value: i };
+            });
+          }
+        }, {
           key: 'query',
           value: function query(options) {
 

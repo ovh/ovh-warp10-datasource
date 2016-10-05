@@ -13,6 +13,35 @@ export class Warp10Datasource {
     this.lastErrors = {};
   }
 
+  // Optional
+  // Required for templating
+  metricFindQuery(options) {
+    
+    var backend = this.url;
+    while (backend[backend.length-1] === '/') {
+      // remove trailing slash
+      backend = backend.substr(0, backend.length - 1);
+    }
+    var url = backend + '/api/v0/exec';
+
+    var options = {
+      method: 'POST',
+      url: url,
+      data: options,
+      headers: {
+          'Accept': undefined,
+          'Content-Type': undefined
+      }
+    };
+    return this.backendSrv.datasourceRequest(options).then(this.parseTemplatingResult);
+  }
+  parseTemplatingResult(o) {
+    console.log(o);
+     return _.map(o.data, (d, i) => {
+      return { text: d, value: i};
+    });
+  }
+
   // Called once per panel (graph)
   query(options) {
 
