@@ -169,7 +169,6 @@ export class Warp10Datasource {
       }
     };
 
-
     return this.backendSrv.datasourceRequest(options);
   }
 
@@ -188,7 +187,12 @@ export class Warp10Datasource {
           "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " +
           interval + " 'interval' STORE";
     _.each(this.templateSrv.variables, function(variable) {
-      warpscriptScript += "\n'" + variable.current.value + "' '"+variable.name+"' STORE";
+      var tmp = variable.current.value;
+      if( isNaN(variable.current.value) ) {
+        // It's a string
+        tmp = "'" + variable.current.value + "'";
+      }
+      warpscriptScript += "\n" + tmp + " '"+variable.name+"' STORE";
     });
     if (query.expr !== undefined) {
       warpscriptScript += " " + query.expr;
