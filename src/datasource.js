@@ -13,6 +13,34 @@ export class Warp10Datasource {
     this.lastErrors = {};
   }
 
+  // Optional
+  // Required for templating
+  metricFindQuery(options) {
+    
+    var backend = this.url;
+    while (backend[backend.length-1] === '/') {
+      // remove trailing slash
+      backend = backend.substr(0, backend.length - 1);
+    }
+    var url = backend + '/api/v0/exec';
+
+    var options = {
+      method: 'POST',
+      url: url,
+      data: options,
+      headers: {
+          'Accept': undefined,
+          'Content-Type': undefined
+      }
+    };
+    return this.backendSrv.datasourceRequest(options).then(this.parseTemplatingResult);
+  }
+  parseTemplatingResult(o) {
+     return _.map(o.data, (d, i) => {
+      return { text: d, value: i};
+    });
+  }
+
   // Called once per panel (graph)
   query(options) {
 
@@ -141,7 +169,6 @@ export class Warp10Datasource {
       }
     };
 
-
     return this.backendSrv.datasourceRequest(options);
   }
 
@@ -160,7 +187,12 @@ export class Warp10Datasource {
           "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " +
           interval + " 'interval' STORE";
     _.each(this.templateSrv.variables, function(variable) {
-      warpscriptScript += "\n'" + variable.current.value + "' '"+variable.name+"' STORE";
+      var tmp = variable.current.value;
+      if( isNaN(variable.current.value) ) {
+        // It's a string
+        tmp = "'" + variable.current.value + "'";
+      }
+      warpscriptScript += "\n" + tmp + " '"+variable.name+"' STORE";
     });
     if (query.expr !== undefined) {
       warpscriptScript += " " + query.expr;
