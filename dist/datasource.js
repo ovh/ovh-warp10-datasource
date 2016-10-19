@@ -225,10 +225,10 @@ System.register(['lodash', 'moment'], function (_export, _context) {
 
             var warpscriptScript = " " + start + " 'start' STORE " + end + " 'end' STORE " + "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " + interval + " 'interval' STORE";
             _.each(this.templateSrv.variables, function (variable) {
-              var tmp = variable.current.value;
-              if (isNaN(variable.current.value)) {
+              var tmp = variable.current.text;
+              if (isNaN(variable.current.text)) {
                 // It's a string
-                tmp = "'" + variable.current.value + "'";
+                tmp = "'" + variable.current.text + "'";
               }
               warpscriptScript += "\n" + tmp + " '" + variable.name + "' STORE";
             });
