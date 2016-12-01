@@ -145,16 +145,33 @@ System.register(['lodash', 'moment'], function (_export, _context) {
                   return {};
                 }*/
 
-                _.each(response.data, function (warpscriptJsonResponse) {
+                //var warpscriptJsonResponse = response.data[0];
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
 
-                  console.log("Response data", warpscriptJsonResponse);
+                try {
+                  for (var _iterator = response.data[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var entry = _step.value;
 
-                  _.each(warpscriptJsonResponse, function (metricData) {
-                    console.log("Metric data", metricData);
-                    var grafanaDataPoints = self.transformMetricData(metricData, options.targets[index]);
-                    if (grafanaDataPoints != null) result.push(grafanaDataPoints);
-                  });
-                });
+                    console.log("Response data", entry);
+
+                    result.push(self.transformMetricData(entry, options.targets[index]));
+                  }
+                } catch (err) {
+                  _didIteratorError = true;
+                  _iteratorError = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                      _iterator.return();
+                    }
+                  } finally {
+                    if (_didIteratorError) {
+                      throw _iteratorError;
+                    }
+                  }
+                }
               });
 
               return { data: result };
@@ -244,7 +261,7 @@ System.register(['lodash', 'moment'], function (_export, _context) {
 
             if (!this.isGts(gts)) {
               console.log("Response item isn't a gts", gts);
-              return null;
+              return;
             }
 
             var className = gts.c;

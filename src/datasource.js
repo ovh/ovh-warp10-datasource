@@ -94,20 +94,18 @@ export class Warp10Datasource {
           }
           delete self.lastErrors.query;
 
-          if (!self.isArray(response.data) || (response.data.length !== 1)) {
+          /*if (!self.isArray(response.data) || (response.data.length !== 1)) {
             console.log("Response isn't an Array or it has more than 1 element", response.data);
             return {};
+          }*/
+
+          //var warpscriptJsonResponse = response.data[0];
+          for (var entry of response.data) {
+            console.log("Response data", entry);
+
+            
+            result.push(self.transformMetricData(entry, options.targets[index]));
           }
-
-          var warpscriptJsonResponse = response.data[0];
-
-          console.log("Response data", warpscriptJsonResponse);
-
-          _.each(warpscriptJsonResponse, function(metricData) {
-            console.log("Metric data",metricData);
-
-            result.push(self.transformMetricData(metricData, options.targets[index]));
-          });
         });
 
         return { data: result };

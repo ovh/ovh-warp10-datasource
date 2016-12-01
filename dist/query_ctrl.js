@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_export, _context) {
+System.register(['app/plugins/sdk', './css/query-editor.css!', './css/codemirror.css!', './css/monokai-theme.css!'], function (_export, _context) {
   "use strict";
 
   var QueryCtrl, _createClass, Warp10DatasourceQueryCtrl;
@@ -38,7 +38,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
   return {
     setters: [function (_appPluginsSdk) {
       QueryCtrl = _appPluginsSdk.QueryCtrl;
-    }, function (_cssQueryEditorCss) {}],
+    }, function (_cssQueryEditorCss) {}, function (_cssCodemirrorCss) {}, function (_cssMonokaiThemeCss) {}],
     execute: function () {
       _createClass = function () {
         function defineProperties(target, props) {
@@ -69,6 +69,22 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           _this.scope = $scope;
           _this.uiSegmentSrv = uiSegmentSrv;
           _this.target.target = _this.target.target || 'select metric';
+
+          System.import('/public/plugins/grafana-warp10-datasource/editor.js').then(function (editor) {
+
+            // When CodeMirror editor change 
+            $scope.$watch('val', function (t) {
+
+              //$scope.target.expr = t;
+              if ($scope.val != undefined && $scope.val != null) {
+                _this.target.expr = $scope.val;
+              }
+            });
+
+            // send scope to codeMirror
+            _this.editor = editor;
+            editor($scope);
+          });
           return _this;
         }
 
@@ -87,6 +103,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           key: 'onChangeInternal',
           value: function onChangeInternal() {
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.editor($scope);
           }
         }]);
 
