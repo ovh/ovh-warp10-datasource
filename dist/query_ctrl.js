@@ -72,9 +72,9 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', './css/codemirror
 
           System.import('/public/plugins/grafana-warp10-datasource/editor.js').then(function (editor) {
 
+            _this.textAreaID = Math.trunc(Math.random() * 1000);
             // When CodeMirror editor change 
             $scope.$watch('val', function (t) {
-
               //$scope.target.expr = t;
               if ($scope.val != undefined && $scope.val != null) {
                 _this.target.expr = $scope.val;

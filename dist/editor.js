@@ -67,13 +67,25 @@ var Editor = function(scope) {
       function plugEditor() {
 
         var codeAreas = $('.editor');
+        var editorsID = [];
 
-        for (var codeAreaEl of codeAreas) {
+        for (var textArea of codeAreas) {
+          if ($(textArea).attr('id') == null) {
+            let id = Math.trunc(Math.random() * 1000); 
+            $(textArea).attr('id', id);
+          }
+          editorsID.push('#' + $(textArea).attr('id'));
+          console.log('id', $(textArea).attr('id'));
+        }
+
+        for (var textArea of editorsID) {
           
           // if next is not div.CodeMirror
-          if ($(codeAreaEl).next("div.CodeMirror").length == 0) {
+          console.log($(textArea));
+          if (($(textArea)).next("div.CodeMirror").length == 0) {
 
-            let codeArea = CodeMirror.fromTextArea(codeAreaEl, {
+            // CodeMirror need a real element
+            let codeArea = CodeMirror.fromTextArea($(textArea)[0], {
               lineNumbers: true,
               matchBrackets: true,
               viewportMargin: Infinity,
@@ -98,10 +110,11 @@ var Editor = function(scope) {
               });
             }
             codeArea.on('changes', (e) => {
+              console.log(e);
               scope.$apply(() => {
-                var wscript = codeArea.getValue(); 
+                var wscript = e.getValue(); 
                 scope.val = wscript;
-                $(codeAreaEl).val(wscript);
+                $(e.getTextArea()).val(wscript);
               });
             })
           }

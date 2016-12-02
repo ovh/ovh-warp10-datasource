@@ -15,9 +15,11 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
     System.import('/public/plugins/grafana-warp10-datasource/editor.js')
     .then( (editor) => {
       
+      // set a random ID
+      this.textAreaID = Math.trunc(Math.random() * 1000);
+       
       // When CodeMirror editor change 
       $scope.$watch('val', (t) => {
-        
         //$scope.target.expr = t;
         if ($scope.val != undefined && $scope.val != null) {
           this.target.expr = $scope.val;
