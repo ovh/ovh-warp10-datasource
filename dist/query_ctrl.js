@@ -72,7 +72,10 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', './css/codemirror
 
           System.import('/public/plugins/grafana-warp10-datasource/editor.js').then(function (editor) {
 
-            _this.textAreaID = Math.trunc(Math.random() * 1000);
+            // set a random ID
+            $scope.textAreaID = Math.trunc(Math.random() * 1000);
+            _this.textAreaID = $scope.textAreaID;
+
             // When CodeMirror editor change 
             $scope.$watch('val', function (t) {
               //$scope.target.expr = t;
@@ -83,7 +86,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', './css/codemirror
 
             // send scope to codeMirror
             _this.editor = editor;
-            editor($scope);
+            _this.editor($scope);
           });
           return _this;
         }
@@ -103,7 +106,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', './css/codemirror
           key: 'onChangeInternal',
           value: function onChangeInternal() {
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
-            this.editor($scope);
           }
         }]);
 

@@ -66,67 +66,59 @@ var Editor = function(scope) {
 
       function plugEditor() {
 
-        var codeAreas = $('.editor');
-        var editorsID = [];
-
-        for (var textArea of codeAreas) {
-          if ($(textArea).attr('id') == null) {
-            let id = Math.trunc(Math.random() * 1000); 
-            $(textArea).attr('id', id);
-          }
-          editorsID.push('#' + $(textArea).attr('id'));
-          console.log('id', $(textArea).attr('id'));
+        var textArea = $('#' + scope.textAreaID);
+        // if next is not div.CodeMirror
+        console.log(textArea[0]);
+        if (textArea[0] === undefined) {
+          // textarea from directive will appear soon
+          return setTimeout(plugEditor, 100);
         }
 
-        for (var textArea of editorsID) {
-          
-          // if next is not div.CodeMirror
-          console.log($(textArea));
-          if (($(textArea)).next("div.CodeMirror").length == 0) {
+        // check id CodeMirror is already plugged
+        if (textArea.next("div.CodeMirror").length == 0) {
 
-            // CodeMirror need a real element
-            let codeArea = CodeMirror.fromTextArea($(textArea)[0], {
-              lineNumbers: true,
-              matchBrackets: true,
-              viewportMargin: Infinity,
-              mode: 'warpscript',
-              theme: 'monokai'
-            });
+          // CodeMirror need a real element
+          let codeArea = CodeMirror.fromTextArea(textArea[0], {
+            lineNumbers: true,
+            matchBrackets: true,
+            viewportMargin: Infinity,
+            mode: 'warpscript',
+            theme: 'monokai'
+          });
 
-            codeArea.errLine = function (l) {
-              if (!l) {
-                return;
-              }
-
-              codeArea.markText({
-                line: l - 1,
-                ch: 0
-              }, {
-                line: l - 1,
-                ch: codeArea.getLine(l - 1).length
-              }, {
-                css: "background: #EF9A9A",
-                clearOnEnter: true
-              });
+          codeArea.errLine = function (l) {
+            if (!l) {
+              return;
             }
-            codeArea.on('changes', (e) => {
-              console.log(e);
-              scope.$apply(() => {
-                var wscript = e.getValue(); 
-                scope.val = wscript;
-                $(e.getTextArea()).val(wscript);
-              });
-            })
+
+            codeArea.markText({
+              line: l - 1,
+              ch: 0
+            }, {
+              line: l - 1,
+              ch: codeArea.getLine(l - 1).length
+            }, {
+              css: "background: #EF9A9A",
+              clearOnEnter: true
+            });
           }
+          codeArea.on('changes', (e) => {
+            console.log(e);
+            scope.$apply(() => {
+              var wscript = e.getValue(); 
+              scope.val = wscript;
+              $(e.getTextArea()).val(wscript);
+            });
+          })
         }
       }
       plugEditor()
 
-      $("button[ng-click='ctrl.addDataQuery()']").on('click', function() {
+      /*$("button[ng-click='ctrl.addDataQuery()']").on('click', function() {
         setTimeout(function() {
           plugEditor()
         }, 800); 
-      });
+      });*/
     });
   });
 }

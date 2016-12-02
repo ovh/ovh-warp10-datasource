@@ -16,8 +16,9 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
     .then( (editor) => {
       
       // set a random ID
-      this.textAreaID = Math.trunc(Math.random() * 1000);
-       
+      $scope.textAreaID = Math.trunc(Math.random() * 1000);
+      this.textAreaID = $scope.textAreaID;
+
       // When CodeMirror editor change 
       $scope.$watch('val', (t) => {
         //$scope.target.expr = t;
@@ -29,7 +30,7 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
 
       // send scope to codeMirror
       this.editor = editor;
-      editor($scope)
+      this.editor($scope)
     }); 
   }
 
@@ -45,7 +46,6 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
 
   onChangeInternal() {
     this.panelCtrl.refresh(); // Asks the panel to refresh data.
-    this.editor($scope);
   }
 }
 
