@@ -10,15 +10,21 @@ var Editor = function($scope) {
         System.import(path + 'ext-language_tools.js').then(() => {
 
           setTimeout(() => {
+            // Link to dom
             var editor = window.ace.edit(document.getElementById($scope.textAreaID));
+            // Theme
             editor.setTheme("ace/theme/monokai");
+            // Warpscript language
             editor.getSession().setMode("ace/mode/warpscript");
+            // Autocompletion
             editor.setOptions({
               enableBasicAutocompletion: true
             });
-            editor.$blockScrolling = 'Infinity';
+            // Resizable
+            editor.$blockScrolling = Infinity;
+            editor.setAutoScrollEditorIntoView(true);
+            // Fill content
             editor.setValue($scope.val);
-            // place holder "query expression"
             // update scope with ace changes
             editor.on('change', (e) => {
               $scope.$apply(() => { 
@@ -26,15 +32,6 @@ var Editor = function($scope) {
               });
             });
           }, 3000);
-        
-          /*codeArea.on('changes', (e) => {
-            console.log(e);
-            scope.$apply(() => {
-              var wscript = e.getValue(); 
-              scope.val = wscript;
-              $(e.getTextArea()).val(wscript);
-            });
-          });*/
         });
       });
     });
