@@ -97,6 +97,6 @@ module.exports = function(grunt) {
     'copy:img_to_dist', 
     'copy:pluginDef', 
     'babel', 
-    'mochaTest'
+    /*'mochaTest'*/
   ]);
 };

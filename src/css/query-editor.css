@@ -23,3 +23,7 @@
 .warp10-datasource-query-row .CodeMirror {
   width: 100%;
 }
+
+.warp10-datasource-query-row .editor {
+  min-height: 15rem;
+}

@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['app/plugins/sdk', './css/query-editor.css!', './css/codemirror.css!', './css/monokai-theme.css!'], function (_export, _context) {
+System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_export, _context) {
   "use strict";
 
   var QueryCtrl, _createClass, Warp10DatasourceQueryCtrl;
@@ -38,7 +38,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', './css/codemirror
   return {
     setters: [function (_appPluginsSdk) {
       QueryCtrl = _appPluginsSdk.QueryCtrl;
-    }, function (_cssQueryEditorCss) {}, function (_cssCodemirrorCss) {}, function (_cssMonokaiThemeCss) {}],
+    }, function (_cssQueryEditorCss) {}],
     execute: function () {
       _createClass = function () {
         function defineProperties(target, props) {
@@ -75,6 +75,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', './css/codemirror
             // set a random ID
             $scope.textAreaID = Math.trunc(Math.random() * 1000);
             _this.textAreaID = $scope.textAreaID;
+            $scope.val = _this.target.expr;
 
             // When CodeMirror editor change 
             $scope.$watch('val', function (t) {
@@ -83,6 +84,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!', './css/codemirror
                 _this.target.expr = $scope.val;
               }
             });
+            console.log(uiSegmentSrv);
 
             // send scope to codeMirror
             _this.editor = editor;

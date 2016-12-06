@@ -1,7 +1,5 @@
 import {QueryCtrl} from 'app/plugins/sdk';
 import './css/query-editor.css!'
-import './css/codemirror.css!'
-import './css/monokai-theme.css!'
 
 
 export class Warp10DatasourceQueryCtrl extends QueryCtrl {
@@ -18,6 +16,7 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
       // set a random ID
       $scope.textAreaID = Math.trunc(Math.random() * 1000);
       this.textAreaID = $scope.textAreaID;
+      $scope.val = this.target.expr;
 
       // When CodeMirror editor change 
       $scope.$watch('val', (t) => {
@@ -26,7 +25,7 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
           this.target.expr = $scope.val;
         }
       });
-
+      console.log(uiSegmentSrv);
 
       // send scope to codeMirror
       this.editor = editor;
