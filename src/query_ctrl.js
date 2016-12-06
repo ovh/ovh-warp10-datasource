@@ -25,7 +25,6 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
           this.target.expr = $scope.val;
         }
       });
-      console.log(uiSegmentSrv);
 
       // send scope to codeMirror
       this.editor = editor;

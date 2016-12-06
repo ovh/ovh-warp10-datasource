@@ -84,7 +84,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
                 _this.target.expr = $scope.val;
               }
             });
-            console.log(uiSegmentSrv);
 
             // send scope to codeMirror
             _this.editor = editor;
