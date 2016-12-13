@@ -34,6 +34,7 @@
     "chai": "~3.5.0"
   },
   "dependencies": {
+    "ace-builds": "^1.2.5",
     "babel-plugin-transform-es2015-for-of": "^6.6.0",
     "babel-plugin-transform-es2015-modules-systemjs": "^6.5.0",
     "babel-preset-es2015": "^6.5.0",

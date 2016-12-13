@@ -1,3 +1,29 @@
 .generic-datasource-query-row .query-keyword {
   width: 75px;
 }
+
+.warp10-datasource-query-row .gf-form-inline {
+  width: 100%;
+  display: flex;
+  flex-align: row; 
+}
+
+.warp10-datasource-query-row .gf-form-query-content {
+  width: 100%
+}
+
+.warp10-datasource-query-row  {
+  display: flex;
+  flex-direction: column;
+}
+
+.warp10-datasource-query-row textarea.gf-form-input {
+}
+
+.warp10-datasource-query-row .CodeMirror {
+  width: 100%;
+}
+
+.warp10-datasource-query-row .editor {
+  min-height: 25rem;
+}

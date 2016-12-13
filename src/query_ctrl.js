@@ -1,14 +1,35 @@
 import {QueryCtrl} from 'app/plugins/sdk';
 import './css/query-editor.css!'
 
+
 export class Warp10DatasourceQueryCtrl extends QueryCtrl {
 
   constructor($scope, $injector, uiSegmentSrv)  {
     super($scope, $injector);
-
     this.scope = $scope;
     this.uiSegmentSrv = uiSegmentSrv;
     this.target.target = this.target.target || 'select metric';
+
+    System.import('/public/plugins/grafana-warp10-datasource/editor.js')
+    .then( (editor) => {
+      
+      // set a random ID
+      $scope.textAreaID = Math.trunc(Math.random() * 1000);
+      this.textAreaID = $scope.textAreaID;
+      $scope.val = this.target.expr;
+
+      // When CodeMirror editor change 
+      $scope.$watch('val', (t) => {
+        //$scope.target.expr = t;
+        if ($scope.val != undefined && $scope.val != null) {
+          this.target.expr = $scope.val;
+        }
+      });
+
+      // send scope to codeMirror
+      this.editor = editor;
+      this.editor($scope)
+    }); 
   }
 
   getOptions() {
@@ -27,4 +48,3 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
 }
 
 Warp10DatasourceQueryCtrl.templateUrl = './partials/query.editor.html';
-

@@ -140,20 +140,38 @@ System.register(['lodash', 'moment'], function (_export, _context) {
                 }
                 delete self.lastErrors.query;
 
-                if (!self.isArray(response.data) || response.data.length !== 1) {
+                /*if (!self.isArray(response.data) || (response.data.length !== 1)) {
                   console.log("Response isn't an Array or it has more than 1 element", response.data);
                   return {};
+                }*/
+
+                //var warpscriptJsonResponse = response.data[0];
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                  for (var _iterator = response.data[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var entry = _step.value;
+
+                    console.log("Response data", entry);
+
+                    result.push(self.transformMetricData(entry, options.targets[index]));
+                  }
+                } catch (err) {
+                  _didIteratorError = true;
+                  _iteratorError = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                      _iterator.return();
+                    }
+                  } finally {
+                    if (_didIteratorError) {
+                      throw _iteratorError;
+                    }
+                  }
                 }
-
-                var warpscriptJsonResponse = response.data[0];
-
-                console.log("Response data", warpscriptJsonResponse);
-
-                _.each(warpscriptJsonResponse, function (metricData) {
-                  console.log("Metric data", metricData);
-
-                  result.push(self.transformMetricData(metricData, options.targets[index]));
-                });
               });
 
               return { data: result };

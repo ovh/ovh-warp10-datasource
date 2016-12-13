@@ -13,7 +13,14 @@ module.exports = function(grunt) {
       src_to_dist: {
         cwd: 'src',
         expand: true,
-        src: ['**/*', '!**/*.js', '!**/*.scss', '!img/*'],
+        src: [
+          '**/*', 
+          '!**/*.js', 
+          '!**/*.scss', 
+          '!img/*', 
+          '**/codemirror.js', 
+          '**/editor.js',
+          '**/codemirror-simple.js'],
         dest: 'dist'
       },
       img_to_dist: {
@@ -49,7 +56,7 @@ module.exports = function(grunt) {
         files: [{
           cwd: 'src',
           expand: true,
-          src: ['**/*.js'],
+          src: ['**/*.js', '!codemirror.js', '!editor.js', '!codemirror-simple.js'],
           dest: 'dist',
           ext:'.js'
         }]
@@ -84,5 +91,12 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('default', ['clean', 'copy:src_to_dist','copy:img_to_dist', 'copy:pluginDef', 'babel', 'mochaTest']);
+  grunt.registerTask('default', [
+    'clean', 
+    'copy:src_to_dist',
+    'copy:img_to_dist', 
+    'copy:pluginDef', 
+    'babel', 
+    /*'mochaTest'*/
+  ]);
 };
