@@ -1,17 +1,31 @@
-var Editor = function($scope) {
+/**
+ * Extensions files like ext-language-tools / mode-warpscript / theme-monikai
+ * need to prefix their define function with ace :
+ * ace.define();
+ */
+
+
+var Editor = function(ctrl) {
   path = '/public/plugins/grafana-warp10-datasource/';
 
   System.import(path + 'ace.js').then(() => {
 
-    System.import(path + 'theme-monokai.js').then(() => {
+    System.import(path + 'ext-language_tools.js').then(() => {
 
       System.import(path + 'mode-warpscript.js').then(() => {
 
-        System.import(path + 'ext-language_tools.js').then(() => {
+        System.import(path + 'theme-monokai.js').then(() => {
 
+          
+          // force render query directive
+          ctrl.scope.$apply();
           setTimeout(() => {
+            var el = document.getElementById(ctrl.textAreaID);
+            console.log(el);
+
+            console.log("try to link");
             // Link to dom
-            var editor = window.ace.edit(document.getElementById($scope.textAreaID));
+            var editor = window.ace.edit(el);
             // Theme
             editor.setTheme("ace/theme/monokai");
             // Warpscript language
@@ -23,15 +37,17 @@ var Editor = function($scope) {
             // Resizable
             editor.$blockScrolling = Infinity;
             editor.setAutoScrollEditorIntoView(true);
+
+            editor.resize(true);
+
             // Fill content
-            editor.setValue($scope.val);
-            // update scope with ace changes
-            editor.on('change', (e) => {
-              $scope.$apply(() => { 
-                $scope.val = editor.getValue();
-              });
+            editor.setValue(ctrl.target.expr);
+
+            editor.on('change', (ev) => {
+              console.log("change", ev);
+              ctrl.target.expr = editor.getValue();
             });
-          }, 3000);
+          }, 0);
         });
       });
     });
