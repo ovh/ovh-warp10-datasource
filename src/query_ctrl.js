@@ -14,21 +14,14 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
     .then( (editor) => {
       
       // set a random ID
-      $scope.textAreaID = Math.trunc(Math.random() * 1000);
+      this.scope.textAreaID = Math.trunc(Math.random() * 10000);
       this.textAreaID = $scope.textAreaID;
-      $scope.val = this.target.expr;
 
-      // When CodeMirror editor change 
-      $scope.$watch('val', (t) => {
-        //$scope.target.expr = t;
-        if ($scope.val != undefined && $scope.val != null) {
-          this.target.expr = $scope.val;
-        }
-      });
+      if (!this.target.expr) this.target.expr = "";
 
-      // send scope to codeMirror
+      // send controler to Ace
       this.editor = editor;
-      this.editor($scope)
+      this.editor(this);
     }); 
   }
 

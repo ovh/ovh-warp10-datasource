@@ -73,21 +73,14 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           System.import('/public/plugins/grafana-warp10-datasource/editor.js').then(function (editor) {
 
             // set a random ID
-            $scope.textAreaID = Math.trunc(Math.random() * 1000);
+            _this.scope.textAreaID = Math.trunc(Math.random() * 10000);
             _this.textAreaID = $scope.textAreaID;
-            $scope.val = _this.target.expr;
 
-            // When CodeMirror editor change 
-            $scope.$watch('val', function (t) {
-              //$scope.target.expr = t;
-              if ($scope.val != undefined && $scope.val != null) {
-                _this.target.expr = $scope.val;
-              }
-            });
+            if (!_this.target.expr) _this.target.expr = "";
 
-            // send scope to codeMirror
+            // send controler to Ace
             _this.editor = editor;
-            _this.editor($scope);
+            _this.editor(_this);
           });
           return _this;
         }
