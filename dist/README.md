@@ -1,7 +1,9 @@
 Grafana - Warp 10 Datasource Plugin
 ======================================
 
-This is a plugin that allows Grafana 3 to support Warp 10 as datasource.
+This is a plugin that allows Grafana 4 to support Warp 10 as datasource.
+
+Grafana 3 plugin is in [`grafana-3`](https://github.com/cityzendata/grafana-warp10/tree/grafana-3) branch, Grafana 2.6 plugin in [`grafana-2.6`](https://github.com/cityzendata/grafana-warp10/tree/grafana-2.6).
 
 Installation:
 =============
