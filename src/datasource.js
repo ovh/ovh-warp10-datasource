@@ -23,8 +23,16 @@ export class Warp10Datasource {
       backend = backend.substr(0, backend.length - 1);
     }
     var url = backend + '/api/v0/exec';
+    
+    console.log(this.templateSrv);
+    _.each(this.templateSrv.variables, function(variable) {
+      if (isNaN(variable.current.value)) {
+        options = options.replace(new RegExp('\\$' + variable.name, 'g'), "'$" + variable.name + "'");
+      }
+    });
+    options = this.templateSrv.replace(options, null, 'regex')
 
-    var options = {
+    options = {
       method: 'POST',
       url: url,
       data: options,
@@ -36,8 +44,9 @@ export class Warp10Datasource {
     return this.backendSrv.datasourceRequest(options).then(this.parseTemplatingResult);
   }
   parseTemplatingResult(o) {
-     return _.map(o.data, (d, i) => {
-      return { text: d, value: i};
+    console.log('tesmplating result', o)
+     return _.map(o.data, (data, indice) => {
+      return { text: data.toString() || indice, value: data};
     });
   }
 
