@@ -70,7 +70,15 @@ System.register(['lodash', 'moment'], function (_export, _context) {
             }
             var url = backend + '/api/v0/exec';
 
-            var options = {
+            console.log(this.templateSrv);
+            _.each(this.templateSrv.variables, function (variable) {
+              if (isNaN(variable.current.value)) {
+                options = options.replace(new RegExp('\\$' + variable.name, 'g'), "'$" + variable.name + "'");
+              }
+            });
+            options = this.templateSrv.replace(options, null, 'regex');
+
+            options = {
               method: 'POST',
               url: url,
               data: options,
@@ -84,8 +92,9 @@ System.register(['lodash', 'moment'], function (_export, _context) {
         }, {
           key: 'parseTemplatingResult',
           value: function parseTemplatingResult(o) {
-            return _.map(o.data, function (d, i) {
-              return { text: d, value: i };
+            console.log('tesmplating result', o);
+            return _.map(o.data, function (data, indice) {
+              return { text: data.toString() || indice, value: data };
             });
           }
         }, {
