@@ -98,6 +98,45 @@ System.register(['lodash', 'moment'], function (_export, _context) {
             });
           }
         }, {
+          key: 'testDatasource',
+          value: function testDatasource() {
+            return this.backendSrv.datasourceRequest({
+              url: this.url + '/api/v0/exec',
+              method: 'POST',
+              data: '1 2 +',
+              headers: {
+                'Accept': undefined,
+                'Content-Type': undefined
+              }
+            }).then(function (res) {
+              if (res.status != 200) {
+                return {
+                  status: 'error',
+                  message: 'Not a 200 receivend from server',
+                  title: 'Error'
+                };
+              }
+              if (res.data[0] != 3) {
+                return {
+                  status: 'error',
+                  message: "Can't execute test WarpScript: '1 2 +'not equals to " + res.data,
+                  title: 'Success'
+                };
+              }
+              return {
+                status: 'success',
+                message: 'Datasource is working',
+                title: 'Success'
+              };
+            }).catch(function (res) {
+              return {
+                status: 'error',
+                message: res.err,
+                title: 'Failed to contact server'
+              };
+            });
+          }
+        }, {
           key: 'query',
           value: function query(options) {
 
@@ -165,9 +204,75 @@ System.register(['lodash', 'moment'], function (_export, _context) {
             });
           }
         }, {
+          key: 'annotationQuery',
+          value: function annotationQuery(options) {
+            var _this = this;
+
+            var end = this.convertToWarp10Time(options.range.to);
+            var start = this.convertToWarp10Time(options.range.from);
+
+            return this.performTimeSeriesQuery({
+              expr: options.annotation.query
+            }, start, end).then(function (res) {
+              if (res.data.length != 1 || _typeof(res.data[0]) != 'object') {
+                console.error('Annotation query must return exactly 1 GeoTimeSerie, current stack is:', res.data);
+                return [];
+              }
+
+              var gts = res.data[0];
+              var tags = [];
+              for (var label in gts.l) {
+                tags.push(label + ':' + gts.l[label]);
+              }
+
+              var annotations = [];
+
+              var _iteratorNormalCompletion = true;
+              var _didIteratorError = false;
+              var _iteratorError = undefined;
+
+              try {
+                for (var _iterator = gts.v[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  var dp = _step.value;
+
+                  annotations.push({
+                    annotation: {
+                      name: options.annotation.name,
+                      enabled: true,
+                      datasource: _this.name
+                    },
+                    title: gts.c,
+                    time: Math.trunc(dp[0] / 1000),
+                    text: dp[1],
+                    tags: tags.length > 1 ? tags.join(',') : null
+                  });
+                }
+              } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion && _iterator.return) {
+                    _iterator.return();
+                  }
+                } finally {
+                  if (_didIteratorError) {
+                    throw _iteratorError;
+                  }
+                }
+              }
+
+              console.debug('Annotation query', options.annotation.name, annotations);
+              return annotations;
+            }).catch(function (err) {
+              console.error('Failed to retrieve annotations', err, options);
+              return [];
+            });
+          }
+        }, {
           key: 'buildQueryParameters',
           value: function buildQueryParameters(options) {
-            var _this = this;
+            var _this2 = this;
 
             //remove placeholder targets
             options.targets = _.filter(options.targets, function (target) {
@@ -176,7 +281,7 @@ System.register(['lodash', 'moment'], function (_export, _context) {
 
             var targets = _.map(options.targets, function (target) {
               return {
-                target: _this.templateSrv.replace(target.target),
+                target: _this2.templateSrv.replace(target.target),
                 refId: target.refId,
                 hide: target.hide,
                 expr: target.expr,
@@ -229,14 +334,37 @@ System.register(['lodash', 'moment'], function (_export, _context) {
             var interval = end - start;
 
             var warpscriptScript = " " + start + " 'start' STORE " + end + " 'end' STORE " + "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " + interval + " 'interval' STORE";
-            _.each(this.templateSrv.variables, function (variable) {
-              var tmp = variable.current.text;
-              if (isNaN(variable.current.text)) {
-                // It's a string
-                tmp = "'" + variable.current.text + "'";
+
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+              for (var _iterator2 = this.templateSrv.variables[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                var variable = _step2.value;
+
+                var tmp = variable.current.text;
+                if (isNaN(variable.current.text)) {
+                  // It's a string
+                  tmp = "'" + variable.current.text + "'";
+                }
+                warpscriptScript += "\n" + tmp + " '" + variable.name + "' STORE";
               }
-              warpscriptScript += "\n" + tmp + " '" + variable.name + "' STORE";
-            });
+            } catch (err) {
+              _didIteratorError2 = true;
+              _iteratorError2 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                  _iterator2.return();
+                }
+              } finally {
+                if (_didIteratorError2) {
+                  throw _iteratorError2;
+                }
+              }
+            }
+
             if (query.expr !== undefined) {
               warpscriptScript += " " + query.expr;
             }

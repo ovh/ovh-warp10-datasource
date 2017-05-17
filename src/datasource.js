@@ -16,14 +16,14 @@ export class Warp10Datasource {
   // Optional
   // Required for templating
   metricFindQuery(options) {
-    
+
     var backend = this.url;
     while (backend[backend.length-1] === '/') {
       // remove trailing slash
       backend = backend.substr(0, backend.length - 1);
     }
     var url = backend + '/api/v0/exec';
-    
+
     console.log(this.templateSrv);
     _.each(this.templateSrv.variables, function(variable) {
       if (isNaN(variable.current.value)) {
@@ -50,6 +50,47 @@ export class Warp10Datasource {
     });
   }
 
+  // Used by Grafana to test a Datasource when one is added
+  testDatasource() {
+    return this.backendSrv.datasourceRequest({
+      url: this.url + '/api/v0/exec',
+      method: 'POST',
+      data: '1 2 +',
+      headers: {
+          'Accept': undefined,
+          'Content-Type': undefined
+      }
+    })
+    .then(res => {
+      if (res.status != 200) {
+        return {
+          status: 'error',
+          message: 'Not a 200 receivend from server',
+          title: 'Error'
+        };
+      }
+      if (res.data[0] != 3) {
+        return {
+          status: 'error',
+          message: "Can't execute test WarpScript: '1 2 +'not equals to " + res.data,
+          title: 'Success'
+        };
+      }
+      return {
+        status: 'success',
+        message: 'Datasource is working',
+        title: 'Success'
+      };
+    })
+    .catch((res) => {
+      return {
+        status: 'error',
+        message: res.err,
+        title: 'Failed to contact server'
+      };
+    });
+  }
+
   // Called once per panel (graph)
   query(options) {
 
@@ -57,7 +98,7 @@ export class Warp10Datasource {
 
     var end = this.convertToWarp10Time(options.range.to);
     var start = this.convertToWarp10Time(options.range.from);
-    
+
     console.log("From: "+start+ " To: "+end);
 
 
@@ -109,7 +150,7 @@ export class Warp10Datasource {
           }
 
           var warpscriptJsonResponse = response.data[0];
-          _.each(warpscriptJsonResponse, function(metricData) {     
+          _.each(warpscriptJsonResponse, function(metricData) {
             console.log("Metric data",metricData);
             result.push(self.transformMetricData(metricData, options.targets[index]));
           });
@@ -117,9 +158,52 @@ export class Warp10Datasource {
 
         return { data: result };
       });
-  
   }
 
+  // Used by Grafana for Dashboard annotations
+  annotationQuery(options) {
+
+    var end = this.convertToWarp10Time(options.range.to);
+    var start = this.convertToWarp10Time(options.range.from);
+
+    return this.performTimeSeriesQuery({
+      expr: options.annotation.query
+    }, start, end)
+    .then((res) => {
+      if (res.data.length != 1 || typeof res.data[0] != 'object') {
+        console.error('Annotation query must return exactly 1 GeoTimeSerie, current stack is:', res.data)
+        return [];
+      }
+
+      let gts = res.data[0]
+      let tags = []
+      for (let label in gts.l) {
+        tags.push(label+':'+gts.l[label])
+      }
+
+      let annotations = []
+
+      for (let dp of gts.v) {
+        annotations.push({
+          annotation: {
+            name: options.annotation.name,
+            enabled: true,
+            datasource: this.name,
+          },
+          title: gts.c,
+          time: Math.trunc(dp[0] / 1000),
+          text: dp[1],
+          tags: (tags.length > 1) ? tags.join(',') : null
+        });
+      }
+      console.debug('Annotation query', options.annotation.name, annotations)
+      return annotations
+    })
+    .catch((err) => {
+      console.error('Failed to retrieve annotations', err, options)
+      return []
+    })
+  }
 
   buildQueryParameters(options) {
     //remove placeholder targets
@@ -143,7 +227,7 @@ export class Warp10Datasource {
   }
 
   /* ******************************************************/
-  /* Puts into the Warpscript script a header to place 
+  /* Puts into the Warpscript script a header to place
   /* start and end ont the stacks
   /* ******************************************************/
   performTimeSeriesQuery(query, start, end) {
@@ -178,7 +262,7 @@ export class Warp10Datasource {
   }
 
   /* ******************************************************/
-  /* Puts into the Warpscript script a header to place 
+  /* Puts into the Warpscript script a header to place
   /* start and end ont the stack
   /* ******************************************************/
   prepareWarpscriptQuery(query, start, end) {
@@ -191,14 +275,15 @@ export class Warp10Datasource {
           " " + start + " 'start' STORE " + end + " 'end' STORE " +
           "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " +
           interval + " 'interval' STORE";
-    _.each(this.templateSrv.variables, function(variable) {
+
+    for (let variable of this.templateSrv.variables) {
       var tmp = variable.current.text;
       if( isNaN(variable.current.text) ) {
         // It's a string
         tmp = "'" + variable.current.text + "'";
       }
       warpscriptScript += "\n" + tmp + " '"+variable.name+"' STORE";
-    });
+    }
     if (query.expr !== undefined) {
       warpscriptScript += " " + query.expr;
     }
@@ -255,8 +340,8 @@ export class Warp10Datasource {
   }
 
   /* ******************************************************/
-  /* Converts @date into µs since Epoch time 
-  /* (Warpscript tick format) 
+  /* Converts @date into µs since Epoch time
+  /* (Warpscript tick format)
   /* ******************************************************/
   convertToWarp10Time(date) {
     date = this.parse(date);
@@ -264,7 +349,7 @@ export class Warp10Datasource {
   }
 
   /* ******************************************************/
-  /* Converts @timestamp into ISO 8601 format 
+  /* Converts @timestamp into ISO 8601 format
   /* ******************************************************/
   convertToISO(timestamp) {
     var date = new Date(Math.floor(timestamp/1000));
@@ -272,36 +357,35 @@ export class Warp10Datasource {
   }
 
   parse(text, roundUp) {
-  if (!text) { return undefined; }
-  if (moment.isMoment(text)) { return text; }
-  if (_.isDate(text)) { return moment(text); }
+    if (!text) { return undefined; }
+    if (moment.isMoment(text)) { return text; }
+    if (_.isDate(text)) { return moment(text); }
 
-  var time;
-  var mathString = '';
-  var index;
-  var parseString;
+    var time;
+    var mathString = '';
+    var index;
+    var parseString;
 
-  if (text.substring(0, 3) === 'now') {
-    time = moment();
-    mathString = text.substring('now'.length);
-  } else {
-    index = text.indexOf('||');
-    if (index === -1) {
-      parseString = text;
-      mathString = ''; // nothing else
+    if (text.substring(0, 3) === 'now') {
+      time = moment();
+      mathString = text.substring('now'.length);
     } else {
-      parseString = text.substring(0, index);
-      mathString = text.substring(index + 2);
+      index = text.indexOf('||');
+      if (index === -1) {
+        parseString = text;
+        mathString = ''; // nothing else
+      } else {
+        parseString = text.substring(0, index);
+        mathString = text.substring(index + 2);
+      }
+      // We're going to just require ISO8601 timestamps, k?
+      time = moment(parseString, moment.ISO_8601);
     }
-    // We're going to just require ISO8601 timestamps, k?
-    time = moment(parseString, moment.ISO_8601);
+
+    if (!mathString.length) {
+      return time;
+    }
+
+    return parseDateMath(mathString, time, roundUp);
   }
-
-  if (!mathString.length) {
-    return time;
-  }
-
-  return parseDateMath(mathString, time, roundUp);
-}
-
 }
