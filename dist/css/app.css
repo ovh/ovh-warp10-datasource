@@ -16,6 +16,6 @@
 .warp10-datasource-query-row .editor {
   min-height: 25rem;
 }
-annotation-query-ctrl-grafana-warp10-dataqource textrea.gf-form-input {
-  min-height: 10vh;
+annotations-query-ctrl-grafana-warp10-datasource textarea {
+  min-height: 30vh;
 }

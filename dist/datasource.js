@@ -244,7 +244,7 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
                     title: gts.c,
                     time: Math.trunc(dp[0] / 1000),
                     text: dp[1],
-                    tags: tags.length > 1 ? tags.join(',') : null
+                    tags: tags.length > 0 ? tags.join(',') : null
                   });
                 }
               } catch (err) {

@@ -38,5 +38,4 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
     this.panelCtrl.refresh(); // Asks the panel to refresh data.
   }
 }
-
 Warp10DatasourceQueryCtrl.templateUrl = './partials/query.editor.html';

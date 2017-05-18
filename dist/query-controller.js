@@ -113,4 +113,4 @@ System.register(['app/plugins/sdk'], function (_export, _context) {
     }
   };
 });
-//# sourceMappingURL=query_ctrl.js.map
+//# sourceMappingURL=query-controller.js.map

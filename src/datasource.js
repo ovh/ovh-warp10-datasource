@@ -44,6 +44,7 @@ export class Warp10Datasource {
     };
     return this.backendSrv.datasourceRequest(options).then(this.parseTemplatingResult);
   }
+
   parseTemplatingResult(o) {
     console.log('tesmplating result', o)
      return _.map(o.data, (data, indice) => {
@@ -194,7 +195,7 @@ export class Warp10Datasource {
           title: gts.c,
           time: Math.trunc(dp[0] / 1000),
           text: dp[1],
-          tags: (tags.length > 1) ? tags.join(',') : null
+          tags: (tags.length > 0) ? tags.join(',') : null
         });
       }
       console.de

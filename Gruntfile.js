@@ -34,7 +34,7 @@ module.exports = function(grunt) {
 
     watch: {
       rebuild_less: {
-        files: ['src/css/**.css'],
+        files: ['src/css/**.less'],
         tasks: ['less:prod']
       },
       rebuild_partial: {
