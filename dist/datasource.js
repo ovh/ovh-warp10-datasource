@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['lodash', 'moment'], function (_export, _context) {
+System.register(['lodash', 'moment', './css/app.css!'], function (_export, _context) {
   "use strict";
 
   var _, moment, _typeof, _createClass, Warp10Datasource;
@@ -16,7 +16,7 @@ System.register(['lodash', 'moment'], function (_export, _context) {
       _ = _lodash.default;
     }, function (_moment) {
       moment = _moment.default;
-    }],
+    }, function (_cssAppCss) {}],
     execute: function () {
       _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
         return typeof obj;
@@ -218,8 +218,8 @@ System.register(['lodash', 'moment'], function (_export, _context) {
                 console.error('Annotation query must return exactly 1 GeoTimeSerie, current stack is:', res.data);
                 return [];
               }
-
               var gts = res.data[0];
+              console.log('GTS', gts);
               var tags = [];
               for (var label in gts.l) {
                 tags.push(label + ':' + gts.l[label]);
@@ -262,7 +262,7 @@ System.register(['lodash', 'moment'], function (_export, _context) {
                 }
               }
 
-              console.debug('Annotation query', options.annotation.name, annotations);
+              console.de;
               return annotations;
             }).catch(function (err) {
               console.error('Failed to retrieve annotations', err, options);

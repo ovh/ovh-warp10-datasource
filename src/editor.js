@@ -4,9 +4,8 @@
  * ace.define();
  */
 
-
-var Editor = function(ctrl) {
-  path = '/public/plugins/grafana-warp10-datasource/';
+export function Editor(ctrl) {
+  var path = '/public/plugins/grafana-warp10-datasource/';
 
   System.import(path + 'ace.js').then(() => {
 
@@ -16,7 +15,6 @@ var Editor = function(ctrl) {
 
         System.import(path + 'theme-monokai.js').then(() => {
 
-          
           // force render query directive
           ctrl.scope.$apply();
           setTimeout(() => {

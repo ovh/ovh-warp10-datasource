@@ -4,30 +4,26 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-execute');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-less');
 
   grunt.initConfig({
 
     clean: ["dist"],
 
     copy: {
-      src_to_dist: {
+      partials_to_dist: {
         cwd: 'src',
         expand: true,
         src: [
-          '**/*', 
-          '!**/*.js', 
-          '!**/*.scss', 
-          '!img/*', 
-          '**/codemirror.js', 
-          '**/editor.js',
-          '**/codemirror-simple.js'],
+          'partials/*'
+        ],
         dest: 'dist'
       },
       img_to_dist: {
         cwd: 'src',
         expand: true,
         src: ['img/*'],
-        dest: 'dist/src/'
+        dest: 'dist/'
       },
       pluginDef: {
         expand: true,
@@ -37,10 +33,25 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      rebuild_all: {
-        files: ['src/**/*', 'plugin.json'],
-        tasks: ['default'],
-        options: {spawn: false}
+      rebuild_less: {
+        files: ['src/css/**.css'],
+        tasks: ['less:prod']
+      },
+      rebuild_partial: {
+        files: ['src/partials/**.html'],
+        tasks: ['copy:partials_to_dist']
+      },
+      rebuild_img: {
+        files: ['src/img/**'],
+        tasks: ['copy:img_to_dist']
+      },
+      rebuild_js: {
+        files: ['src/*.js'],
+        tasks: ['babel:dist']
+      },
+      rebuild_plugin: {
+        files: ['src/*.(json|md'],
+        tasks: ['copy:pluginDef']
       }
     },
 
@@ -56,7 +67,7 @@ module.exports = function(grunt) {
         files: [{
           cwd: 'src',
           expand: true,
-          src: ['**/*.js', '!codemirror.js', '!editor.js', '!codemirror-simple.js'],
+          src: ['**/*.js'],
           dest: 'dist',
           ext:'.js'
         }]
@@ -81,6 +92,14 @@ module.exports = function(grunt) {
       }
     },
 
+    less: {
+      prod: {
+        files: {
+          'dist/css/app.css': 'src/css/*.less'
+        }
+      }
+    },
+
     mochaTest: {
       test: {
         options: {
@@ -92,11 +111,12 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('default', [
-    'clean', 
-    'copy:src_to_dist',
-    'copy:img_to_dist', 
-    'copy:pluginDef', 
-    'babel', 
+    'clean',
+    'copy:partials_to_dist',
+    'copy:img_to_dist',
+    'copy:pluginDef',
+    'less:prod',
+    'babel',
     /*'mochaTest'*/
   ]);
 };

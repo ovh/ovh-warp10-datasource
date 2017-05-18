@@ -13,7 +13,7 @@
   "annotations": true,
 
   "info": {
-    "description": "simple json datasource",
+    "description": "Datasource plugin for the Warp1 plateform",
     "author": {
       "name": "warp10.io",
       "url": "http://www.warp10.io/"

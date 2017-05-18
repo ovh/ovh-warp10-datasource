@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import './css/app.css!'
 
 export class Warp10Datasource {
 
@@ -174,8 +175,8 @@ export class Warp10Datasource {
         console.error('Annotation query must return exactly 1 GeoTimeSerie, current stack is:', res.data)
         return [];
       }
-
       let gts = res.data[0]
+      console.log('GTS', gts)
       let tags = []
       for (let label in gts.l) {
         tags.push(label+':'+gts.l[label])
@@ -196,7 +197,7 @@ export class Warp10Datasource {
           tags: (tags.length > 1) ? tags.join(',') : null
         });
       }
-      console.debug('Annotation query', options.annotation.name, annotations)
+      console.de
       return annotations
     })
     .catch((err) => {
