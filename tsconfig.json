@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "module": "system",
+        "target": "es5",
+        "noImplicitAny": false,
+        "noImplicitReturns":false,
+        "noImplicitThis":false,
+        "noImplicitUseStrict":false,
+        "noUnusedLocals":false,
+        "sourceMap": false,
+        "baseUrl": "./",
+        "paths": {
+            "app/*": [ "../../../public/app/*" ],
+            "vendor/*": [ "../../../public/vendor/*" ]
+        }
+    },
+    "include": [
+        "../../../public/app/**/*.ts"
+    ],
+    "exclude": [
+        "../../../public/vendor/**/*",
+        "../../../public/**/*.d.ts"
+    ]
+}

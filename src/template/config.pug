@@ -1,0 +1,31 @@
+h3.page-heading HTTP Address
+.gf-form-group
+  .gf-form-inline
+    .gf-form
+      span.gf-form-label.width-7 URL
+      input.gf-form-input.width-30(ng-model='ctrl.current.url')
+      info-popover(mode='right-absolute')
+        | Do not append /api/v0/exec at the end of the URL
+    .gf-form
+      span.gf-form-label.width-7 Access
+      .gf-form-select-wrapper.gf-form-select-wrapper--has-help-icon.width-30
+        select.gf-form-input(ng-model='ctrl.current.access')
+          option(label="direct" value="direct") direct
+          option(label="proxy" value="proxy") proxy
+        info-popover.gf-form-help-icon.gf-form-help-icon--right-absolute.drop-help.drop-hide-out-of-bounds.drop-target(mode='right-absolute')
+          | Direct = url is used directly from browser
+          | Proxy = Grafana backend will proxy the request
+
+h3.page-heading Execution variables
+.gf-form-group
+  .gf-form-inline
+    .gf-form(ng-repeat="(key, val) in ctrl.current.jsonData")
+      span.gf-form-label.width-7 {{ key }}
+      span.gf-form-label.width-30 {{ val }}
+      button.btn.btn-danger.full-height(ng-click="ctrl._delExtraVar(key)")
+        i.fa.fa-trash(aria-hidden='true')
+    .gf-form
+      input.gf-form-input.width-7(ng-model='ctrl.newExtraKey')
+      input.gf-form-input.width-30(ng-model='ctrl.newExtraVal' ng-keyup='$event.keycode == 13? ctrl._addExtraVar() : null')
+      button.btn.btn-success.full-height(ng-click="ctrl._addExtraVar()")
+          i.fa.fa-plus(aria-hidden='true')
