@@ -1,0 +1,33 @@
+script(src='https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.0.1/webcomponents-lite.js')
+link(rel='import' href='/public/plugins/grafana-warp10-datasource/template/ace-editor.html')
+query-editor-row.warp10-query(query-ctrl="ctrl" has-text-edit-mode="true")
+  .gf-form-inline
+    //label.gf-form-label Backend URL (optional)
+    //input.gf-form-input(type="text" ng-model="ctrl.target.backend" spellcheck='false' bs-typeahead="ctrl.suggestMetrics" placeholder="https://..." data-min-length=0 data-items=100)
+    //  label-class="width-7"
+    gf-form-switch.gf-form(label="Hide labels" checked="ctrl.target.hideLabels" on-change="ctrl.refresh()")
+    gf-form-switch.gf-form(label="WarpScript editor" checked="ctrl.advancedMode")
+  .gf-form-inline(ng-if="ctrl.advancedMode")
+    //textarea.gf-form-input(ng-model="ctrl.target.expr" rows="20" ng-readonly='ctrl.readOnly')
+    ace-editor(style="width: 100%; min-height: 12em;") NEWGTS 'RENAME' STOP
+
+  .gf-form-block(ng-if="!ctrl.advancedMode")
+    .gf-form
+      label.gf-form-label.width-10 Read Token
+      input.gf-form-input(ng-model='ctrl.readToken')
+    .gf-form-inline
+      .gf-form
+        label.gf-form-label.width-10 Metric name
+        input.gf-form-input(ng-model='ctrl.className')
+      .gf-form-block
+        .gf-form(ng-repeat='label in ctrl.labels')
+          label.gf-form-label.width-10 Metric labels
+          input.gf-form-input(ng-model='ctrl.className')
+        .gf-form(ng-repeat='label in ctrl.labels')
+          label.gf-form-label.width-10 Metric labels
+          input.gf-form-input(ng-model='ctrl.className')
+    .gf-form
+      label.gf-form-label.width-10.query-keyword Down sampling
+      select(ng-model='ctrl.bucketizer')
+        option(value='null' selected) None
+        option(ng-repeat='bucketizer in ctrl.bucketizers' ng-value='bucketizer.{{ bucketizer }}') {{ bucketizer }}

@@ -7,6 +7,9 @@
         "noImplicitThis":false,
         "noImplicitUseStrict":false,
         "noUnusedLocals":false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "allowJs": true,
         "sourceMap": false,
         "baseUrl": "./",
         "paths": {
@@ -14,6 +17,9 @@
             "vendor/*": [ "../../../public/vendor/*" ]
         }
     },
+    "files": [
+        "./src/**.ts"
+    ],
     "include": [
         "../../../public/app/**/*.ts"
     ],

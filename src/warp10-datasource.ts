@@ -9,9 +9,9 @@ export class Warp10Datasource {
   /**
    * used by panels to get data
    * @param options
-   * @return {any} Grafana datapoints set
+   * @return {Promise<any>} Grafana datapoints set
    */
-  query(opts: QueryOptions): any {
+  query(opts: QueryOptions): Promise<any> {
 
     /*let test = [
       {
@@ -54,7 +54,9 @@ export class Warp10Datasource {
       responses.forEach((res, i) => {
         if (res.data.type === 'error') {
           console.error(res.data.value)
-          return
+          var d = this.$q.defer()
+          d.resolve({data: []})
+          return d.promise
         }
         let gtss = GTS.stackFilter(res.data)
 
@@ -76,8 +78,9 @@ export class Warp10Datasource {
 
   /**
    * used by datasource configuration page to make sure the connection is working
+   * @return {Promise<any>} response
    */
-  testDatasource(): any {
+  testDatasource(): Promise<any> {
       return this.executeExec('1 2 +')
       .then(res => {
         console.debug('Success', res)
@@ -108,6 +111,7 @@ export class Warp10Datasource {
   /**
    * used by dashboards to get annotations
    * @param options
+   * @return {Promise<any>} results
    */
   annotationQuery(opts: AnnotationOptions) {
     let end = opts.range.to.toDate().getTime() * 1000
@@ -115,17 +119,52 @@ export class Warp10Datasource {
     let interval = end - start
     let startISO = opts.range.from.toISOString()
     let endISO = opts.range.to.toISOString()
-    let wsHeader = `${end} 'end' STORE ${start} 'start' STORE '${endISO}' 'endISO' STORE '${startISO}' 'startISO' STORE ${interval} 'interval' STORE `
-    wsHeader += this.computeGrafanaContext()
+    let ws = `${end} 'end' STORE ${start} 'start' STORE '${endISO}' 'endISO' STORE '${startISO}' 'startISO' STORE ${interval} 'interval' STORE `
+    ws = this.computeGrafanaContext() + (opts.annotation.query || '' )
 
-    return this.executeExec(wsHeader)
+    console.debug('ANNOTATION QUERY', opts)
+
+    return this.executeExec(ws)
+    .then((res) => {
+      let annotations = []
+      if (!GTS.isGTS(res.data[0])) {
+        console.error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
+        var d = this.$q.defer()
+        d.resolve([])
+        return d.promise
+        //throw new Error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
+      }
+
+      let gts = Object.assign(new GTS(), res.data[0])
+      let tags = []
+
+      for (let label in gts.l) {
+        tags.push(`${ label }${ gts.l[label] }`)
+      }
+
+      for (let dp of gts.v) {
+        annotations.push({
+          annotation: {
+            name: opts.annotation.name,
+            enabled: true,
+            datasource: this.instanceSettings.name,
+          },
+          title: gts.c,
+          time: Math.trunc(dp[0] / 1000),
+          text: dp[dp.length - 1],
+          tags: (tags.length > 0) ? tags.join(',') : null
+        })
+      }
+      return annotations
+    })
   }
 
   /**
    * used by query editor to get metric suggestions.
    * @param options
+   * @return {Promise<any>}
    */
-  metricFindQuery(opts: any) {
+  metricFindQuery(opts: any): Promise<any> {
     return this.executeExec(this.computeGrafanaContext() + opts)
     .then((res) => {
 
@@ -166,6 +205,12 @@ export class Warp10Datasource {
         }
     })
   }
+
+  /**
+   * Find all metrics with the given selector
+   * @param selector
+   * @return {Promise<any>} results
+   */
   private executeFind(selector): Promise<any> {
     return this.backendSrv.datasourceRequest({
         method: 'GET',

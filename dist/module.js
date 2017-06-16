@@ -1,10 +1,10 @@
-System.register(["app/plugins/sdk", "./warp10-datasource", "./warp10-config.controller"], function (exports_1, context_1) {
+System.register(["app/plugins/sdk", "./warp10-datasource", "./warp10-config.controller", "./warp10-query.controller"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     function getCSSPath(sheet) {
         return "plugins/grafana-warp10-datasource/style/" + sheet + ".css";
     }
-    var sdk_1, warp10_datasource_1, warp10_config_controller_1, Warp10DatasourceQueryCtrl, Warp10QueryOptionsCtrl, Warp10AnnotationsQueryCtrl;
+    var sdk_1, warp10_datasource_1, warp10_config_controller_1, warp10_query_controller_1, Warp10QueryOptionsCtrl, Warp10AnnotationsQueryCtrl;
     return {
         setters: [
             function (sdk_1_1) {
@@ -15,6 +15,9 @@ System.register(["app/plugins/sdk", "./warp10-datasource", "./warp10-config.cont
             },
             function (warp10_config_controller_1_1) {
                 warp10_config_controller_1 = warp10_config_controller_1_1;
+            },
+            function (warp10_query_controller_1_1) {
+                warp10_query_controller_1 = warp10_query_controller_1_1;
             }
         ],
         execute: function () {
@@ -24,12 +27,7 @@ System.register(["app/plugins/sdk", "./warp10-datasource", "./warp10-config.cont
             });
             exports_1("Datasource", warp10_datasource_1.Warp10Datasource);
             exports_1("ConfigCtrl", warp10_config_controller_1.Warp10ConfigCtrl);
-            Warp10DatasourceQueryCtrl = (function () {
-                function Warp10DatasourceQueryCtrl() {
-                }
-                return Warp10DatasourceQueryCtrl;
-            }());
-            exports_1("QueryCtrl", Warp10DatasourceQueryCtrl);
+            exports_1("QueryCtrl", warp10_query_controller_1.Warp10QueryCtrl);
             Warp10QueryOptionsCtrl = (function () {
                 function Warp10QueryOptionsCtrl() {
                 }

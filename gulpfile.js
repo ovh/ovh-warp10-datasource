@@ -5,6 +5,7 @@ const del = require('del')
 
 const tsProject = P.typescript.createProject('tsconfig.json');
 const tscFiles = 'src/**.ts'
+const jsFiles = 'src/**.js'
 const assetsFiles = 'src/assets/**.{png,svg,jpg}'
 const pluginDefinition = 'src/plugin.json'
 const readme = 'README.md'
@@ -17,33 +18,38 @@ gulp.task('default', ['build', 'watch'])
 gulp.task('tsc', () => {
     return gulp
     .src(tscFiles)
+    .pipe(P.plumberNotifier())
     .pipe(tsProject())
     .pipe(gulp.dest('dist/'));
-});
+})
 
 gulp.task('pug', () => {
     return gulp
     .src(templateFiles)
+    .pipe(P.plumberNotifier())
     .pipe(P.pug({}))
     .pipe(gulp.dest('dist/template'));
-});
+})
 
 gulp.task('less', () => {
     return gulp
     .src(styleFiles)
+    .pipe(P.plumberNotifier())
     .pipe(P.less({}))
     .pipe(gulp.dest('dist/style'));
-});
+})
 
 gulp.task('assets', () => {
     gulp
     .src(assetsFiles)
+    .pipe(P.plumberNotifier())
     .pipe(gulp.dest('dist/assets'))
 })
 
 gulp.task('plugin', () => {
     gulp
     .src([pluginDefinition, readme])
+    .pipe(P.plumberNotifier())
     .pipe(gulp.dest('dist/'))
 })
 

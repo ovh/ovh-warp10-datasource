@@ -22,7 +22,7 @@ export class GTS {
      * @return {boolean} is it a GTS ?
      */
     static isGTS(g: any) {
-        return g.hasOwnProperty('c') && g.hasOwnProperty('v') && g.hasOwnProperty('l')
+        return g != undefined && g.hasOwnProperty('c') && g.hasOwnProperty('v') && g.hasOwnProperty('l')
           && typeof g.c === 'string' && typeof g.l === 'object' && Array.isArray(g.v)
     }
 

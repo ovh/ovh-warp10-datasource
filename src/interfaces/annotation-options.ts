@@ -14,6 +14,7 @@ export interface AnnotationOptions {
     annotation: {
         datasource: string,
         enable: boolean,
-        name: string
+        name: string,
+        query: string
     }
 }

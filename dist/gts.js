@@ -26,7 +26,7 @@ System.register([], function (exports_1, context_1) {
                  * @return {boolean} is it a GTS ?
                  */
                 GTS.isGTS = function (g) {
-                    return g.hasOwnProperty('c') && g.hasOwnProperty('v') && g.hasOwnProperty('l')
+                    return g != undefined && g.hasOwnProperty('c') && g.hasOwnProperty('v') && g.hasOwnProperty('l')
                         && typeof g.c === 'string' && typeof g.l === 'object' && Array.isArray(g.v);
                 };
                 /**
