@@ -6,6 +6,12 @@
   "repository": "git@github.com:cityzendata/grafana-warp10.git",
   "author": "miton18 <rcd18@hotmail.fr>",
   "license": "MIT",
+  "engines": {
+    "node": ">=7.9.0"
+  },
+  "scripts": {
+    "docker": "docker build -t grafana . && docker run -i -p 3000:3000 grafana"
+  },
   "dependencies": {
     "ace-builds": "^1.2.6",
     "angular-ui-ace": "^0.2.3",

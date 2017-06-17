@@ -5,6 +5,7 @@ export class Warp10QueryCtrl extends QueryCtrl {
   static templateUrl = 'template/query.html'
   uiSegmentSrv: any
   target: any
+  changeTicker: any
 
   className: string
   readToken: string
@@ -12,7 +13,6 @@ export class Warp10QueryCtrl extends QueryCtrl {
 
   readOnly: boolean
   advancedMode: boolean
-  test: any
 
   bucketizers: string[]
 
@@ -38,5 +38,10 @@ export class Warp10QueryCtrl extends QueryCtrl {
     this.readOnly = !this.readOnly
   }
 
-  onChangeInternal() {}
+  onChangeInternal() {
+    clearTimeout(this.changeTicker)
+    this.changeTicker = setTimeout(() => {
+      this.refresh()
+    }, 1000)
+  }
 }

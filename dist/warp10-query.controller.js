@@ -39,7 +39,13 @@ System.register(["app/plugins/sdk"], function (exports_1, context_1) {
                 Warp10QueryCtrl.prototype.toggleEditorMode = function () {
                     this.readOnly = !this.readOnly;
                 };
-                Warp10QueryCtrl.prototype.onChangeInternal = function () { };
+                Warp10QueryCtrl.prototype.onChangeInternal = function () {
+                    var _this = this;
+                    clearTimeout(this.changeTicker);
+                    this.changeTicker = setTimeout(function () {
+                        _this.refresh();
+                    }, 1000);
+                };
                 return Warp10QueryCtrl;
             }(sdk_1.QueryCtrl));
             Warp10QueryCtrl.templateUrl = 'template/query.html';

@@ -9,7 +9,7 @@ query-editor-row.warp10-query(query-ctrl="ctrl" has-text-edit-mode="true")
 
   .gf-form-inline(ng-if='ctrl.advancedMode')
     ace-editor(theme='ace/theme/monokai' mode='ace/mode/warpscript')
-      textarea(ng-model='ctrl.target.expr')
+      textarea(ng-model='ctrl.target.expr' ng-change='ctrl.onChangeInternal()')
     //pre
       code {{ ctrl.target.expr }}
 

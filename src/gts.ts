@@ -51,11 +51,11 @@ export class GTS {
         for (let entry of stack) {
 
             if (GTS.isGTS(entry))
-                gtss.push(Object.assign(new GTS(), entry))
+                gtss.push((<any>Object).assign(new GTS(), entry))
 
             else if (GTS.isGTSArray(entry)) {
                 entry = entry.map((gts) => {
-                    return Object.assign(new GTS(), gts)
+                    return (<any>Object).assign(new GTS(), gts)
                 })
                 gtss = gtss.concat(entry)
             }
