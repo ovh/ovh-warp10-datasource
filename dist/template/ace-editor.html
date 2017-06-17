@@ -1,150 +1,120 @@
 <template><style>:host {
+  width: 100%;
   display: flex;
-  min-height: 1em;
+  min-height: 40vh;
   flex-direction: column;
 }
 #container{
   flex: 1;
-}</style><div id="container"></div></template><script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js"></script><script>(function(window, document, undefined) {
-    const currentDocument = document
-    const thisDoc = (document._currentScript || document.currentScript).ownerDocument
+}</style><div id="container"></div></template><script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js"></script><script src="/public/plugins/grafana-warp10-datasource/assets/lib/ace-mode-warpscript.js"></script><script>(function(window, document, undefined) {
+  const currentDocument = document
+  const thisDoc = (document._currentScript || document.currentScript).ownerDocument
+  ace.require("ace/ext/language_tools");
 
-    class AceEditor extends HTMLElement {
+  class AceEditor extends HTMLElement {
 
-        constructor() {
-            super()
-            this.shadow = this.createShadowRoot()
-            this.shadow.appendChild(currentDocument.importNode(thisDoc.querySelector('template').content, true))
-            this.container = this.shadow.querySelector('#container')
+    constructor() {
+      super()
+      this.shadow = this.createShadowRoot()
+      this.shadow.appendChild(currentDocument.importNode(thisDoc.querySelector('template').content, true))
+      this.container = this.shadow.querySelector('#container')
 
-            // Prevent Grafana shortcuts when query editor is show
-            let events = ['keydown', 'keypress', 'keyup']
-            for (let event of events) {
-              this.addEventListener(event, (e)=>{
-                e.stopPropagation()
-              }, false)
-            }
-        }
-
-        get value(){
-            return this.editor && this.editor.getValue() || this.textContent
-        }
-
-        set value(val){
-            if(this.editor){
-                this.editor.setValue( val )
-            } else {
-                this.textContent = val
-            }
-        }
-
-        connectedCallback() {
-            var text = this.childNodes[0]
-            var container = this.container
-            var element = this
-            var editor
-            if(this.editor){
-                editor = this.editor
-            } else {
-                // container.appendChild(text)
-                container.textContent = this.value
-                editor = ace.edit(container)
-                //this.dispatchEvent(new CustomEvent("editor-ready", {detail: editor}))
-                this.editor = editor
-                // inject base editor styles
-                this.injectTheme('#ace_editor\\.css')
-                this.injectTheme('#ace-tm')
-                //this.injectTheme('#ace_searchbox')
-                editor.getSession().on('change', function(event){
-                    //element.dispatchEvent(new CustomEvent("change", {detail: event}))
-                })
-            }
-            // handle theme changes
-            editor.renderer.addEventListener("themeLoaded", this.onThemeLoaded.bind(this))
-            // initial attributes
-                editor.setTheme( this.getAttribute("theme") )
-                editor.setFontSize( parseInt(this.getAttribute("fontsize")) || 12 )
-                editor.setReadOnly( this.hasAttribute("readonly") )
-                var session = editor.getSession()
-                session.setMode( this.getAttribute("mode") )
-                session.setUseSoftTabs( this.getAttribute("softtabs") )
-                this.getAttribute("tabsize") && session.setTabSize( this.getAttribute("tabsize") )
-                session.setUseWrapMode( this.hasAttribute("wrapmode") )
-            // Observe input textNode changes
-            // Could be buggy as editor was also added to Light DOM
-            var observer = new MutationObserver(function(mutations) {
-              mutations.forEach(function(mutation) {
-                // console.log("observation", mutation.type, arguments, mutations, editor, text)
-                if(mutation.type == "characterData"){
-                    element.value = text.data
-                }
-              })
-            })
-            text && observer.observe(text, { characterData: true })
-            // container.appendChild(text)
-            this._attached = true
-        }
-
-        disconnectedCallback() {
-            this._attached = false
-        }
-
-        /**
-          * Which attributes change have to call attributeChangedCallback
-          */
-        static get observedAttributes() {
-            return ['theme', 'mode', 'fontsize', 'softtabs', 'tabsize', 'readonly', 'wrapmode']
-        }
-
-        attributeChangedCallback(attr, oldVal, newVal) {
-            if(!this._attached){
-                return false
-            }
-            switch(attr){
-                case "theme":
-                    this.editor.setTheme( newVal )
-                    break
-                case "mode":
-                    this.editor.getSession().setMode( newVal )
-                    break
-                case "fontsize":
-                    this.editor.setFontSize( newVal )
-                    break
-                case "softtabs":
-                    this.editor.getSession().setUseSoftTabs( newVal )
-                    break
-                case "tabsize":
-                    this.editor.getSession().setTabSize( newVal )
-                    break
-                case "readonly":
-                    this.editor.setReadOnly( newVal === '' || newVal )
-                    break
-                case "wrapmode":
-                    this.editor.getSession().setUseWrapMode( newVal !== null )
-                    break
-            }
-        }
-
-        onThemeLoaded(e){
-            var themeId = "#" + e.theme.cssClass
-            this.injectTheme(themeId)
-            // Workaround Chrome stable bug, force repaint
-            this.container.style.display='none'
-            this.container.offsetHeight
-            this.container.style.display=''
-        }
-
-        injectTheme(themeId){
-            var n = document.querySelector(themeId)
-            this.shadowRoot.appendChild(cloneStyle(n))
-        }
+      // Prevent Grafana shortcuts when query editor is show
+      let events = ['keydown', 'keypress', 'keyup']
+      for (let event of events) {
+        this.addEventListener(event, (e)=>{
+          e.stopPropagation()
+        }, false)
+      }
     }
-    //helper function to clone a style
-    function cloneStyle(style) {
-        var s = document.createElement('style')
-        s.id = style.id
-        s.textContent = style.textContent
-        return s
+
+    connectedCallback() {
+      console.debug('ACE EDITOR', 'connected')
+      this.input = this.querySelector('textarea')
+      this.editor = ace.edit(this.container)
+      // init query
+      this.editor.getSession().setValue(this.input.value)
+      this._injectTheme('#ace_editor\\.css')
+      this._injectTheme('#ace-tm')
+      this.editor.getSession()
+      .on('change', () => {
+          this.input.value = this.editor.getValue()
+          this.input.dispatchEvent(new Event('input'))
+      })
+      this.editor.renderer.addEventListener('themeLoaded', this._onThemeLoaded.bind(this))
+      // initial attributes
+      this.editor.setTheme(this.getAttribute('theme'))
+      this.editor.setFontSize(parseInt(this.getAttribute('fontsize')) || 12 )
+      this.editor.setReadOnly(this.hasAttribute('readonly'))
+      this.editor.getSession().setMode(this.getAttribute('mode') )
+      this.editor.getSession().setUseSoftTabs(this.getAttribute('softtabs'))
+      this.editor.getSession().setUseWrapMode( this.hasAttribute('wrapmode') )
+      this.getAttribute('tabsize') && editor.getSession().setTabSize( this.getAttribute('tabsize'))
+      this.editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true
+      })
     }
-    window.customElements.define('ace-editor', AceEditor)
+
+    disconnectedCallback() {
+      console.debug('ACE EDITOR', 'disconnected')
+    }
+
+    /**
+      * Which attributes change have to call attributeChangedCallback
+      */
+    static get observedAttributes() {
+        return ['theme', 'mode', 'fontsize', 'softtabs', 'tabsize', 'readonly', 'wrapmode']
+    }
+
+    attributeChangedCallback(attr, oldVal, newVal) {
+      console.debug('ACE EDITOR', 'attribute change', attr, oldVal, newVal)
+      switch(attr){
+        case 'theme':
+          if (this.editor) this.editor.setTheme( newVal )
+          break
+        case 'mode':
+          if (this.editor) this.editor.getSession().setMode( newVal )
+          break
+        case 'fontsize':
+          if (this.editor) this.editor.setFontSize( newVal )
+          break
+        case 'softtabs':
+          if (this.editor) this.editor.getSession().setUseSoftTabs( newVal )
+          break
+        case 'tabsize':
+          if (this.editor) this.editor.getSession().setTabSize( newVal )
+          break
+        case 'readonly':
+          if (this.editor) this.editor.setReadOnly( newVal === '' || newVal )
+          break
+        case 'wrapmode':
+          if (this.editor) this.editor.getSession().setUseWrapMode( newVal !== null )
+          break
+      }
+    }
+
+    _onThemeLoaded(e){
+        const themeId = `#${e.theme.cssClass}`
+        this._injectTheme(themeId)
+        // Workaround Chrome stable bug, force repaint
+        this.container.style.display='none'
+        this.container.offsetHeight
+        this.container.style.display=''
+    }
+
+    _injectTheme(themeId) {
+        const n = document.querySelector(themeId)
+        this.shadowRoot.appendChild(AceEditor.cloneStyle(n))
+    }
+
+    static cloneStyle(style) {
+      const s = document.createElement('style')
+      s.id = style.id
+      s.textContent = style.textContent
+      return s
+    }
+  }
+  window.customElements.define('ace-editor', AceEditor)
 }(window, document))</script>

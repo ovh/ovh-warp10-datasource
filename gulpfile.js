@@ -5,8 +5,7 @@ const del = require('del')
 
 const tsProject = P.typescript.createProject('tsconfig.json');
 const tscFiles = 'src/**.ts'
-const jsFiles = 'src/**.js'
-const assetsFiles = 'src/assets/**.{png,svg,jpg}'
+const assetsFiles = 'src/assets/**/*.{png,svg,jpg,js}'
 const pluginDefinition = 'src/plugin.json'
 const readme = 'README.md'
 const templateFiles = 'src/template/*.pug'

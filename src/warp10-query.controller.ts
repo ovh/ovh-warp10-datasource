@@ -12,6 +12,7 @@ export class Warp10QueryCtrl extends QueryCtrl {
 
   readOnly: boolean
   advancedMode: boolean
+  test: any
 
   bucketizers: string[]
 
