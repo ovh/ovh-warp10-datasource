@@ -51,7 +51,8 @@ System.register(["./gts"], function (exports_1, context_1) {
                     wsHeader += this.computeGrafanaContext();
                     for (var _i = 0, _a = opts.targets; _i < _a.length; _i++) {
                         var query = _a[_i];
-                        queries.push(wsHeader + "\n" + query.expr);
+                        if (!query.hide)
+                            queries.push(wsHeader + "\n" + query.expr);
                     }
                     queries = queries.map(this.executeExec.bind(this));
                     return this.$q.all(queries)

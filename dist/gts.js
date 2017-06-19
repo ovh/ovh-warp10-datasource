@@ -14,7 +14,6 @@ System.register([], function (exports_1, context_1) {
                         for (var key in this.l) {
                             keyValues.push(key + "=" + this.l[key]);
                         }
-                        console.log('nameWithLabels', this.c + "{" + keyValues.join(',') + "}");
                         return this.c + "{" + keyValues.join(',') + "}";
                     },
                     enumerable: true,

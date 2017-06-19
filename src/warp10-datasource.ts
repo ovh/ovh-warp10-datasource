@@ -43,6 +43,7 @@ export class Warp10Datasource {
     wsHeader += this.computeGrafanaContext()
 
     for (let query of opts.targets) {
+      if (!query.hide)
       queries.push(`${ wsHeader }\n${ query.expr }`)
     }
 

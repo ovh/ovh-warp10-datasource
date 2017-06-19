@@ -12,7 +12,6 @@ export class GTS {
         for (let key in this.l) {
             keyValues.push(`${ key }=${ this.l[key] }`)
         }
-        console.log('nameWithLabels', `${ this.c }{${ keyValues.join(',') }}`)
         return `${ this.c }{${ keyValues.join(',') }}`
     }
 
@@ -49,7 +48,6 @@ export class GTS {
     static stackFilter(stack: any[]): GTS[] {
         let gtss = []
         for (let entry of stack) {
-
             if (GTS.isGTS(entry))
                 gtss.push((<any>Object).assign(new GTS(), entry))
 
