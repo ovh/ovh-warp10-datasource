@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_export, _context) {
+System.register(['app/plugins/sdk'], function (_export, _context) {
   "use strict";
 
   var QueryCtrl, _createClass, Warp10DatasourceQueryCtrl;
@@ -38,7 +38,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
   return {
     setters: [function (_appPluginsSdk) {
       QueryCtrl = _appPluginsSdk.QueryCtrl;
-    }, function (_cssQueryEditorCss) {}],
+    }],
     execute: function () {
       _createClass = function () {
         function defineProperties(target, props) {
@@ -78,8 +78,9 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
 
             if (!_this.target.expr) _this.target.expr = "";
 
+            console.log('EDITOR', editor);
             // send controler to Ace
-            _this.editor = editor;
+            _this.editor = editor.Editor;
             _this.editor(_this);
           });
           return _this;
@@ -112,4 +113,4 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
     }
   };
 });
-//# sourceMappingURL=query_ctrl.js.map
+//# sourceMappingURL=query-controller.js.map

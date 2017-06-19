@@ -1,6 +1,4 @@
 import {QueryCtrl} from 'app/plugins/sdk';
-import './css/query-editor.css!'
-
 
 export class Warp10DatasourceQueryCtrl extends QueryCtrl {
 
@@ -12,17 +10,18 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
 
     System.import('/public/plugins/grafana-warp10-datasource/editor.js')
     .then( (editor) => {
-      
+
       // set a random ID
       this.scope.textAreaID = Math.trunc(Math.random() * 10000);
       this.textAreaID = $scope.textAreaID;
 
       if (!this.target.expr) this.target.expr = "";
 
+      console.log('EDITOR', editor)
       // send controler to Ace
-      this.editor = editor;
+      this.editor = editor.Editor;
       this.editor(this);
-    }); 
+    });
   }
 
   getOptions() {
@@ -39,5 +38,4 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
     this.panelCtrl.refresh(); // Asks the panel to refresh data.
   }
 }
-
 Warp10DatasourceQueryCtrl.templateUrl = './partials/query.editor.html';

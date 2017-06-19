@@ -1,5 +1,5 @@
-import {Warp10Datasource} from './datasource';
-import {Warp10DatasourceQueryCtrl} from './query_ctrl';
+import { Warp10Datasource } from './datasource';
+import { Warp10DatasourceQueryCtrl } from './query-controller';
 
 class Warp10ConfigCtrl {}
 Warp10ConfigCtrl.templateUrl = 'partials/config.html';

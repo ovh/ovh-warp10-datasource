@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['./datasource', './query_ctrl'], function (_export, _context) {
+System.register(['./datasource', './query-controller'], function (_export, _context) {
   "use strict";
 
   var Warp10Datasource, Warp10DatasourceQueryCtrl, Warp10ConfigCtrl, Warp10QueryOptionsCtrl, Warp10AnnotationsQueryCtrl;
@@ -14,8 +14,8 @@ System.register(['./datasource', './query_ctrl'], function (_export, _context) {
   return {
     setters: [function (_datasource) {
       Warp10Datasource = _datasource.Warp10Datasource;
-    }, function (_query_ctrl) {
-      Warp10DatasourceQueryCtrl = _query_ctrl.Warp10DatasourceQueryCtrl;
+    }, function (_queryController) {
+      Warp10DatasourceQueryCtrl = _queryController.Warp10DatasourceQueryCtrl;
     }],
     execute: function () {
       _export('ConfigCtrl', Warp10ConfigCtrl = function Warp10ConfigCtrl() {

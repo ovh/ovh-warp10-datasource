@@ -13,14 +13,14 @@
   "annotations": true,
 
   "info": {
-    "description": "simple json datasource",
+    "description": "Datasource plugin for the Warp1 plateform",
     "author": {
-      "name": "Raintank Inc.",
-      "url": "http://raintank.io"
+      "name": "warp10.io",
+      "url": "http://www.warp10.io/"
     },
     "logos": {
-      "small": "src/img/simpleJson_logo.svg",
-      "large": "src/img/simpleJson_logo.svg"
+      "small": "src/img/warp10.png",
+      "large": "src/img/warp10.png"
     },
     "links": [
       {"name": "GitHub", "url": "https://github.com/grafana/simple-json-datasource"},
