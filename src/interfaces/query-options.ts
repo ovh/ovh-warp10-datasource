@@ -1,4 +1,5 @@
 import { Moment } from '../../node_modules/moment/moment'
+import { Warp10Query } from '../query'
 export interface QueryOptions {
 
     range: {
@@ -20,6 +21,8 @@ export interface QueryOptions {
         hide: boolean,
         expr: string,
         hideLabels: boolean
+        advancedMode: boolean
+        friendlyQuery: Warp10Query
     }>
 
     format: string

@@ -1,11 +1,12 @@
 <template><style>:host {
   width: 100%;
   display: flex;
-  min-height: 80vh;
+  min-height: 50vh;
   flex-direction: column;
 }
 #container{
   flex: 1;
+  resize: both;
 }</style><div id="container"></div></template><script src="/public/plugins/grafana-warp10-datasource/assets/lib/ace-1.2.6.js"></script><script src="/public/plugins/grafana-warp10-datasource/assets/lib/ace-theme-monokai-1.2.6.js"></script><script src="/public/plugins/grafana-warp10-datasource/assets/lib/ace-ext-language_tools-1.2.6.js"></script><script src="/public/plugins/grafana-warp10-datasource/assets/lib/ace-mode-warpscript.js"></script><script>(function(window, document, undefined) {
   const currentDocument = document
   const thisDoc = (document._currentScript || document.currentScript).ownerDocument
@@ -15,10 +16,11 @@
 
     constructor() {
       super()
+      console.debug('create new ace-editor', this)
       this.shadow = this.createShadowRoot()
       this.shadow.appendChild(currentDocument.importNode(thisDoc.querySelector('template').content, true))
       this.container = this.shadow.querySelector('#container')
-      this.input = this.querySelector('textarea')
+      console.log('ace-editor container', this.container)
 
       // Prevent Grafana shortcuts when query editor is show
       let events = ['keydown', 'keypress', 'keyup']
@@ -30,15 +32,12 @@
     }
 
     connectedCallback() {
-      console.debug('ACE EDITOR', 'connected')
+      console.debug('ace editor', 'connected')
+      this.input = this.querySelector('textarea')
+      console.log('ace-editor textarea', this.input.value)
       this.editor = ace.edit(this.container)
       // init query
       this.editor.getSession().setValue(this.input.value)
-      this.editor.getSession()
-      .on('change', () => {
-          this.input.value = this.editor.getValue()
-          this.input.dispatchEvent(new Event('input'))
-      })
       this.editor.renderer.addEventListener('themeLoaded', this._onThemeLoaded.bind(this))
       // initial attributes
       this._injectTheme('#ace_editor\\.css')
@@ -56,10 +55,17 @@
         useWrapMode: this.getAttribute('wrapmode'),
         tabSize: 2
       })
+
+      // When user change ace editor, notify angular ngModel routine
+      this.editor.getSession()
+      .on('change', () => {
+          this.input.value = this.editor.getValue()
+          this.input.dispatchEvent(new Event('input'))
+      })
     }
 
     disconnectedCallback() {
-      console.debug('ACE EDITOR', 'disconnected')
+      console.debug('ace-editor', 'disconnected')
       this.input.value = this.editor.getSession().getValue()
     }
 
@@ -67,7 +73,7 @@
       * Which attributes change have to call attributeChangedCallback
       */
     static get observedAttributes() {
-        return ['theme', 'mode', 'fontsize', 'readonly', 'wrapmode', 'needupdate']
+        return ['theme', 'mode', 'fontsize', 'readonly', 'wrapmode']
     }
 
     attributeChangedCallback(attr, oldVal, newVal) {
@@ -87,10 +93,6 @@
           break
         case 'wrapmode':
           if (this.editor) this.editor.getSession().setUseWrapMode( newVal !== null )
-          break
-        case 'needupdate':
-          this.editor.getSession().setValue(this.input.value)
-          console.log(this.input.value)
           break
       }
     }

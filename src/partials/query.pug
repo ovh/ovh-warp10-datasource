@@ -1,0 +1,106 @@
+script(src='https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.0.1/webcomponents-lite.js')
+link(rel='import' href='/public/plugins/grafana-warp10-datasource/template/ace-editor.html')
+
+query-editor-row.warp10-query(query-ctrl='ctrl' has-text-edit-mode='true')
+
+  .gf-form-inline
+    gf-form-switch.gf-form(label='Hide labels' checked='ctrl.target.hideLabels' on-change='ctrl.refresh()')
+    gf-form-switch.gf-form.pull-right(label='WarpScript editor' checked='ctrl.target.advancedMode')
+    //button.btn.btn-secondary.full-height(ng-if='!ctrl.target.advancedMode' ng-click='ctrl._buildQuery()') Build query
+
+  .gf-form-inline(ng-show='ctrl.target.advancedMode')
+    ace-editor(theme='ace/theme/monokai' mode='ace/mode/warpscript')
+      textarea(ng-model='ctrl.target.expr' ng-change='ctrl.onChangeInternal()')
+
+  .gf-form-block(ng-show='!ctrl.target.advancedMode')
+
+    h5 Fetch data
+    .gf-form
+      label.gf-form-label.width-10 Read Token
+      input.gf-form-input(ng-model='ctrl.target.friendlyQuery.readToken')
+    .gf-form-inline
+      .gf-form.flex-self-start
+        label.gf-form-label.width-10 Metric name
+        input.gf-form-input.width-10(ng-model='ctrl.target.friendlyQuery.className')
+        label.gf-form-label.width-6 Labels
+      .gf-form-block
+          .gf-form(ng-repeat='(key, val) in ctrl.target.friendlyQuery.labels')
+            input.gf-form-input.width-10(ng-value='key' readonly)
+            input.gf-form-input.width-10(ng-value='val' readonly)
+            button.btn.btn-danger.full-height(ng-click='ctrl._delLabel(key)')
+              i.fa.fa-trash(aria-hidden='true')
+          .gf-form
+            input.gf-form-input.width-10(placeholder='key' ng-model='ctrl.extraLabelKey')
+            input.gf-form-input.width-10(placeholder='value' ng-model='ctrl.extraLabelValue')
+            button.btn.btn-success.full-height(ng-click='ctrl._addLabel()')
+              i.fa.fa-plus(aria-hidden='true')
+    h5 Down sampling
+    .gf-form
+      label.gf-form-label.width-10.query-keyword Bucketizer
+      select(ng-model='ctrl.target.friendlyQuery.bucketizer')
+        option(value='' selected) None
+        option(ng-repeat='bucketizer in ctrl.target.friendlyQuery.bucketizers' ng-value="'bucketizer.{{ bucketizer }}'") {{ bucketizer }}
+
+      label.gf-form-label Bucket count
+      input.gf-form-input.width-7(type='number' step='10' min='10' max='3840' ng-model='ctrl.target.friendlyQuery.bucketCount')
+    h5 Reduce
+    .gf-form-inline
+      .gf-form
+        label.gf-form-label.width-10.query-keyword Reducer
+        select(ng-model='ctrl.target.friendlyQuery.reducer')
+          option(value='' selected) None
+          option(ng-repeat='reducer in ctrl.target.friendlyQuery.reducers' ng-value="'reducer.{{ reducer }}'") {{ reducer }}
+      .gf-form
+        label.gf-form-label labels
+        input.gf-form-input.width-10(placeholder='label' ng-model='ctrl.extraReducerLabel')
+        button.btn.btn-success.full-height(ng-click='ctrl._addReducerLabel()')
+          i.fa.fa-plus(aria-hidden='true')
+    .gf-form-inline
+      .gf-form(ng-repeat='label in ctrl.target.friendlyQuery.reducerLabels')
+        label.gf-form-label {{ label }}
+        button.btn.btn-danger.btn-small.full-height(ng-click='ctrl._delReducerLabel(label)')
+          i.fa.fa-trash(aria-hidden='true')
+    h5 Filter
+    h6 Select on wich label, the filter must me applied
+    .gf-form
+      label.gf-form-label labels
+      input.gf-form-input.width-10(placeholder='label' ng-model='ctrl.extraFilterLabel')
+      button.btn.btn-success.full-height(ng-click='ctrl._addFilterLabel()')
+        i.fa.fa-plus(aria-hidden='true')
+    h6 Select a filter
+    .gf-form-inline
+      .gf-form(ng-repeat='label in ctrl.target.friendlyQuery.filterLabels')
+        label.gf-form-label {{ label }}
+        button.btn.btn-danger.btn-small.full-height(ng-click='ctrl._delFilterLabel(label)')
+          i.fa.fa-trash(aria-hidden='true')
+    .gf-form-inline
+      .gf-form.flex-self-start
+        label.gf-form-label.width-10.query-keyword Filter
+        select(ng-model='ctrl.target.friendlyQuery.filter')
+          option(value='' selected) None
+          option(ng-repeat='filter in ctrl.target.friendlyQuery.filters' ng-value="$index") {{ filter.name }}
+    h6 Configure your filter
+    .gf-form-inline
+      // String case
+      .gf-form(ng-if='ctrl.staticQuery.filters[ctrl.target.friendlyQuery.filter].type == "S"')
+        label.gf-form-label.width-10 ClassName
+        input.gf-form-input(type='text' ng-model='ctrl.target.friendlyQuery.filterParamClass')
+      // Map case
+      .gf-form-inline(ng-if='ctrl.staticQuery.filters[ctrl.target.friendlyQuery.filter].type == "M"')
+        .gf-form.flex-self-start
+          label.gf-form-label.width-10 Labels
+        .gf-form-block
+          .gf-form(style='justify-content: flex-end' ng-repeat='(key, val) in ctrl.target.friendlyQuery.filterParamMap')
+              input.gf-form-input.width-10(ng-model='key' readonly)
+              input.gf-form-label.width-10(ng-model='val' readonly)
+              button.btn.btn-danger.full-height(ng-click='ctrl._delFilterParamMapLabel(key)')
+                i.fa.fa-trash(aria-hidden='true')
+          .gf-form
+            input.gf-form-input.width-10(placeholder='Label key' ng-model='ctrl.extraFilterParamMapKey')
+            input.gf-form-input.width-10(placeholder='Label value' ng-model='ctrl.extraFilterParamMapValue')
+            button.btn.btn-success.full-height(ng-click='ctrl._addFilterParamMapLabel()')
+              i.fa.fa-plus(aria-hidden='true')
+      // Number case
+      .gf-form(ng-if='ctrl.staticQuery.filters[ctrl.target.friendlyQuery.filter].type == "N"')
+        label.gf-form-label.width-10 Ceil
+        input.gf-form-input(type='number' ng-model='ctrl.target.friendlyQuery.filterParamNumber')

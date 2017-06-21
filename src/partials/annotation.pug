@@ -1,0 +1,9 @@
+script(src='https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.0.1/webcomponents-lite.js')
+link(rel='import' href='/public/plugins/grafana-warp10-datasource/template/ace-editor.html')
+
+.gf-form-group
+  .gf-form-inline
+    ace-editor(theme='ace/theme/monokai' mode='ace/mode/warpscript')
+      textarea(ng-model='ctrl.annotation.query')
+pre
+  code {{ ctrl.annotation | json }}

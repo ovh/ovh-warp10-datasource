@@ -4,3 +4,12 @@
 .warp10-query {
   margin-bottom: 1vh;
 }
+.warp10-query h5 {
+  margin-top: 4vh;
+}
+.warp10-query h6 {
+  margin-top: 3vh;
+}
+.flex-self-start {
+  align-self: flex-start;
+}

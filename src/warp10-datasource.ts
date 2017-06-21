@@ -1,10 +1,15 @@
 import { QueryOptions } from './interfaces/query-options'
 import { AnnotationOptions } from './interfaces/annotation-options'
 import { GTS } from './gts'
+import { Warp10Query } from './query'
 
 export class Warp10Datasource {
 
-  constructor(private instanceSettings: any, private $q: any, private backendSrv: any, private templateSrv: any) {}
+  constructor(private instanceSettings: any,
+              private $q: any,
+              private backendSrv: any,
+              private templateSrv: any,
+              private $log: any) {}
 
   /**
    * used by panels to get data
@@ -12,46 +17,29 @@ export class Warp10Datasource {
    * @return {Promise<any>} Grafana datapoints set
    */
   query(opts: QueryOptions): Promise<any> {
-
-    /*let test = [
-      {
-      c: "test",
-      l: {
-        a: "b"
-      },
-      v: [
-        [10, 10],
-        [20, 20]
-      ]
-    }, {
-      c: "test",
-      v: [
-        [10, 10],
-        [20, 20]
-      ]
-    }]*/
-
-    console.debug('QUERY OPTIONS', opts)
     let queries = []
-    let end = opts.range.to.toDate().getTime() * 1000
-    let start = opts.range.from.toDate().getTime() * 1000
-    let interval = end - start
-    let startISO = opts.range.from.toISOString()
-    let endISO = opts.range.to.toISOString()
-    let wsHeader = `${end} 'end' STORE ${start} 'start' STORE '${endISO}' 'endISO' STORE '${startISO}' 'startISO' STORE ${interval} 'interval' STORE `
-
-    wsHeader += this.computeGrafanaContext()
+    let wsHeader = this.computeTimeVars(opts) +  this.computeGrafanaContext()
 
     for (let query of opts.targets) {
-      if (!query.hide)
-      queries.push(`${ wsHeader }\n${ query.expr }`)
+      if (!query.hide) {
+        console.log('WARP10 QUERY', query)
+        if (query.friendlyQuery)
+          query.friendlyQuery = Object.assign(new Warp10Query(), query.friendlyQuery)
+        // Grafana can send empty Object at the first time, we need to check is there is something
+        if(query.expr || query.friendlyQuery) {
+          if (query.advancedMode === undefined)
+            query.advancedMode = true
+          queries.push(`${ wsHeader }\n${query.advancedMode? query.expr: query.friendlyQuery.warpScript }`)
+          console.log('New Query: ', (query.advancedMode)? query.expr : query.friendlyQuery)
+        }
+      }
     }
-
     queries = queries.map(this.executeExec.bind(this))
 
     return this.$q.all(queries)
     .then((responses) => {
-      let result = []
+      // Grafana formated GTS
+      let data = []
       responses.forEach((res, i) => {
         if (res.data.type === 'error') {
           console.error(res.data.value)
@@ -70,10 +58,10 @@ export class Warp10Datasource {
           for (let dp of gts.v) {
             grafanaGts.datapoints.push([ dp[dp.length - 1], dp[0] / 1000 ])
           }
-          result.push(grafanaGts)
+          data.push(grafanaGts)
         }
       })
-      return { data: result }
+      return { data }
     })
   }
 
@@ -115,32 +103,23 @@ export class Warp10Datasource {
    * @return {Promise<any>} results
    */
   annotationQuery(opts: AnnotationOptions) {
-    let end = opts.range.to.toDate().getTime() * 1000
-    let start = opts.range.from.toDate().getTime() * 1000
-    let interval = end - start
-    let startISO = opts.range.from.toISOString()
-    let endISO = opts.range.to.toISOString()
-    let ws = `${end} 'end' STORE ${start} 'start' STORE '${endISO}' 'endISO' STORE '${startISO}' 'startISO' STORE ${interval} 'interval' STORE `
-    ws = this.computeGrafanaContext() + (opts.annotation.query || '' )
-
-    console.debug('ANNOTATION QUERY', opts)
+    let ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query
 
     return this.executeExec(ws)
     .then((res) => {
-      let annotations = []
+      const annotations = []
       if (!GTS.isGTS(res.data[0])) {
         console.error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
         var d = this.$q.defer()
         d.resolve([])
         return d.promise
-        //throw new Error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
       }
 
       let gts = Object.assign(new GTS(), res.data[0])
       let tags = []
 
       for (let label in gts.l) {
-        tags.push(`${ label }${ gts.l[label] }`)
+        tags.push(`${ label }:${ gts.l[label] }`)
       }
 
       for (let dp of gts.v) {
@@ -151,7 +130,7 @@ export class Warp10Datasource {
             datasource: this.instanceSettings.name,
           },
           title: gts.c,
-          time: Math.trunc(dp[0] / 1000),
+          time: Math.trunc(dp[0] / (1000)),
           text: dp[dp.length - 1],
           tags: (tags.length > 0) ? tags.join(',') : null
         })
@@ -165,10 +144,10 @@ export class Warp10Datasource {
    * @param options
    * @return {Promise<any>}
    */
-  metricFindQuery(opts: any): Promise<any> {
-    return this.executeExec(this.computeGrafanaContext() + opts)
+  metricFindQuery(ws: string): Promise<any> {
+    console.log("metricFindQuery OPTS", ws)
+    return this.executeExec(this.computeGrafanaContext() + ws)
     .then((res) => {
-
       // only one object on the stack, good user
       if (res.data.length === 1 &&  typeof res.data[0] === 'object') {
         let entries = []
@@ -182,6 +161,7 @@ export class Warp10Datasource {
       }
       // some elements on the stack, return all of them as entry
       return res.data.map((entry, i) => {
+        console.log('ENTRY', typeof entry)
         return {
           text: entry.toString() || i,
           value: entry
@@ -197,13 +177,13 @@ export class Warp10Datasource {
    */
   private executeExec(ws: string): Promise<any> {
     return this.backendSrv.datasourceRequest({
-        method: 'POST',
-        url: this.instanceSettings.url + '/api/v0/exec',
-        data: ws,
-        headers: {
-            'Accept': undefined,
-            'Content-Type': undefined
-        }
+      method: 'POST',
+      url: this.instanceSettings.url + '/api/v0/exec',
+      data: ws,
+      headers: {
+        'Accept': undefined,
+        'Content-Type': undefined
+      }
     })
   }
 
@@ -214,12 +194,12 @@ export class Warp10Datasource {
    */
   private executeFind(selector): Promise<any> {
     return this.backendSrv.datasourceRequest({
-        method: 'GET',
-        url: `${ this.instanceSettings.url }/api/v0/find?selector=${selector}`,
-        headers: {
-            'Accept': undefined,
-            'Content-Type': undefined
-        }
+      method: 'GET',
+      url: `${ this.instanceSettings.url }/api/v0/find?selector=${selector}`,
+      headers: {
+        'Accept': undefined,
+        'Content-Type': undefined
+      }
     })
   }
 
@@ -229,20 +209,33 @@ export class Warp10Datasource {
    */
   private computeGrafanaContext(): string {
     let wsHeader = ''
+    console.debug('CONTEXT', this.instanceSettings.jsonData)
     // Datasource vars
     for (let myVar in this.instanceSettings.jsonData) {
       let value = this.instanceSettings.jsonData[myVar]
-      if (isNaN(parseFloat(value)))
+      if (typeof value === 'string')
+        value = value.replace(/'/g, '"')
+      if (typeof value === 'string' && !value.startsWith('<%') && !value.endsWith('%>'))
         value = `'${value}'`
-      wsHeader += `${value} '${myVar}' STORE `
+      wsHeader += `${value || 'NULL'} '${myVar}' STORE `
     }
     // Dashboad templating vars
+    console.log('TEMPLATING', this.templateSrv)
     for (let myVar of this.templateSrv.variables) {
-      let value = myVar.current.value
-      if (isNaN(parseFloat(value)))
+      let value = myVar.current.text
+      if (typeof value === 'string')
         value = `'${value}'`
-      wsHeader += `${value} '${myVar.name}' STORE `
+      wsHeader += `${value || 'NULL'} '${myVar.name}' STORE `
     }
     return wsHeader
+  }
+
+  private computeTimeVars(opts): string {
+    let end = opts.range.to.toDate().getTime() * 1000
+    let start = opts.range.from.toDate().getTime() * 1000
+    let interval = end - start
+    let startISO = opts.range.from.toISOString()
+    let endISO = opts.range.to.toISOString()
+    return `${end} 'end' STORE ${start} 'start' STORE '${endISO}' 'endISO' STORE '${startISO}' 'startISO' STORE ${interval} 'interval' STORE `
   }
 }

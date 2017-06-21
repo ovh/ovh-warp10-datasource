@@ -1,20 +1,24 @@
-System.register(["./gts"], function (exports_1, context_1) {
+System.register(["./gts", "./query"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var gts_1, Warp10Datasource;
+    var gts_1, query_1, Warp10Datasource;
     return {
         setters: [
             function (gts_1_1) {
                 gts_1 = gts_1_1;
+            },
+            function (query_1_1) {
+                query_1 = query_1_1;
             }
         ],
         execute: function () {
             Warp10Datasource = (function () {
-                function Warp10Datasource(instanceSettings, $q, backendSrv, templateSrv) {
+                function Warp10Datasource(instanceSettings, $q, backendSrv, templateSrv, $log) {
                     this.instanceSettings = instanceSettings;
                     this.$q = $q;
                     this.backendSrv = backendSrv;
                     this.templateSrv = templateSrv;
+                    this.$log = $log;
                 }
                 /**
                  * used by panels to get data
@@ -22,42 +26,29 @@ System.register(["./gts"], function (exports_1, context_1) {
                  * @return {Promise<any>} Grafana datapoints set
                  */
                 Warp10Datasource.prototype.query = function (opts) {
-                    /*let test = [
-                      {
-                      c: "test",
-                      l: {
-                        a: "b"
-                      },
-                      v: [
-                        [10, 10],
-                        [20, 20]
-                      ]
-                    }, {
-                      c: "test",
-                      v: [
-                        [10, 10],
-                        [20, 20]
-                      ]
-                    }]*/
                     var _this = this;
-                    console.debug('QUERY OPTIONS', opts);
                     var queries = [];
-                    var end = opts.range.to.toDate().getTime() * 1000;
-                    var start = opts.range.from.toDate().getTime() * 1000;
-                    var interval = end - start;
-                    var startISO = opts.range.from.toISOString();
-                    var endISO = opts.range.to.toISOString();
-                    var wsHeader = end + " 'end' STORE " + start + " 'start' STORE '" + endISO + "' 'endISO' STORE '" + startISO + "' 'startISO' STORE " + interval + " 'interval' STORE ";
-                    wsHeader += this.computeGrafanaContext();
+                    var wsHeader = this.computeTimeVars(opts) + this.computeGrafanaContext();
                     for (var _i = 0, _a = opts.targets; _i < _a.length; _i++) {
                         var query = _a[_i];
-                        if (!query.hide)
-                            queries.push(wsHeader + "\n" + query.expr);
+                        if (!query.hide) {
+                            console.log('WARP10 QUERY', query);
+                            if (query.friendlyQuery)
+                                query.friendlyQuery = Object.assign(new query_1.Warp10Query(), query.friendlyQuery);
+                            // Grafana can send empty Object at the first time, we need to check is there is something
+                            if (query.expr || query.friendlyQuery) {
+                                if (query.advancedMode === undefined)
+                                    query.advancedMode = true;
+                                queries.push(wsHeader + "\n" + (query.advancedMode ? query.expr : query.friendlyQuery.warpScript));
+                                console.log('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery);
+                            }
+                        }
                     }
                     queries = queries.map(this.executeExec.bind(this));
                     return this.$q.all(queries)
                         .then(function (responses) {
-                        var result = [];
+                        // Grafana formated GTS
+                        var data = [];
                         responses.forEach(function (res, i) {
                             if (res.data.type === 'error') {
                                 console.error(res.data.value);
@@ -76,10 +67,10 @@ System.register(["./gts"], function (exports_1, context_1) {
                                     var dp = _b[_a];
                                     grafanaGts.datapoints.push([dp[dp.length - 1], dp[0] / 1000]);
                                 }
-                                result.push(grafanaGts);
+                                data.push(grafanaGts);
                             }
                         });
-                        return { data: result };
+                        return { data: data };
                     });
                 };
                 /**
@@ -121,14 +112,7 @@ System.register(["./gts"], function (exports_1, context_1) {
                  */
                 Warp10Datasource.prototype.annotationQuery = function (opts) {
                     var _this = this;
-                    var end = opts.range.to.toDate().getTime() * 1000;
-                    var start = opts.range.from.toDate().getTime() * 1000;
-                    var interval = end - start;
-                    var startISO = opts.range.from.toISOString();
-                    var endISO = opts.range.to.toISOString();
-                    var ws = end + " 'end' STORE " + start + " 'start' STORE '" + endISO + "' 'endISO' STORE '" + startISO + "' 'startISO' STORE " + interval + " 'interval' STORE ";
-                    ws = this.computeGrafanaContext() + (opts.annotation.query || '');
-                    console.debug('ANNOTATION QUERY', opts);
+                    var ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query;
                     return this.executeExec(ws)
                         .then(function (res) {
                         var annotations = [];
@@ -137,12 +121,11 @@ System.register(["./gts"], function (exports_1, context_1) {
                             var d = _this.$q.defer();
                             d.resolve([]);
                             return d.promise;
-                            //throw new Error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
                         }
                         var gts = Object.assign(new gts_1.GTS(), res.data[0]);
                         var tags = [];
                         for (var label in gts.l) {
-                            tags.push("" + label + gts.l[label]);
+                            tags.push(label + ":" + gts.l[label]);
                         }
                         for (var _i = 0, _a = gts.v; _i < _a.length; _i++) {
                             var dp = _a[_i];
@@ -153,7 +136,7 @@ System.register(["./gts"], function (exports_1, context_1) {
                                     datasource: _this.instanceSettings.name,
                                 },
                                 title: gts.c,
-                                time: Math.trunc(dp[0] / 1000),
+                                time: Math.trunc(dp[0] / (1000)),
                                 text: dp[dp.length - 1],
                                 tags: (tags.length > 0) ? tags.join(',') : null
                             });
@@ -166,8 +149,9 @@ System.register(["./gts"], function (exports_1, context_1) {
                  * @param options
                  * @return {Promise<any>}
                  */
-                Warp10Datasource.prototype.metricFindQuery = function (opts) {
-                    return this.executeExec(this.computeGrafanaContext() + opts)
+                Warp10Datasource.prototype.metricFindQuery = function (ws) {
+                    console.log("metricFindQuery OPTS", ws);
+                    return this.executeExec(this.computeGrafanaContext() + ws)
                         .then(function (res) {
                         // only one object on the stack, good user
                         if (res.data.length === 1 && typeof res.data[0] === 'object') {
@@ -183,6 +167,7 @@ System.register(["./gts"], function (exports_1, context_1) {
                         }
                         // some elements on the stack, return all of them as entry
                         return res.data.map(function (entry, i) {
+                            console.log('ENTRY', typeof entry);
                             return {
                                 text: entry.toString() || i,
                                 value: entry
@@ -227,22 +212,34 @@ System.register(["./gts"], function (exports_1, context_1) {
                  */
                 Warp10Datasource.prototype.computeGrafanaContext = function () {
                     var wsHeader = '';
+                    console.debug('CONTEXT', this.instanceSettings.jsonData);
                     // Datasource vars
                     for (var myVar in this.instanceSettings.jsonData) {
                         var value = this.instanceSettings.jsonData[myVar];
-                        if (isNaN(parseFloat(value)))
+                        if (typeof value === 'string')
+                            value = value.replace(/'/g, '"');
+                        if (typeof value === 'string' && !value.startsWith('<%') && !value.endsWith('%>'))
                             value = "'" + value + "'";
-                        wsHeader += value + " '" + myVar + "' STORE ";
+                        wsHeader += (value || 'NULL') + " '" + myVar + "' STORE ";
                     }
                     // Dashboad templating vars
+                    console.log('TEMPLATING', this.templateSrv);
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
-                        var value = myVar.current.value;
-                        if (isNaN(parseFloat(value)))
+                        var value = myVar.current.text;
+                        if (typeof value === 'string')
                             value = "'" + value + "'";
-                        wsHeader += value + " '" + myVar.name + "' STORE ";
+                        wsHeader += (value || 'NULL') + " '" + myVar.name + "' STORE ";
                     }
                     return wsHeader;
+                };
+                Warp10Datasource.prototype.computeTimeVars = function (opts) {
+                    var end = opts.range.to.toDate().getTime() * 1000;
+                    var start = opts.range.from.toDate().getTime() * 1000;
+                    var interval = end - start;
+                    var startISO = opts.range.from.toISOString();
+                    var endISO = opts.range.to.toISOString();
+                    return end + " 'end' STORE " + start + " 'start' STORE '" + endISO + "' 'endISO' STORE '" + startISO + "' 'startISO' STORE " + interval + " 'interval' STORE ";
                 };
                 return Warp10Datasource;
             }());

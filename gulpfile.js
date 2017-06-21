@@ -8,7 +8,7 @@ const tscFiles = 'src/**.ts'
 const assetsFiles = 'src/assets/**/*.{png,svg,jpg,js}'
 const pluginDefinition = 'src/plugin.json'
 const readme = 'README.md'
-const templateFiles = 'src/template/*.pug'
+const templateFiles = 'src/partials/*.pug'
 const styleFiles = ['src/style/light.less', 'src/style/dark.less']
 
 gulp.task('build', ['assets', 'tsc', 'pug', 'less', 'plugin'])
@@ -19,7 +19,8 @@ gulp.task('tsc', () => {
     .src(tscFiles)
     .pipe(P.plumberNotifier())
     .pipe(tsProject())
-    .pipe(gulp.dest('dist/'));
+    .pipe(gulp.dest('dist/'))
+    .pipe(P.livereload())
 })
 
 gulp.task('pug', () => {
@@ -27,7 +28,8 @@ gulp.task('pug', () => {
     .src(templateFiles)
     .pipe(P.plumberNotifier())
     .pipe(P.pug({}))
-    .pipe(gulp.dest('dist/template'));
+    .pipe(gulp.dest('dist/template'))
+    .pipe(P.livereload())
 })
 
 gulp.task('less', () => {
@@ -35,7 +37,8 @@ gulp.task('less', () => {
     .src(styleFiles)
     .pipe(P.plumberNotifier())
     .pipe(P.less({}))
-    .pipe(gulp.dest('dist/style'));
+    .pipe(gulp.dest('dist/style'))
+    .pipe(P.livereload())
 })
 
 gulp.task('assets', () => {
@@ -43,6 +46,7 @@ gulp.task('assets', () => {
     .src(assetsFiles)
     .pipe(P.plumberNotifier())
     .pipe(gulp.dest('dist/assets'))
+    .pipe(P.livereload())
 })
 
 gulp.task('plugin', () => {
@@ -50,13 +54,15 @@ gulp.task('plugin', () => {
     .src([pluginDefinition, readme])
     .pipe(P.plumberNotifier())
     .pipe(gulp.dest('dist/'))
+    .pipe(P.livereload())
 })
 
 gulp.task('clean', () => {
-    return del(['dist/']);
+    return del(['dist/'])
 })
 
 gulp.task('watch', () => {
+    P.livereload.listen()
     gulp.watch(tscFiles, ['tsc'])
     gulp.watch(assetsFiles, ['assets'])
     gulp.watch([pluginDefinition, readme], ['plugin'])

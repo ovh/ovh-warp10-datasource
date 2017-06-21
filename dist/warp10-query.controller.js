@@ -1,4 +1,4 @@
-System.register(["app/plugins/sdk"], function (exports_1, context_1) {
+System.register(["app/plugins/sdk", "./query"], function (exports_1, context_1) {
     "use strict";
     var __extends = (this && this.__extends) || (function () {
         var extendStatics = Object.setPrototypeOf ||
@@ -11,34 +11,27 @@ System.register(["app/plugins/sdk"], function (exports_1, context_1) {
         };
     })();
     var __moduleName = context_1 && context_1.id;
-    var sdk_1, Warp10QueryCtrl;
+    var sdk_1, query_1, Warp10QueryCtrl;
     return {
         setters: [
             function (sdk_1_1) {
                 sdk_1 = sdk_1_1;
+            },
+            function (query_1_1) {
+                query_1 = query_1_1;
             }
         ],
         execute: function () {
             Warp10QueryCtrl = (function (_super) {
                 __extends(Warp10QueryCtrl, _super);
-                function Warp10QueryCtrl($scope, $injector, uiSegmentSrv) {
+                function Warp10QueryCtrl($scope, uiSegmentSrv, $injector) {
                     var _this = _super.call(this, $scope, $injector) || this;
                     _this.$scope = $scope;
                     _this.uiSegmentSrv = uiSegmentSrv;
-                    _this.target.target = _this.target.target || 'select metric';
-                    _this.advancedMode = true;
-                    _this.className = '';
-                    _this.labels = {};
-                    _this.bucketizer = null;
-                    _this.bucketCount = 50;
-                    _this.reducer = null;
-                    _this.reducerLabels = [];
-                    _this.bucketizers = [
-                        'sum', 'max', 'min', 'mean', 'mean.circular', 'bucketizer.mean.circular.exclude-nulls', 'first', 'last', 'join', 'median', 'count', 'and', 'or'
-                    ];
-                    _this.reducers = [
-                        'argmax', 'argmin', 'count', 'count.exclude-nulls', 'count.include-nulls', 'join', 'join.forbid-nulls', 'max', 'max.forbid-nulls', 'mean', 'mean.exclude-nulls', 'mean.circular', 'mean.circular.exclude-nulls', 'median', 'min', 'min.forbid-nulls', 'and', 'and.exclude-nulls', 'or', 'or.exclude-nulls', 'sd', 'shannonentropy.0', 'shannonentropy.1', 'sum', 'sum.forbid-nulls', 'var'
-                    ];
+                    _this.target.friendlyQuery = Object.assign(new query_1.Warp10Query(), _this.target.friendlyQuery);
+                    // acces to static members from dom
+                    _this.staticQuery = new query_1.Warp10Query();
+                    console.debug('$scope', $scope);
                     return _this;
                 }
                 /*getOptions() {
@@ -47,51 +40,47 @@ System.register(["app/plugins/sdk"], function (exports_1, context_1) {
                 Warp10QueryCtrl.prototype._addLabel = function () {
                     if (!this.extraLabelKey || !this.extraLabelValue)
                         return;
-                    this.labels[this.extraLabelKey] = this.extraLabelValue;
+                    this.target.friendlyQuery.addLabel(this.extraLabelKey, this.extraLabelValue);
                     this.extraLabelKey = '';
                     this.extraLabelValue = '';
                 };
                 Warp10QueryCtrl.prototype._delLabel = function (key) {
-                    delete this.labels[key];
+                    this.target.friendlyQuery.delLabel(key);
                 };
                 Warp10QueryCtrl.prototype._addReducerLabel = function () {
                     if (!this.extraReducerLabel)
                         return;
-                    this.reducerLabels.push(this.extraReducerLabel);
+                    this.target.friendlyQuery.addReducerLabel(this.extraReducerLabel);
                     this.extraReducerLabel = '';
                 };
                 Warp10QueryCtrl.prototype._delReducerLabel = function (label) {
-                    var i = this.reducerLabels.indexOf(label);
-                    if (i != -1)
-                        this.reducerLabels.splice(i, 1);
+                    this.target.friendlyQuery.delReducerLabel(label);
+                };
+                Warp10QueryCtrl.prototype._addFilterLabel = function () {
+                    if (!this.extraFilterLabel)
+                        return;
+                    this.target.friendlyQuery.addFilterLabel(this.extraFilterLabel);
+                    this.extraFilterLabel = '';
+                };
+                Warp10QueryCtrl.prototype._delFilterLabel = function (label) {
+                    this.target.friendlyQuery.delFilterLabel(label);
+                };
+                Warp10QueryCtrl.prototype._addFilterParamMapLabel = function () {
+                    if (!this.extraFilterParamMapKey || !this.extraFilterParamMapValue)
+                        return;
+                    this.target.friendlyQuery.addFilterParamMapLabel(this.extraFilterParamMapKey, this.extraFilterParamMapValue);
+                    this.extraFilterParamMapKey = '';
+                    this.extraFilterParamMapValue = '';
+                };
+                Warp10QueryCtrl.prototype._delFilterParamMapLabel = function (key) {
+                    this.target.friendlyQuery.delFilterParamMapLabel(key);
                 };
                 Warp10QueryCtrl.prototype._buildQuery = function () {
                     this._addLabel();
                     this._addReducerLabel();
-                    var q = '// QUERY BUILDER : AUTOGENERATED \n';
-                    var labelsStr = '';
-                    for (var label in this.labels) {
-                        labelsStr += "'" + label + "' '" + this.labels[label] + "'";
-                    }
-                    q += "[ '" + this.readToken + "' '~" + this.className + ".*' { " + labelsStr + " } $end $interval ] FETCH \n";
-                    if (this.bucketizer)
-                        q += "[ SWAP " + this.bucketizer + " $end $interval " + this.bucketCount + " / " + this.bucketCount + " ] BUCKETIZE \n";
-                    if (this.reducer) {
-                        var labels = this.reducerLabels.map(function (label) {
-                            return "'" + label + "'";
-                        });
-                        q += "[ SWAP [ " + labels.join(' ') + " ] " + this.reducer + " ] REDUCE \n";
-                    }
-                    q += "// END OF GENERATED QUERY \n";
-                    this.target.expr = q + this.target.expr;
-                    //this.$scope.$apply()
-                    console.log('GENERATED QUERY', this.target.expr);
-                    this._refreshAce();
-                };
-                Warp10QueryCtrl.prototype._refreshAce = function () {
-                    this.updateAce = !this.updateAce;
                 };
                 Warp10QueryCtrl.prototype.toggleEditorMode = function () {
+                    console.debug('Toggle readonly', this.readOnly);
                     this.readOnly = !this.readOnly;
                 };
                 Warp10QueryCtrl.prototype.onChangeInternal = function () {
