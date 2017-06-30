@@ -21,7 +21,7 @@ export class Warp10Datasource {
     let wsHeader = this.computeTimeVars(opts) +  this.computeGrafanaContext()
 
     for (let query of opts.targets) {
-      if (!query.hide) {
+      //if (!query.hide) {
         console.log('WARP10 QUERY', query)
         if (query.friendlyQuery)
           query.friendlyQuery = Object.assign(new Warp10Query(), query.friendlyQuery)
@@ -32,7 +32,7 @@ export class Warp10Datasource {
           queries.push(`${ wsHeader }\n${query.advancedMode? query.expr: query.friendlyQuery.warpScript }`)
           console.log('New Query: ', (query.advancedMode)? query.expr : query.friendlyQuery)
         }
-      }
+      //}
     }
     queries = queries.map(this.executeExec.bind(this))
 
@@ -223,7 +223,7 @@ export class Warp10Datasource {
     console.log('TEMPLATING', this.templateSrv)
     for (let myVar of this.templateSrv.variables) {
       let value = myVar.current.text
-      if (typeof value === 'string')
+      if (isNaN(value) || value.startsWith('0'))
         value = `'${value}'`
       wsHeader += `${value || 'NULL'} '${myVar.name}' STORE `
     }

@@ -31,18 +31,18 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                     var wsHeader = this.computeTimeVars(opts) + this.computeGrafanaContext();
                     for (var _i = 0, _a = opts.targets; _i < _a.length; _i++) {
                         var query = _a[_i];
-                        if (!query.hide) {
-                            console.log('WARP10 QUERY', query);
-                            if (query.friendlyQuery)
-                                query.friendlyQuery = Object.assign(new query_1.Warp10Query(), query.friendlyQuery);
-                            // Grafana can send empty Object at the first time, we need to check is there is something
-                            if (query.expr || query.friendlyQuery) {
-                                if (query.advancedMode === undefined)
-                                    query.advancedMode = true;
-                                queries.push(wsHeader + "\n" + (query.advancedMode ? query.expr : query.friendlyQuery.warpScript));
-                                console.log('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery);
-                            }
+                        //if (!query.hide) {
+                        console.log('WARP10 QUERY', query);
+                        if (query.friendlyQuery)
+                            query.friendlyQuery = Object.assign(new query_1.Warp10Query(), query.friendlyQuery);
+                        // Grafana can send empty Object at the first time, we need to check is there is something
+                        if (query.expr || query.friendlyQuery) {
+                            if (query.advancedMode === undefined)
+                                query.advancedMode = true;
+                            queries.push(wsHeader + "\n" + (query.advancedMode ? query.expr : query.friendlyQuery.warpScript));
+                            console.log('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery);
                         }
+                        //}
                     }
                     queries = queries.map(this.executeExec.bind(this));
                     return this.$q.all(queries)
@@ -227,7 +227,7 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
                         var value = myVar.current.text;
-                        if (typeof value === 'string')
+                        if (isNaN(value) || value.startsWith('0'))
                             value = "'" + value + "'";
                         wsHeader += (value || 'NULL') + " '" + myVar.name + "' STORE ";
                     }
