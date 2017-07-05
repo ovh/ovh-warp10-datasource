@@ -10,6 +10,19 @@
 .warp10-query h6 {
   margin-top: 3vh;
 }
+.warp10-query .gf-form-inline ace-editor {
+  width: 100%;
+}
+.warp10-query .gf-form-inline ace-editor textarea {
+  width: 100%;
+  min-height: 50vh;
+  outline: none;
+}
 .flex-self-start {
   align-self: flex-start;
+}
+.warp10-query .gf-form-inline ace-editor textarea {
+  background-color: #272822;
+  color: white;
+  border-color: #000000;
 }
