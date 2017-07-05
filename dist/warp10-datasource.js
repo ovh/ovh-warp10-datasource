@@ -226,7 +226,9 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                     console.log('TEMPLATING', this.templateSrv);
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
-                        var value = (!!myVar.current.value) ? myVar.current.value : myVar.current.text;
+                        var value = myVar.current.text;
+                        if (myVar.current.value === '$__all' && myVar.allValue != null)
+                            value = myVar.allValue;
                         if (isNaN(value) || value.startsWith('0'))
                             value = "'" + value + "'";
                         wsHeader += (value || 'NULL') + " '" + myVar.name + "' STORE ";

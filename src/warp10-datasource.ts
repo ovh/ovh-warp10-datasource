@@ -222,7 +222,11 @@ export class Warp10Datasource {
     // Dashboad templating vars
     console.log('TEMPLATING', this.templateSrv)
     for (let myVar of this.templateSrv.variables) {
-      let value = (!!myVar.current.value)? myVar.current.value : myVar.current.text
+      let value = myVar.current.text
+
+      if (myVar.current.value === '$__all' && myVar.allValue != null)
+        value = myVar.allValue
+
       if (isNaN(value) || value.startsWith('0'))
         value = `'${value}'`
       wsHeader += `${value || 'NULL'} '${myVar.name}' STORE `
