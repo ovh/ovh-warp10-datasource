@@ -18,6 +18,6 @@ export {
   Warp10Datasource as Datasource,
   Warp10QueryCtrl as QueryCtrl,
   Warp10ConfigCtrl as ConfigCtrl,
-  Warp10QueryOptionsCtrl as QueryOptionsCtrl,
-  //Warp10AnnotationQueryCtrl as AnnotationsQueryCtrl
+  //Warp10QueryOptionsCtrl as QueryOptionsCtrl,
+  Warp10AnnotationQueryCtrl as AnnotationsQueryCtrl
 }
