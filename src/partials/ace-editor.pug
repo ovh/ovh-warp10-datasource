@@ -23,7 +23,7 @@ script.
     const myWindow = window
     const myDocument = document
     const currentScript = (document._currentScript || document.currentScript)
-    const thidDoc = (currentScript) ? currentScript.ownerDocument : myDocument
+    const aceEditorTemplate = ((currentScript) ? currentScript.ownerDocument : myDocument).querySelector('template').content
 
     myWindow.addEventListener('WebComponentsReady', function() {
       const currentDocument = myDocument
@@ -36,7 +36,7 @@ script.
           console.debug('create new ace-editor', this)
           this.shadyRoot = this.attachShadow({mode: 'open'})
           console.log(currentDocument.querySelector('#warp10-query-template'))
-          this.shadyRoot.appendChild(currentDocument.importNode(thidDoc.querySelector('template').content, true))
+          this.shadyRoot.appendChild(currentDocument.importNode(aceEditorTemplate, true))
           this.container = this.shadyRoot.querySelector('#container')
           console.log('ace-editor container', this.container)
 
@@ -136,6 +136,7 @@ script.
           return s
         }
       }
-      window.customElements.define('ace-editor', AceEditor)
+      if (!customElements.get('ace-editor'))
+        window.customElements.define('ace-editor', AceEditor)
     })
   }(window, document))
