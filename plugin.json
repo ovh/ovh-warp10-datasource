@@ -19,8 +19,8 @@
       "url": "http://www.warp10.io/"
     },
     "logos": {
-      "small": "src/img/warp10.png",
-      "large": "src/img/warp10.png"
+      "small": "img/warp10.png",
+      "large": "img/warp10.png"
     },
     "links": [
       {"name": "GitHub", "url": "https://github.com/grafana/simple-json-datasource"},
