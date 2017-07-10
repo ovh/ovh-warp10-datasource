@@ -29,7 +29,8 @@ export class Warp10Datasource {
         if(query.expr || query.friendlyQuery) {
           if (query.advancedMode === undefined)
             query.advancedMode = true
-          queries.push(`${ wsHeader }\n${query.advancedMode? query.expr: query.friendlyQuery.warpScript }`)
+          query.ws = `${wsHeader}\n${query.advancedMode ? query.expr : query.friendlyQuery.warpScript}`
+          queries.push(query)
           console.log('New Query: ', (query.advancedMode)? query.expr : query.friendlyQuery)
         }
       //}
@@ -70,7 +71,7 @@ export class Warp10Datasource {
    * @return {Promise<any>} response
    */
   testDatasource(): Promise<any> {
-      return this.executeExec('1 2 +')
+      return this.executeExec({ws: '1 2 +'})
       .then(res => {
         console.debug('Success', res)
         if (res.data[0] != 3) {
@@ -105,7 +106,7 @@ export class Warp10Datasource {
   annotationQuery(opts: AnnotationOptions) {
     let ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query
 
-    return this.executeExec(ws)
+    return this.executeExec({ws})
     .then((res) => {
       const annotations = []
       if (!GTS.isGTS(res.data[0])) {
@@ -146,7 +147,7 @@ export class Warp10Datasource {
    */
   metricFindQuery(ws: string): Promise<any> {
     console.log("metricFindQuery OPTS", ws)
-    return this.executeExec(this.computeGrafanaContext() + ws)
+    return this.executeExec({ws: this.computeGrafanaContext() + ws})
     .then((res) => {
       // only one object on the stack, good user
       if (res.data.length === 1 &&  typeof res.data[0] === 'object') {
@@ -175,11 +176,16 @@ export class Warp10Datasource {
    * @param ws WarpScript string
    * @return {Promise<any>} Response
    */
-  private executeExec(ws: string): Promise<any> {
+  private executeExec(query: any): Promise<any> {
+
+    let endpoint = this.instanceSettings.url
+    if ((query.backend !== undefined) && (query.backend.length > 0)) {
+      endpoint = query.backend;
+    }
     return this.backendSrv.datasourceRequest({
       method: 'POST',
-      url: this.instanceSettings.url + '/api/v0/exec',
-      data: ws,
+      url: endpoint + '/api/v0/exec',
+      data: query.ws,
       headers: {
         'Accept': undefined,
         'Content-Type': undefined

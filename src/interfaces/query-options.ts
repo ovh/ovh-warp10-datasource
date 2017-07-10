@@ -20,6 +20,7 @@ export interface QueryOptions {
         target: string,
         hide: boolean,
         expr: string,
+        ws: string,
         hideLabels: boolean
         advancedMode: boolean
         friendlyQuery: Warp10Query

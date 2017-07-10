@@ -39,7 +39,8 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                         if (query.expr || query.friendlyQuery) {
                             if (query.advancedMode === undefined)
                                 query.advancedMode = true;
-                            queries.push(wsHeader + "\n" + (query.advancedMode ? query.expr : query.friendlyQuery.warpScript));
+                            query.ws = wsHeader + "\n" + (query.advancedMode ? query.expr : query.friendlyQuery.warpScript);
+                            queries.push(query);
                             console.log('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery);
                         }
                         //}
@@ -78,7 +79,7 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                  * @return {Promise<any>} response
                  */
                 Warp10Datasource.prototype.testDatasource = function () {
-                    return this.executeExec('1 2 +')
+                    return this.executeExec({ ws: '1 2 +' })
                         .then(function (res) {
                         console.debug('Success', res);
                         if (res.data[0] != 3) {
@@ -113,7 +114,7 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                 Warp10Datasource.prototype.annotationQuery = function (opts) {
                     var _this = this;
                     var ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query;
-                    return this.executeExec(ws)
+                    return this.executeExec({ ws: ws })
                         .then(function (res) {
                         var annotations = [];
                         if (!gts_1.GTS.isGTS(res.data[0])) {
@@ -151,7 +152,7 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                  */
                 Warp10Datasource.prototype.metricFindQuery = function (ws) {
                     console.log("metricFindQuery OPTS", ws);
-                    return this.executeExec(this.computeGrafanaContext() + ws)
+                    return this.executeExec({ ws: this.computeGrafanaContext() + ws })
                         .then(function (res) {
                         // only one object on the stack, good user
                         if (res.data.length === 1 && typeof res.data[0] === 'object') {
@@ -180,11 +181,15 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                  * @param ws WarpScript string
                  * @return {Promise<any>} Response
                  */
-                Warp10Datasource.prototype.executeExec = function (ws) {
+                Warp10Datasource.prototype.executeExec = function (query) {
+                    var endpoint = this.instanceSettings.url;
+                    if ((query.backend !== undefined) && (query.backend.length > 0)) {
+                        endpoint = query.backend;
+                    }
                     return this.backendSrv.datasourceRequest({
                         method: 'POST',
-                        url: this.instanceSettings.url + '/api/v0/exec',
-                        data: ws,
+                        url: endpoint + '/api/v0/exec',
+                        data: query.ws,
                         headers: {
                             'Accept': undefined,
                             'Content-Type': undefined
