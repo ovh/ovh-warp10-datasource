@@ -186,6 +186,9 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                     if ((query.backend !== undefined) && (query.backend.length > 0)) {
                         endpoint = query.backend;
                     }
+                    if (endpoint.charAt(endpoint.length - 1) === '/') {
+                        endpoint = endpoint.substr(0, endpoint.length - 1);
+                    }
                     return this.backendSrv.datasourceRequest({
                         method: 'POST',
                         url: endpoint + '/api/v0/exec',
