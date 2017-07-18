@@ -19,7 +19,6 @@ export class Warp10Datasource {
   query(opts: QueryOptions): Promise<any> {
     let queries = []
     let wsHeader = this.computeTimeVars(opts) +  this.computeGrafanaContext()
-
     for (let query of opts.targets) {
       //if (!query.hide) {
         console.log('WARP10 QUERY', query)
@@ -35,6 +34,10 @@ export class Warp10Datasource {
         }
       //}
     }
+
+    if (queries.length === 0)
+      return this.$q.when({ data: [] })
+
     queries = queries.map(this.executeExec.bind(this))
 
     return this.$q.all(queries)
@@ -44,13 +47,10 @@ export class Warp10Datasource {
       responses.forEach((res, i) => {
         if (res.data.type === 'error') {
           console.error(res.data.value)
-          var d = this.$q.defer()
-          d.resolve({data: []})
-          return d.promise
+          return
         }
-        let gtss = GTS.stackFilter(res.data)
 
-        for (let gts of gtss) {
+        for (let gts of GTS.stackFilter(res.data)) {
           let grafanaGts = {
             target: (opts.targets[i].hideLabels)? gts.c : gts.nameWithLabels,
             datapoints: []
@@ -64,6 +64,9 @@ export class Warp10Datasource {
       })
       return { data }
     })
+    .catch((err) => {
+      return this.$q.when({ data: [] })
+    })
   }
 
   /**
@@ -74,7 +77,7 @@ export class Warp10Datasource {
       return this.executeExec({ws: '1 2 +'})
       .then(res => {
         console.debug('Success', res)
-        if (res.data[0] != 3) {
+        if (res.data[0] !== 3) {
           return {
             status: 'error',
             message: JSON.parse(res.data) || res.data,
@@ -146,7 +149,6 @@ export class Warp10Datasource {
    * @return {Promise<any>}
    */
   metricFindQuery(ws: string): Promise<any> {
-    console.log("metricFindQuery OPTS", ws)
     return this.executeExec({ws: this.computeGrafanaContext() + ws})
     .then((res) => {
       // only one object on the stack, good user
@@ -246,11 +248,20 @@ export class Warp10Datasource {
   }
 
   private computeTimeVars(opts): string {
-    let end = opts.range.to.toDate().getTime() * 1000
-    let start = opts.range.from.toDate().getTime() * 1000
-    let interval = end - start
-    let startISO = opts.range.from.toISOString()
-    let endISO = opts.range.to.toISOString()
-    return `${end} 'end' STORE ${start} 'start' STORE '${endISO}' 'endISO' STORE '${startISO}' 'startISO' STORE ${interval} 'interval' STORE `
+    let vars: any = {
+      start: opts.range.from.toDate().getTime() * 1000,
+      startISO: opts.range.from.toISOString(),
+      end: opts.range.to.toDate().getTime() * 1000,
+      endISO: opts.range.to.toISOString(),
+    }
+    vars.interval = vars.end - vars.start
+    vars.__interval = Math.floor(vars.interval / (opts.maxDataPoints || 1))
+    vars.__interval_ms = Math.floor(vars.__interval / 1000)
+
+    let str = ''
+    for (let gVar in vars) {
+      str += `${isNaN(vars[gVar]) ? `'${vars[gVar]}'` : vars[gVar] } '${ gVar }' STORE `
+    }
+    return str
   }
 }

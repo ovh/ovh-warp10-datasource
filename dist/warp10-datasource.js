@@ -45,6 +45,8 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                         }
                         //}
                     }
+                    if (queries.length === 0)
+                        return this.$q.when({ data: [] });
                     queries = queries.map(this.executeExec.bind(this));
                     return this.$q.all(queries)
                         .then(function (responses) {
@@ -53,25 +55,25 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                         responses.forEach(function (res, i) {
                             if (res.data.type === 'error') {
                                 console.error(res.data.value);
-                                var d = _this.$q.defer();
-                                d.resolve({ data: [] });
-                                return d.promise;
+                                return;
                             }
-                            var gtss = gts_1.GTS.stackFilter(res.data);
-                            for (var _i = 0, gtss_1 = gtss; _i < gtss_1.length; _i++) {
-                                var gts = gtss_1[_i];
+                            for (var _i = 0, _a = gts_1.GTS.stackFilter(res.data); _i < _a.length; _i++) {
+                                var gts = _a[_i];
                                 var grafanaGts = {
                                     target: (opts.targets[i].hideLabels) ? gts.c : gts.nameWithLabels,
                                     datapoints: []
                                 };
-                                for (var _a = 0, _b = gts.v; _a < _b.length; _a++) {
-                                    var dp = _b[_a];
+                                for (var _b = 0, _c = gts.v; _b < _c.length; _b++) {
+                                    var dp = _c[_b];
                                     grafanaGts.datapoints.push([dp[dp.length - 1], dp[0] / 1000]);
                                 }
                                 data.push(grafanaGts);
                             }
                         });
                         return { data: data };
+                    })
+                        .catch(function (err) {
+                        return _this.$q.when({ data: [] });
                     });
                 };
                 /**
@@ -82,7 +84,7 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                     return this.executeExec({ ws: '1 2 +' })
                         .then(function (res) {
                         console.debug('Success', res);
-                        if (res.data[0] != 3) {
+                        if (res.data[0] !== 3) {
                             return {
                                 status: 'error',
                                 message: JSON.parse(res.data) || res.data,
@@ -151,7 +153,6 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                  * @return {Promise<any>}
                  */
                 Warp10Datasource.prototype.metricFindQuery = function (ws) {
-                    console.log("metricFindQuery OPTS", ws);
                     return this.executeExec({ ws: this.computeGrafanaContext() + ws })
                         .then(function (res) {
                         // only one object on the stack, good user
@@ -244,12 +245,20 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                     return wsHeader;
                 };
                 Warp10Datasource.prototype.computeTimeVars = function (opts) {
-                    var end = opts.range.to.toDate().getTime() * 1000;
-                    var start = opts.range.from.toDate().getTime() * 1000;
-                    var interval = end - start;
-                    var startISO = opts.range.from.toISOString();
-                    var endISO = opts.range.to.toISOString();
-                    return end + " 'end' STORE " + start + " 'start' STORE '" + endISO + "' 'endISO' STORE '" + startISO + "' 'startISO' STORE " + interval + " 'interval' STORE ";
+                    var vars = {
+                        start: opts.range.from.toDate().getTime() * 1000,
+                        startISO: opts.range.from.toISOString(),
+                        end: opts.range.to.toDate().getTime() * 1000,
+                        endISO: opts.range.to.toISOString(),
+                    };
+                    vars.interval = vars.end - vars.start;
+                    vars.__interval = Math.floor(vars.interval / (opts.maxDataPoints || 1));
+                    vars.__interval_ms = Math.floor(vars.__interval / 1000);
+                    var str = '';
+                    for (var gVar in vars) {
+                        str += (isNaN(vars[gVar]) ? "'" + vars[gVar] + "'" : vars[gVar]) + " '" + gVar + "' STORE ";
+                    }
+                    return str;
                 };
                 return Warp10Datasource;
             }());
