@@ -119,30 +119,32 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                     return this.executeExec({ ws: ws })
                         .then(function (res) {
                         var annotations = [];
-                        if (!gts_1.GTS.isGTS(res.data[0])) {
-                            console.error("An annotation query must return exactly 1 GTS on top of the stack, annotation: " + opts.annotation.name);
-                            var d = _this.$q.defer();
-                            d.resolve([]);
-                            return d.promise;
-                        }
-                        var gts = Object.assign(new gts_1.GTS(), res.data[0]);
-                        var tags = [];
-                        for (var label in gts.l) {
-                            tags.push(label + ":" + gts.l[label]);
-                        }
-                        for (var _i = 0, _a = gts.v; _i < _a.length; _i++) {
-                            var dp = _a[_i];
-                            annotations.push({
-                                annotation: {
-                                    name: opts.annotation.name,
-                                    enabled: true,
-                                    datasource: _this.instanceSettings.name,
-                                },
-                                title: gts.c,
-                                time: Math.trunc(dp[0] / (1000)),
-                                text: dp[dp.length - 1],
-                                tags: (tags.length > 0) ? tags.join(',') : null
-                            });
+                        /*if (!) {
+                          console.error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
+                          var d = this.$q.defer()
+                          d.resolve([])
+                          return d.promise
+                        }*/
+                        for (var _i = 0, _a = gts_1.GTS.stackFilter(res.data); _i < _a.length; _i++) {
+                            var gts = _a[_i];
+                            var tags = [];
+                            for (var label in gts.l) {
+                                tags.push(label + ":" + gts.l[label]);
+                            }
+                            for (var _b = 0, _c = gts.v; _b < _c.length; _b++) {
+                                var dp = _c[_b];
+                                annotations.push({
+                                    annotation: {
+                                        name: opts.annotation.name,
+                                        enabled: true,
+                                        datasource: _this.instanceSettings.name,
+                                    },
+                                    title: gts.c,
+                                    time: Math.trunc(dp[0] / (1000)),
+                                    text: dp[dp.length - 1],
+                                    tags: (tags.length > 0) ? tags.join(',') : null
+                                });
+                            }
                         }
                         return annotations;
                     });
@@ -236,7 +238,7 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
                         var value = myVar.current.text;
-                        if (myVar.current.value === '$__all' && myVar.allValue != null)
+                        if (myVar.current.value === '$__all' && myVar.allValue !== null)
                             value = myVar.allValue;
                         if (isNaN(value) || value.startsWith('0'))
                             value = "'" + value + "'";

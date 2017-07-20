@@ -112,32 +112,33 @@ export class Warp10Datasource {
     return this.executeExec({ws})
     .then((res) => {
       const annotations = []
-      if (!GTS.isGTS(res.data[0])) {
+      /*if (!) {
         console.error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
         var d = this.$q.defer()
         d.resolve([])
         return d.promise
-      }
+      }*/
 
-      let gts = Object.assign(new GTS(), res.data[0])
-      let tags = []
+      for (let gts of GTS.stackFilter(res.data)) {
+        let tags = []
 
-      for (let label in gts.l) {
-        tags.push(`${ label }:${ gts.l[label] }`)
-      }
+        for (let label in gts.l) {
+          tags.push(`${ label }:${ gts.l[label] }`)
+        }
 
-      for (let dp of gts.v) {
-        annotations.push({
-          annotation: {
-            name: opts.annotation.name,
-            enabled: true,
-            datasource: this.instanceSettings.name,
-          },
-          title: gts.c,
-          time: Math.trunc(dp[0] / (1000)),
-          text: dp[dp.length - 1],
-          tags: (tags.length > 0) ? tags.join(',') : null
-        })
+        for (let dp of gts.v) {
+          annotations.push({
+            annotation: {
+              name: opts.annotation.name,
+              enabled: true,
+              datasource: this.instanceSettings.name,
+            },
+            title: gts.c,
+            time: Math.trunc(dp[0] / (1000)),
+            text: dp[dp.length - 1],
+            tags: (tags.length > 0) ? tags.join(',') : null
+          })
+        }
       }
       return annotations
     })
@@ -237,7 +238,7 @@ export class Warp10Datasource {
     for (let myVar of this.templateSrv.variables) {
       let value = myVar.current.text
 
-      if (myVar.current.value === '$__all' && myVar.allValue != null)
+      if (myVar.current.value === '$__all' && myVar.allValue !== null)
         value = myVar.allValue
 
       if (isNaN(value) || value.startsWith('0'))
