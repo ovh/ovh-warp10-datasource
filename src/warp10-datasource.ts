@@ -18,7 +18,8 @@ export class Warp10Datasource {
    */
   query(opts: QueryOptions): Promise<any> {
     let queries = []
-    let wsHeader = this.computeTimeVars(opts) +  this.computeGrafanaContext()
+    console.log("OPTIONS", opts)
+    let wsHeader = this.computeTimeVars(opts) +  this.computeGrafanaContext() + this.computePanelRepeatVars(opts)
     for (let query of opts.targets) {
       //if (!query.hide) {
         console.log('WARP10 QUERY', query)
@@ -262,6 +263,20 @@ export class Warp10Datasource {
     let str = ''
     for (let gVar in vars) {
       str += `${isNaN(vars[gVar]) ? `'${vars[gVar]}'` : vars[gVar] } '${ gVar }' STORE `
+    }
+
+    return str
+  }
+
+  private computePanelRepeatVars(opts): string {
+    let str = ''
+    if (opts.scopedVars) {
+      for(let k in opts.scopedVars) {
+        let v = opts.scopedVars[k]
+        if (v.selected) {
+          str += `'${v.value}' '${k}' STORE `
+        }
+      }
     }
     return str
   }

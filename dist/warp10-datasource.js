@@ -28,7 +28,8 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                 Warp10Datasource.prototype.query = function (opts) {
                     var _this = this;
                     var queries = [];
-                    var wsHeader = this.computeTimeVars(opts) + this.computeGrafanaContext();
+                    console.log("OPTIONS", opts);
+                    var wsHeader = this.computeTimeVars(opts) + this.computeGrafanaContext() + this.computePanelRepeatVars(opts);
                     for (var _i = 0, _a = opts.targets; _i < _a.length; _i++) {
                         var query = _a[_i];
                         //if (!query.hide) {
@@ -259,6 +260,18 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                     var str = '';
                     for (var gVar in vars) {
                         str += (isNaN(vars[gVar]) ? "'" + vars[gVar] + "'" : vars[gVar]) + " '" + gVar + "' STORE ";
+                    }
+                    return str;
+                };
+                Warp10Datasource.prototype.computePanelRepeatVars = function (opts) {
+                    var str = '';
+                    if (opts.scopedVars) {
+                        for (var k in opts.scopedVars) {
+                            var v = opts.scopedVars[k];
+                            if (v.selected) {
+                                str += "'" + v.value + "' '" + k + "' STORE ";
+                            }
+                        }
                     }
                     return str;
                 };
