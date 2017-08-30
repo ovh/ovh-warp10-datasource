@@ -1,6 +1,7 @@
 import { QueryOptions } from './interfaces/query-options'
 import { AnnotationOptions } from './interfaces/annotation-options'
 import { GTS } from './gts'
+import { Table } from './table'
 import { Warp10Query } from './query'
 
 export class Warp10Datasource {
@@ -18,11 +19,9 @@ export class Warp10Datasource {
    */
   query(opts: QueryOptions): Promise<any> {
     let queries = []
-    console.log("OPTIONS", opts)
     let wsHeader = this.computeTimeVars(opts) +  this.computeGrafanaContext() + this.computePanelRepeatVars(opts)
     for (let query of opts.targets) {
       //if (!query.hide) {
-        console.log('WARP10 QUERY', query)
         if (query.friendlyQuery)
           query.friendlyQuery = Object.assign(new Warp10Query(), query.friendlyQuery)
         // Grafana can send empty Object at the first time, we need to check is there is something
@@ -36,8 +35,11 @@ export class Warp10Datasource {
       //}
     }
 
-    if (queries.length === 0)
-      return this.$q.when({ data: [] })
+    if (queries.length === 0) {
+      let p = this.$q.defer()
+      p.resolve({ data: [] })
+      return p.promise
+    }
 
     queries = queries.map(this.executeExec.bind(this))
 
@@ -48,6 +50,14 @@ export class Warp10Datasource {
       responses.forEach((res, i) => {
         if (res.data.type === 'error') {
           console.error(res.data.value)
+          return
+        }
+
+        // is it for a Table grpah ?
+        if (res.data.length === 1 && res.data[0] && Table.isTable(res.data[0])) {
+          const t = res.data[0]
+          t.type = 'table'
+          data.push(t)
           return
         }
 
@@ -66,7 +76,9 @@ export class Warp10Datasource {
       return { data }
     })
     .catch((err) => {
-      return this.$q.when({ data: [] })
+      let p = this.$q.defer()
+      p.resolve({ data: [] })
+      return p.promise
     })
   }
 
@@ -77,7 +89,6 @@ export class Warp10Datasource {
   testDatasource(): Promise<any> {
       return this.executeExec({ws: '1 2 +'})
       .then(res => {
-        console.debug('Success', res)
         if (res.data[0] !== 3) {
           return {
             status: 'error',
@@ -166,7 +177,6 @@ export class Warp10Datasource {
       }
       // some elements on the stack, return all of them as entry
       return res.data.map((entry, i) => {
-        console.log('ENTRY', typeof entry)
         return {
           text: entry.toString() || i,
           value: entry
@@ -224,7 +234,6 @@ export class Warp10Datasource {
    */
   private computeGrafanaContext(): string {
     let wsHeader = ''
-    console.debug('CONTEXT', this.instanceSettings.jsonData)
     // Datasource vars
     for (let myVar in this.instanceSettings.jsonData) {
       let value = this.instanceSettings.jsonData[myVar]
@@ -235,7 +244,6 @@ export class Warp10Datasource {
       wsHeader += `${value || 'NULL'} '${myVar}' STORE `
     }
     // Dashboad templating vars
-    console.log('TEMPLATING', this.templateSrv)
     for (let myVar of this.templateSrv.variables) {
       let value = myVar.current.text
 

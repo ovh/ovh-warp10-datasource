@@ -1,11 +1,14 @@
-System.register(["./gts", "./query"], function (exports_1, context_1) {
+System.register(["./gts", "./table", "./query"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var gts_1, query_1, Warp10Datasource;
+    var gts_1, table_1, query_1, Warp10Datasource;
     return {
         setters: [
             function (gts_1_1) {
                 gts_1 = gts_1_1;
+            },
+            function (table_1_1) {
+                table_1 = table_1_1;
             },
             function (query_1_1) {
                 query_1 = query_1_1;
@@ -28,12 +31,10 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                 Warp10Datasource.prototype.query = function (opts) {
                     var _this = this;
                     var queries = [];
-                    console.log("OPTIONS", opts);
                     var wsHeader = this.computeTimeVars(opts) + this.computeGrafanaContext() + this.computePanelRepeatVars(opts);
                     for (var _i = 0, _a = opts.targets; _i < _a.length; _i++) {
                         var query = _a[_i];
                         //if (!query.hide) {
-                        console.log('WARP10 QUERY', query);
                         if (query.friendlyQuery)
                             query.friendlyQuery = Object.assign(new query_1.Warp10Query(), query.friendlyQuery);
                         // Grafana can send empty Object at the first time, we need to check is there is something
@@ -46,8 +47,11 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                         }
                         //}
                     }
-                    if (queries.length === 0)
-                        return this.$q.when({ data: [] });
+                    if (queries.length === 0) {
+                        var p = this.$q.defer();
+                        p.resolve({ data: [] });
+                        return p.promise;
+                    }
                     queries = queries.map(this.executeExec.bind(this));
                     return this.$q.all(queries)
                         .then(function (responses) {
@@ -56,6 +60,13 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                         responses.forEach(function (res, i) {
                             if (res.data.type === 'error') {
                                 console.error(res.data.value);
+                                return;
+                            }
+                            // is it for a Table grpah ?
+                            if (res.data.length === 1 && res.data[0] && table_1.Table.isTable(res.data[0])) {
+                                var t = res.data[0];
+                                t.type = 'table';
+                                data.push(t);
                                 return;
                             }
                             for (var _i = 0, _a = gts_1.GTS.stackFilter(res.data); _i < _a.length; _i++) {
@@ -74,7 +85,9 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                         return { data: data };
                     })
                         .catch(function (err) {
-                        return _this.$q.when({ data: [] });
+                        var p = _this.$q.defer();
+                        p.resolve({ data: [] });
+                        return p.promise;
                     });
                 };
                 /**
@@ -84,7 +97,6 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                 Warp10Datasource.prototype.testDatasource = function () {
                     return this.executeExec({ ws: '1 2 +' })
                         .then(function (res) {
-                        console.debug('Success', res);
                         if (res.data[0] !== 3) {
                             return {
                                 status: 'error',
@@ -172,7 +184,6 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                         }
                         // some elements on the stack, return all of them as entry
                         return res.data.map(function (entry, i) {
-                            console.log('ENTRY', typeof entry);
                             return {
                                 text: entry.toString() || i,
                                 value: entry
@@ -224,7 +235,6 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                  */
                 Warp10Datasource.prototype.computeGrafanaContext = function () {
                     var wsHeader = '';
-                    console.debug('CONTEXT', this.instanceSettings.jsonData);
                     // Datasource vars
                     for (var myVar in this.instanceSettings.jsonData) {
                         var value = this.instanceSettings.jsonData[myVar];
@@ -235,7 +245,6 @@ System.register(["./gts", "./query"], function (exports_1, context_1) {
                         wsHeader += (value || 'NULL') + " '" + myVar + "' STORE ";
                     }
                     // Dashboad templating vars
-                    console.log('TEMPLATING', this.templateSrv);
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
                         var value = myVar.current.text;

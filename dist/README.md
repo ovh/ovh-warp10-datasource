@@ -34,9 +34,9 @@ to graph something on Grafana you need to return some GTS
 
 ## WarpScript example
 
-The plugin look for GTS or GTS array in your stack, all other stack entry will be ignored
+/!\ The plugin look for GTS or GTS array in your stack, all other stack entry will be ignored
 
-```warpScript
+```WarpScript
 NEWGTS
 'com.cityzendata.grafana.test' RENAME @myMacro
 'func' 'sinus' 2 ->MAP RELABEL
@@ -59,6 +59,33 @@ $interval 20 / TOLONG 'step' STORE
 $start $end $stepMacro $execMacroSinus FORSTEP
 $start $end $stepMacro $execMacroCoinus FORSTEP
 $sinus $cosinus
+```
+
+### Table case
+There is a way to build custom tables instead of formating GTS array
+If your stack have only 1 element and this element have `columns` and `rows` property
+Then you can choose *Table* as *Table transform* in Table Options section
+
+WarpScript example:
+```WarpScript
+{
+  'columns' [
+    {
+      'text' 'columnA'
+      'type' 'number'
+      'sort' true
+      'desc' true
+    }
+    {
+      'text' 'columnB'
+      'type' 'number'
+    }
+  ]
+  'rows' [
+    [ 10 20 ]
+    [ 100 200 ]
+  ]
+}
 ```
 
 ## Available variables
