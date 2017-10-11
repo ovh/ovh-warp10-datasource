@@ -3,7 +3,7 @@
 System.register(['moment', './css/app.css!'], function (_export, _context) {
   "use strict";
 
-  var moment, _typeof, _createClass, Warp10Datasource;
+  var moment, _slicedToArray, _typeof, _createClass, Warp10Datasource;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -16,6 +16,44 @@ System.register(['moment', './css/app.css!'], function (_export, _context) {
       moment = _moment.default;
     }, function (_cssAppCss) {}],
     execute: function () {
+      _slicedToArray = function () {
+        function sliceIterator(arr, i) {
+          var _arr = [];
+          var _n = true;
+          var _d = false;
+          var _e = undefined;
+
+          try {
+            for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+              _arr.push(_s.value);
+
+              if (i && _arr.length === i) break;
+            }
+          } catch (err) {
+            _d = true;
+            _e = err;
+          } finally {
+            try {
+              if (!_n && _i["return"]) _i["return"]();
+            } finally {
+              if (_d) throw _e;
+            }
+          }
+
+          return _arr;
+        }
+
+        return function (arr, i) {
+          if (Array.isArray(arr)) {
+            return arr;
+          } else if (Symbol.iterator in Object(arr)) {
+            return sliceIterator(arr, i);
+          } else {
+            throw new TypeError("Invalid attempt to destructure non-iterable instance");
+          }
+        };
+      }();
+
       _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
         return typeof obj;
       } : function (obj) {
@@ -196,7 +234,7 @@ System.register(['moment', './css/app.css!'], function (_export, _context) {
                   result.push(self.transformMetricData(metricData, options.targets[index]));
                 });
               });
-
+              console.debug('[grafana-warp10-datasource] Response data', { data: result });
               return { data: result };
             });
           }
@@ -368,17 +406,23 @@ System.register(['moment', './css/app.css!'], function (_export, _context) {
         }, {
           key: 'transformMetricData',
           value: function transformMetricData(gts) {
-            if ((typeof gts === 'undefined' ? 'undefined' : _typeof(gts)) == 'object') {
-              return gts;
-            }
             if (!this.isGts(gts)) {
-              console.debug('[grafana-warp10-datasource] Response item isn\'t a gts', gts);
+              if ((typeof gts === 'undefined' ? 'undefined' : _typeof(gts)) == 'object') {
+                console.debug('[grafana-warp10-datasource] Response item is an object', gts);
+                return gts;
+              }
+              console.debug('[grafana-warp10-datasource] Response item isn\'t neither an object nor a GTS', gts);
               return;
             }
 
+            console.debug('[grafana-warp10-datasource] Response item is a GTS', gts);
             var className = gts.c;
 
-            var labels = gts.l.map(function (value, key) {
+            var labels = Object.entries(gts.l).map(function (_ref) {
+              var _ref2 = _slicedToArray(_ref, 2),
+                  key = _ref2[0],
+                  value = _ref2[1];
+
               return key + '=' + value;
             }).join(',');
 
