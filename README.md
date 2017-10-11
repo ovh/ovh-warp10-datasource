@@ -88,7 +88,8 @@ add the changes to the official version of the plugin.
 When both `grafana-warp10-datasource` and the modified `grafana-worldmap-panel` installed, you can define a new Wordmap widget,
 with a Warp&nbsp;10 datasource and `json result` as *Location Data* in the *Worlmap* tab:
 
-[[ Add images here ]]
+![Warp&nbsp;10 datasource](./assets/README-worldmap-datasource-tab.jpg)
+![`json result` as *Location Data* in the *Worlmap* tab](./assets/README-worldmap-worldmap-tab.jpg)
 
 Now in your WarpScript you can generate data in the JSON format supported by Worldmap, for example :
 
@@ -99,7 +100,7 @@ JSON->
 
 And then you can see the chosen locations in the map:
 
-[[ Add images here ]]
+![Worlmap view without values](README-worldmap-view-without-values.jpg)
 
 You can also give a `value` to each location, in order to show the locations with different sizes and colors, as Worldmap allows:
 
@@ -108,7 +109,7 @@ You can also give a `value` to each location, in order to show the locations wit
 JSON->
 ```
 
-[[ Add images here ]]
+![Worlmap view with values](README-worldmap-view-with-values.jpg)
 
 
 
