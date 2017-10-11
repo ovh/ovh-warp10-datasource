@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['lodash', 'moment', './css/app.css!'], function (_export, _context) {
+System.register(['moment', './css/app.css!'], function (_export, _context) {
   "use strict";
 
-  var _, moment, _typeof, _createClass, Warp10Datasource;
+  var moment, _typeof, _createClass, Warp10Datasource;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -12,9 +12,7 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
   }
 
   return {
-    setters: [function (_lodash) {
-      _ = _lodash.default;
-    }, function (_moment) {
+    setters: [function (_moment) {
       moment = _moment.default;
     }, function (_cssAppCss) {}],
     execute: function () {
@@ -62,7 +60,6 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
         _createClass(Warp10Datasource, [{
           key: 'metricFindQuery',
           value: function metricFindQuery(options) {
-
             var backend = this.url;
             while (backend[backend.length - 1] === '/') {
               // remove trailing slash
@@ -70,10 +67,10 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
             }
             var url = backend + '/api/v0/exec';
 
-            console.log(this.templateSrv);
-            _.each(this.templateSrv.variables, function (variable) {
+            console.debug(this.templateSrv);
+            this.templateSrv.variables.forEach(function (variable) {
               if (isNaN(variable.current.value)) {
-                options = options.replace(new RegExp('\\$' + variable.name, 'g'), "'$" + variable.name + "'");
+                options = options.replace(new RegExp('\\$' + variable.name, 'g'), '\'$' + variable.name + '\'');
               }
             });
             options = this.templateSrv.replace(options, null, 'regex');
@@ -92,8 +89,8 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
         }, {
           key: 'parseTemplatingResult',
           value: function parseTemplatingResult(o) {
-            console.log('tesmplating result', o);
-            return _.map(o.data, function (data, indice) {
+            console.debug('tesmplating result', o);
+            return o.data.map(function (data, indice) {
               return { text: data.toString() || indice, value: data };
             });
           }
@@ -119,7 +116,7 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
               if (res.data[0] != 3) {
                 return {
                   status: 'error',
-                  message: "Can't execute test WarpScript: '1 2 +'not equals to " + res.data,
+                  message: 'Can\'t execute test WarpScript: \'1 2 +\'not equals to ' + res.data,
                   title: 'Success'
                 };
               }
@@ -139,49 +136,49 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
         }, {
           key: 'query',
           value: function query(options) {
+            var _this = this;
 
-            console.log("Query begin");
+            console.debug('[grafana-warp10-datasource] Query begin', options);
 
             var end = this.convertToWarp10Time(options.range.to);
             var start = this.convertToWarp10Time(options.range.from);
 
-            console.log("From: " + start + " To: " + end);
+            console.debug('[grafana-warp10-datasource] From: ' + start + ' To: ' + end);
 
             var queries = [];
 
-            console.log("Before foreach");
+            console.debug('[grafana-warp10-datasource] Before foreach');
 
-            _.each(options.targets, _.bind(function (target) {
+            if (options.targets) {
+              options.targets.forEach(function (target) {
+                console.debug('[grafana-warp10-datasource] Expr', target.expr);
+                console.debug('[grafana-warp10-datasource] Backend URL', target.backend);
+                queries.push(target);
+              });
+            }
 
-              console.log("Expre", target.expr);
-              console.log("Backend URL", target.backend);
-
-              queries.push(target);
-            }, this));
-
-            console.log("After foreach");
+            console.debug('[grafana-warp10-datasource] After foreach');
 
             // No valid targets, return the empty result to save a round trip.
-            if (_.isEmpty(queries)) {
 
-              console.log("Empty query");
+            if (!queries || queries.length == 0) {
+              console.debug('[grafana-warp10-datasource] Empty query');
 
               var d = this.q.defer();
               d.resolve({ data: [] });
               return d.promise;
             }
 
-            var allQueryPromise = _.map(queries, _.bind(function (query) {
-              return this.performTimeSeriesQuery(query, start, end);
-            }, this));
+            var allQueryPromise = queries.map(function (query) {
+              return _this.performTimeSeriesQuery(query, start, end);
+            });
 
             var self = this;
             return this.q.all(allQueryPromise).then(function (allResponse) {
               var result = [];
 
-              _.each(allResponse, function (response, index) {
-
-                console.log("Response", response);
+              allResponse.forEach(function (response, index) {
+                console.debug('[grafana-warp10-datasource] Response', response);
                 if (response.data.type === 'error') {
                   self.lastErrors.query = response.data.value;
                   throw response.data.value;
@@ -189,13 +186,13 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
                 delete self.lastErrors.query;
 
                 if (!self.isArray(response.data) || response.data.length !== 1) {
-                  console.log("Response isn't an Array or it has more than 1 element", response.data);
+                  console.debug('[grafana-warp10-datasource] Response isn\'t an Array or it has more than 1 element', response.data);
                   return {};
                 }
 
                 var warpscriptJsonResponse = response.data[0];
-                _.each(warpscriptJsonResponse, function (metricData) {
-                  console.log("Metric data", metricData);
+                warpscriptJsonResponse.forEach(function (metricData) {
+                  console.debug('[grafana-warp10-datasource] Metric data', metricData);
                   result.push(self.transformMetricData(metricData, options.targets[index]));
                 });
               });
@@ -206,7 +203,7 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
         }, {
           key: 'annotationQuery',
           value: function annotationQuery(options) {
-            var _this = this;
+            var _this2 = this;
 
             var end = this.convertToWarp10Time(options.range.to);
             var start = this.convertToWarp10Time(options.range.from);
@@ -219,7 +216,7 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
                 return [];
               }
               var gts = res.data[0];
-              console.log('GTS', gts);
+              console.debug('GTS', gts);
               var tags = [];
               for (var label in gts.l) {
                 tags.push(label + ':' + gts.l[label]);
@@ -239,7 +236,7 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
                     annotation: {
                       name: options.annotation.name,
                       enabled: true,
-                      datasource: _this.name
+                      datasource: _this2.name
                     },
                     title: gts.c,
                     time: Math.trunc(dp[0] / 1000),
@@ -272,16 +269,16 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
         }, {
           key: 'buildQueryParameters',
           value: function buildQueryParameters(options) {
-            var _this2 = this;
+            var _this3 = this;
 
-            //remove placeholder targets
-            options.targets = _.filter(options.targets, function (target) {
+            // remove placeholder targets
+            options.targets = options.targets.filter(function (target) {
               return target.target !== 'select metric';
             });
 
-            var targets = _.map(options.targets, function (target) {
+            var targets = options.targets.map(function (target) {
               return {
-                target: _this2.templateSrv.replace(target.target),
+                target: _this3.templateSrv.replace(target.target),
                 refId: target.refId,
                 hide: target.hide,
                 expr: target.expr,
@@ -296,7 +293,6 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
         }, {
           key: 'performTimeSeriesQuery',
           value: function performTimeSeriesQuery(query, start, end) {
-
             var warpscriptScript = this.prepareWarpscriptQuery(query, start, end);
 
             var backend = this.url;
@@ -328,12 +324,11 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
         }, {
           key: 'prepareWarpscriptQuery',
           value: function prepareWarpscriptQuery(query, start, end) {
-
             var endISO = this.convertToISO(end);
             var startISO = this.convertToISO(start);
             var interval = end - start;
 
-            var warpscriptScript = " " + start + " 'start' STORE " + end + " 'end' STORE " + "'" + startISO + "' 'startISO' STORE '" + endISO + "' 'endISO' STORE " + interval + " 'interval' STORE";
+            var warpscriptScript = ' ' + start + ' \'start\' STORE ' + end + ' \'end\' STORE ' + '\'' + startISO + '\' \'startISO\' STORE \'' + endISO + '\' \'endISO\' STORE ' + interval + ' \'interval\' STORE';
 
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
@@ -346,9 +341,9 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
                 var tmp = variable.current.text;
                 if (isNaN(variable.current.text)) {
                   // It's a string
-                  tmp = "'" + variable.current.text + "'";
+                  tmp = '\'' + variable.current.text + '\'';
                 }
-                warpscriptScript += "\n" + tmp + " '" + variable.name + "' STORE";
+                warpscriptScript += '\n' + tmp + ' \'' + variable.name + '\' STORE';
               }
             } catch (err) {
               _didIteratorError2 = true;
@@ -366,36 +361,38 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
             }
 
             if (query.expr !== undefined) {
-              warpscriptScript += " " + query.expr;
+              warpscriptScript += ' ' + query.expr;
             }
             return warpscriptScript;
           }
         }, {
           key: 'transformMetricData',
           value: function transformMetricData(gts) {
-
+            if ((typeof gts === 'undefined' ? 'undefined' : _typeof(gts)) == 'object') {
+              return gts;
+            }
             if (!this.isGts(gts)) {
-              console.log("Response item isn't a gts", gts);
+              console.debug('[grafana-warp10-datasource] Response item isn\'t a gts', gts);
               return;
             }
 
             var className = gts.c;
 
-            var labels = _.map(gts.l, function (value, key) {
-              return key + "=" + value;
-            }).join(",");
+            var labels = gts.l.map(function (value, key) {
+              return key + '=' + value;
+            }).join(',');
 
-            var metricName = className + "{" + labels + "}";
+            var metricName = className + '{' + labels + '}';
             var dps = [];
 
-            _.each(gts.v, function (value) {
+            gts.v.forEach(function (value) {
               // Datapoint format: [ value, label]
               dps.push([value[value.length - 1], Math.floor(value[0] / 1000)]);
             });
 
             // Metric format {target: "Label text", datapoints: [ datapoints objects] }
 
-            console.log({ target: metricName, datapoints: dps });
+            console.debug({ target: metricName, datapoints: dps });
             return { target: metricName, datapoints: dps };
           }
         }, {
@@ -432,7 +429,7 @@ System.register(['lodash', 'moment', './css/app.css!'], function (_export, _cont
             if (moment.isMoment(text)) {
               return text;
             }
-            if (_.isDate(text)) {
+            if (Object.prototype.toString.call(text) === '[object Date]') {
               return moment(text);
             }
 

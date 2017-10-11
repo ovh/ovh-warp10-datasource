@@ -21,10 +21,9 @@ System.register([], function (_export, _context) {
           "keyword.control": warpscriptControl,
           "keyword.other": warpscriptFrameworkFunctions,
           "support.function": warpscriptFunctions
-        };
 
-        // console.debug("[mode-warpscript] keywordMap", keywordMap);
-        exports.KeywordMap = keywordMap;
+          // console.debug("[mode-warpscript] keywordMap", keywordMap);
+        };exports.KeywordMap = keywordMap;
       });
 
       ace.define("ace/mode/warpscript_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules", "ace/mode/warpscript_keywords"], function (require, exports, module) {

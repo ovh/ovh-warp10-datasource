@@ -71,14 +71,13 @@ System.register(['app/plugins/sdk'], function (_export, _context) {
           _this.target.target = _this.target.target || 'select metric';
 
           System.import('/public/plugins/grafana-warp10-datasource/editor.js').then(function (editor) {
-
             // set a random ID
             _this.scope.textAreaID = Math.trunc(Math.random() * 10000);
             _this.textAreaID = $scope.textAreaID;
 
-            if (!_this.target.expr) _this.target.expr = "";
+            if (!_this.target.expr) _this.target.expr = '';
 
-            console.log('EDITOR', editor);
+            console.log('[grafana-warp10-datasource] EDITOR', editor);
             // send controler to Ace
             _this.editor = editor.Editor;
             _this.editor(_this);
