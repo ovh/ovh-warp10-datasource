@@ -80,7 +80,7 @@ Examples of WarpScript scripts:
 
 You can use `grafana-warp10-datasource` as datasource for showing position data on grafana using `grafana-worldmap-panel` plugin.
 
-In order to do it, you need to install a modified version of the `grafana-worldmap-panel` plugin: [LostInBrittany/worldmap-panel] (https://github.com/LostInBrittany/worldmap-panel).
+In order to do it, you need to install a modified version of the `grafana-worldmap-panel` plugin: [LostInBrittany/worldmap-panel](https://github.com/LostInBrittany/worldmap-panel).
 
 > A [pull request](https://github.com/grafana/worldmap-panel/pull/104) has been submitted to `grafana-worldmap-panel` in order to 
 add the changes to the official version of the plugin.
