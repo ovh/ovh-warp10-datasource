@@ -163,7 +163,7 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                     });
                 };
                 /**
-                 * used by query editor to get metric suggestions.
+                 * used by query editor to get metric suggestions and templating.
                  * @param options
                  * @return {Promise<any>}
                  */
@@ -277,9 +277,7 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                     if (opts.scopedVars) {
                         for (var k in opts.scopedVars) {
                             var v = opts.scopedVars[k];
-                            if (v.selected) {
-                                str += "'" + v.value + "' '" + k + "' STORE ";
-                            }
+                            str += "'" + v.value + "' '" + k + "' STORE ";
                         }
                     }
                     return str;

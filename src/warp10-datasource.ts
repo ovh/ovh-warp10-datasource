@@ -19,7 +19,7 @@ export class Warp10Datasource {
    */
   query(opts: QueryOptions): Promise<any> {
     let queries = []
-    let wsHeader = this.computeTimeVars(opts) +  this.computeGrafanaContext() + this.computePanelRepeatVars(opts)
+    let wsHeader = this.computeTimeVars(opts) + this.computeGrafanaContext() + this.computePanelRepeatVars(opts)
     for (let query of opts.targets) {
       //if (!query.hide) {
         if (query.friendlyQuery)
@@ -157,7 +157,7 @@ export class Warp10Datasource {
   }
 
   /**
-   * used by query editor to get metric suggestions.
+   * used by query editor to get metric suggestions and templating.
    * @param options
    * @return {Promise<any>}
    */
@@ -281,9 +281,7 @@ export class Warp10Datasource {
     if (opts.scopedVars) {
       for(let k in opts.scopedVars) {
         let v = opts.scopedVars[k]
-        if (v.selected) {
-          str += `'${v.value}' '${k}' STORE `
-        }
+        str += `'${v.value}' '${k}' STORE `
       }
     }
     return str
