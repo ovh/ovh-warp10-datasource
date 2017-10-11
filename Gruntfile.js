@@ -1,76 +1,74 @@
 module.exports = function(grunt) {
-
   require('load-grunt-tasks')(grunt);
 
-  grunt.loadNpmTasks('grunt-execute');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-less');
 
   grunt.initConfig({
 
-    clean: ["dist"],
+    clean: ['dist'],
 
     copy: {
       partials_to_dist: {
         cwd: 'src',
         expand: true,
         src: [
-          'partials/*'
+          'partials/*',
         ],
-        dest: 'dist'
+        dest: 'dist',
       },
       img_to_dist: {
         cwd: 'src',
         expand: true,
         src: ['img/*'],
-        dest: 'dist/'
+        dest: 'dist/',
       },
       pluginDef: {
         expand: true,
-        src: [ 'plugin.json', 'README.md' ],
-        dest: 'dist'
-      }
+        src: ['plugin.json', 'README.md'],
+        dest: 'dist',
+      },
     },
 
     watch: {
       rebuild_less: {
         files: ['src/css/**.less'],
-        tasks: ['less:prod']
+        tasks: ['less:prod'],
       },
       rebuild_partial: {
         files: ['src/partials/**.html'],
-        tasks: ['copy:partials_to_dist']
+        tasks: ['copy:partials_to_dist'],
       },
       rebuild_img: {
         files: ['src/img/**'],
-        tasks: ['copy:img_to_dist']
+        tasks: ['copy:img_to_dist'],
       },
       rebuild_js: {
         files: ['src/*.js'],
-        tasks: ['babel:dist']
+        tasks: ['babel:dist'],
       },
       rebuild_plugin: {
         files: ['src/*.(json|md'],
-        tasks: ['copy:pluginDef']
-      }
+        tasks: ['copy:pluginDef'],
+      },
     },
 
     babel: {
       options: {
         sourceMap: true,
-        presets:  ['es2015']
+        presets: ['es2015'],
       },
       dist: {
         options: {
-          plugins: ['transform-es2015-modules-systemjs', 'transform-es2015-for-of']
+          plugins: ['transform-es2015-modules-systemjs', 'transform-es2015-for-of'],
         },
         files: [{
           cwd: 'src',
           expand: true,
           src: ['**/*.js'],
           dest: 'dist',
-          ext:'.js'
-        }]
+          ext: '.js',
+        }],
       },
       distTestNoSystemJs: {
         files: [{
@@ -78,8 +76,8 @@ module.exports = function(grunt) {
           expand: true,
           src: ['**/*.js'],
           dest: 'dist/test',
-          ext:'.js'
-        }]
+          ext: '.js',
+        }],
       },
       distTestsSpecsNoSystemJs: {
         files: [{
@@ -87,27 +85,27 @@ module.exports = function(grunt) {
           cwd: 'spec',
           src: ['**/*.js'],
           dest: 'dist/test/spec',
-          ext:'.js'
-        }]
-      }
+          ext: '.js',
+        }],
+      },
     },
 
     less: {
       prod: {
         files: {
-          'dist/css/app.css': 'src/css/*.less'
-        }
-      }
+          'dist/css/app.css': 'src/css/*.less',
+        },
+      },
     },
 
     mochaTest: {
       test: {
         options: {
-          reporter: 'spec'
+          reporter: 'spec',
         },
-        src: ['dist/test/spec/test-main.js', 'dist/test/spec/*_spec.js']
-      }
-    }
+        src: ['dist/test/spec/test-main.js', 'dist/test/spec/*_spec.js'],
+      },
+    },
   });
 
   grunt.registerTask('default', [
@@ -117,6 +115,6 @@ module.exports = function(grunt) {
     'copy:pluginDef',
     'less:prod',
     'babel',
-    /*'mochaTest'*/
+    /* 'mochaTest'*/
   ]);
 };

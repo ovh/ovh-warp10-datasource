@@ -1,8 +1,7 @@
 import {QueryCtrl} from 'app/plugins/sdk';
 
 export class Warp10DatasourceQueryCtrl extends QueryCtrl {
-
-  constructor($scope, $injector, uiSegmentSrv)  {
+  constructor($scope, $injector, uiSegmentSrv) {
     super($scope, $injector);
     this.scope = $scope;
     this.uiSegmentSrv = uiSegmentSrv;
@@ -10,14 +9,13 @@ export class Warp10DatasourceQueryCtrl extends QueryCtrl {
 
     System.import('/public/plugins/grafana-warp10-datasource/editor.js')
     .then( (editor) => {
-
       // set a random ID
       this.scope.textAreaID = Math.trunc(Math.random() * 10000);
       this.textAreaID = $scope.textAreaID;
 
-      if (!this.target.expr) this.target.expr = "";
+      if (!this.target.expr) this.target.expr = '';
 
-      console.log('EDITOR', editor)
+      console.log('[grafana-warp10-datasource] EDITOR', editor);
       // send controler to Ace
       this.editor = editor.Editor;
       this.editor(this);

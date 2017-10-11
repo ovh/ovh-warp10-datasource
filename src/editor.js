@@ -8,29 +8,25 @@ export function Editor(ctrl) {
   var path = '/public/plugins/grafana-warp10-datasource/';
 
   System.import(path + 'ace.js').then(() => {
-
     System.import(path + 'ext-language_tools.js').then(() => {
-
       System.import(path + 'mode-warpscript.js').then(() => {
-
         System.import(path + 'theme-monokai.js').then(() => {
-
           // force render query directive
           ctrl.scope.$apply();
           setTimeout(() => {
             var el = document.getElementById(ctrl.textAreaID);
             console.log(el);
 
-            console.log("try to link");
+            console.log('[grafana-warp10-datasource] try to link');
             // Link to dom
             var editor = window.ace.edit(el);
             // Theme
-            editor.setTheme("ace/theme/monokai");
+            editor.setTheme('ace/theme/monokai');
             // Warpscript language
-            editor.getSession().setMode("ace/mode/warpscript");
+            editor.getSession().setMode('ace/mode/warpscript');
             // Autocompletion
             editor.setOptions({
-              enableBasicAutocompletion: true
+              enableBasicAutocompletion: true,
             });
             // Resizable
             editor.$blockScrolling = Infinity;
@@ -42,7 +38,7 @@ export function Editor(ctrl) {
             editor.setValue(ctrl.target.expr);
 
             editor.on('change', (ev) => {
-              console.log("change", ev);
+              console.log('[grafana-warp10-datasource] change', ev);
               ctrl.target.expr = editor.getValue();
             });
           }, 0);
@@ -50,4 +46,4 @@ export function Editor(ctrl) {
       });
     });
   });
-};
+}
