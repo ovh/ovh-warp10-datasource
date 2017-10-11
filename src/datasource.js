@@ -152,7 +152,7 @@ export class Warp10Datasource {
             result.push(self.transformMetricData(metricData, options.targets[index]));
           });
         });
-
+        console.debug('[grafana-warp10-datasource] Response data', {data: result});
         return {data: result};
       });
   }
@@ -288,19 +288,23 @@ export class Warp10Datasource {
   /* Transform from Warpscript JSON to Grafana dps
   /* ******************************************************/
   transformMetricData(gts) {
-    if ( typeof gts == 'object') {
-        return gts;
-    }
     if (!this.isGts(gts)) {
-      console.debug('[grafana-warp10-datasource] Response item isn\'t a gts', gts);
+      if ( typeof gts == 'object') {
+        console.debug('[grafana-warp10-datasource] Response item is an object', gts);
+        return gts;
+      }
+      console.debug('[grafana-warp10-datasource] Response item isn\'t neither an object nor a GTS', gts);
       return;
     }
 
+    console.debug('[grafana-warp10-datasource] Response item is a GTS', gts);
     var className = gts.c;
 
-    var labels = gts.l.map((value, key) => {
+    var labels = Object.entries(gts.l).
+      map(([key, value]) => {
         return key+'='+value;
-      }).join(',');
+      }).
+      join(',');
 
     var metricName = className+'{'+labels+'}';
     var dps = [];
