@@ -100,7 +100,7 @@ JSON->
 
 And then you can see the chosen locations in the map:
 
-![Worlmap view without values](README-worldmap-view-without-values.jpg)
+![Worlmap view without values](./assets/README-worldmap-view-without-values.jpg)
 
 You can also give a `value` to each location, in order to show the locations with different sizes and colors, as Worldmap allows:
 
@@ -109,7 +109,7 @@ You can also give a `value` to each location, in order to show the locations wit
 JSON->
 ```
 
-![Worlmap view with values](README-worldmap-view-with-values.jpg)
+![Worlmap view with values](./assets/README-worldmap-view-with-values.jpg)
 
 
 
