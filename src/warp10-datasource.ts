@@ -281,7 +281,9 @@ export class Warp10Datasource {
     if (opts.scopedVars) {
       for(let k in opts.scopedVars) {
         let v = opts.scopedVars[k]
-        str += `'${v.value}' '${k}' STORE `
+        if (v.selected) {
+          str += `'${v.value}' '${k}' STORE `
+        }
       }
     }
     return str

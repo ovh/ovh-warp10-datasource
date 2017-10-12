@@ -277,7 +277,9 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                     if (opts.scopedVars) {
                         for (var k in opts.scopedVars) {
                             var v = opts.scopedVars[k];
-                            str += "'" + v.value + "' '" + k + "' STORE ";
+                            if (v.selected) {
+                                str += "'" + v.value + "' '" + k + "' STORE ";
+                            }
                         }
                     }
                     return str;
