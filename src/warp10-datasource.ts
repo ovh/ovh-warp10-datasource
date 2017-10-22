@@ -7,10 +7,10 @@ import { Warp10Query } from './query'
 export class Warp10Datasource {
 
   constructor(private instanceSettings: any,
-              private $q: any,
-              private backendSrv: any,
-              private templateSrv: any,
-              private $log: any) {}
+    private $q: any,
+    private backendSrv: any,
+    private templateSrv: any,
+    private $log: any) { }
 
   /**
    * used by panels to get data
@@ -22,64 +22,65 @@ export class Warp10Datasource {
     let wsHeader = this.computeTimeVars(opts) + this.computeGrafanaContext() + this.computePanelRepeatVars(opts)
     for (let query of opts.targets) {
       //if (!query.hide) {
-        if (query.friendlyQuery)
-          query.friendlyQuery = Object.assign(new Warp10Query(), query.friendlyQuery)
-        // Grafana can send empty Object at the first time, we need to check is there is something
-        if(query.expr || query.friendlyQuery) {
-          if (query.advancedMode === undefined)
-            query.advancedMode = true
-          query.ws = `${wsHeader}\n${query.advancedMode ? query.expr : query.friendlyQuery.warpScript}`
-          queries.push(query)
-          console.log('New Query: ', (query.advancedMode)? query.expr : query.friendlyQuery)
-        }
+      if (query.friendlyQuery)
+        query.friendlyQuery = Object.assign(new Warp10Query(), query.friendlyQuery)
+      // Grafana can send empty Object at the first time, we need to check is there is something
+      if (query.expr || query.friendlyQuery) {
+        if (query.advancedMode === undefined)
+          query.advancedMode = true
+        query.ws = `${wsHeader}\n${query.advancedMode ? query.expr : query.friendlyQuery.warpScript}`
+        queries.push(query)
+        console.debug('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery)
+      }
       //}
     }
 
     if (queries.length === 0) {
-      let p = this.$q.defer()
-      p.resolve({ data: [] })
-      return p.promise
+      let d = this.$q.defer();
+      d.resolve({ data: [] });
+      return d.promise;
     }
 
     queries = queries.map(this.executeExec.bind(this))
 
     return this.$q.all(queries)
-    .then((responses) => {
-      // Grafana formated GTS
-      let data = []
-      responses.forEach((res, i) => {
-        if (res.data.type === 'error') {
-          console.error(res.data.value)
-          return
-        }
-
-        // is it for a Table grpah ?
-        if (res.data.length === 1 && res.data[0] && Table.isTable(res.data[0])) {
-          const t = res.data[0]
-          t.type = 'table'
-          data.push(t)
-          return
-        }
-
-        for (let gts of GTS.stackFilter(res.data)) {
-          let grafanaGts = {
-            target: (opts.targets[i].hideLabels)? gts.c : gts.nameWithLabels,
-            datapoints: []
+      .then((responses) => {
+        // Grafana formated GTS
+        let data = []
+        responses.forEach((res, i) => {
+          if (res.data.type === 'error') {
+            console.error(res.data.value)
+            return
           }
 
-          for (let dp of gts.v) {
-            grafanaGts.datapoints.push([ dp[dp.length - 1], dp[0] / 1000 ])
+          // is it for a Table grpah ?
+          if (res.data.length === 1 && res.data[0] && Table.isTable(res.data[0])) {
+            const t = res.data[0]
+            t.type = 'table'
+            data.push(t)
+            return
           }
-          data.push(grafanaGts)
-        }
+
+          for (let gts of GTS.stackFilter(res.data)) {
+            let grafanaGts = {
+              target: (opts.targets[i].hideLabels) ? gts.c : gts.nameWithLabels,
+              datapoints: []
+            }
+
+            for (let dp of gts.v) {
+              grafanaGts.datapoints.push([dp[dp.length - 1], dp[0] / 1000])
+            }
+            data.push(grafanaGts)
+          }
+        })
+        return { data }
       })
-      return { data }
-    })
-    .catch((err) => {
-      let p = this.$q.defer()
-      p.resolve({ data: [] })
-      return p.promise
-    })
+      .catch((err) => {
+        console.warn('[Warp10] Failed to execute query', err)
+        let d = this.$q.defer();
+        d.resolve({ data: [] });
+        return d.promise;
+      })
   }
 
   /**
@@ -87,7 +88,7 @@ export class Warp10Datasource {
    * @return {Promise<any>} response
    */
   testDatasource(): Promise<any> {
-      return this.executeExec({ws: '1 2 +'})
+    return this.executeExec({ ws: '1 2 +' })
       .then(res => {
         if (res.data[0] !== 3) {
           return {
@@ -107,7 +108,7 @@ export class Warp10Datasource {
         console.debug('Error', res)
         return {
           status: 'error',
-          message: `Status code: ${ res.err.status }`,
+          message: `Status code: ${res.err.status}`,
           title: 'Failed to contact Warp10 platform'
         }
       })
@@ -121,39 +122,39 @@ export class Warp10Datasource {
   annotationQuery(opts: AnnotationOptions) {
     let ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query
 
-    return this.executeExec({ws})
-    .then((res) => {
-      const annotations = []
-      /*if (!) {
-        console.error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
-        var d = this.$q.defer()
-        d.resolve([])
-        return d.promise
-      }*/
+    return this.executeExec({ ws })
+      .then((res) => {
+        const annotations = []
+        /*if (!) {
+          console.error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
+          var d = this.$q.defer()
+          d.resolve([])
+          return d.promise
+        }*/
 
-      for (let gts of GTS.stackFilter(res.data)) {
-        let tags = []
+        for (let gts of GTS.stackFilter(res.data)) {
+          let tags = []
 
-        for (let label in gts.l) {
-          tags.push(`${ label }:${ gts.l[label] }`)
+          for (let label in gts.l) {
+            tags.push(`${label}:${gts.l[label]}`)
+          }
+
+          for (let dp of gts.v) {
+            annotations.push({
+              annotation: {
+                name: opts.annotation.name,
+                enabled: true,
+                datasource: this.instanceSettings.name,
+              },
+              title: gts.c,
+              time: Math.trunc(dp[0] / (1000)),
+              text: dp[dp.length - 1],
+              tags: (tags.length > 0) ? tags.join(',') : null
+            })
+          }
         }
-
-        for (let dp of gts.v) {
-          annotations.push({
-            annotation: {
-              name: opts.annotation.name,
-              enabled: true,
-              datasource: this.instanceSettings.name,
-            },
-            title: gts.c,
-            time: Math.trunc(dp[0] / (1000)),
-            text: dp[dp.length - 1],
-            tags: (tags.length > 0) ? tags.join(',') : null
-          })
-        }
-      }
-      return annotations
-    })
+        return annotations
+      })
   }
 
   /**
@@ -162,27 +163,27 @@ export class Warp10Datasource {
    * @return {Promise<any>}
    */
   metricFindQuery(ws: string): Promise<any> {
-    return this.executeExec({ws: this.computeGrafanaContext() + ws})
-    .then((res) => {
-      // only one object on the stack, good user
-      if (res.data.length === 1 &&  typeof res.data[0] === 'object') {
-        let entries = []
-        for (let key of res.data[0]) {
-          entries.push({
-            text: key,
-            value: res.data[0][key]
-          })
+    return this.executeExec({ ws: this.computeGrafanaContext() + ws })
+      .then((res) => {
+        // only one object on the stack, good user
+        if (res.data.length === 1 && typeof res.data[0] === 'object') {
+          let entries = []
+          for (let key of res.data[0]) {
+            entries.push({
+              text: key,
+              value: res.data[0][key]
+            })
+          }
+          return entries
         }
-        return entries
-      }
-      // some elements on the stack, return all of them as entry
-      return res.data.map((entry, i) => {
-        return {
-          text: entry.toString() || i,
-          value: entry
-        }
+        // some elements on the stack, return all of them as entry
+        return res.data.map((entry, i) => {
+          return {
+            text: entry.toString() || i,
+            value: entry
+          }
+        })
       })
-    })
   }
 
   /**
@@ -220,7 +221,7 @@ export class Warp10Datasource {
   private executeFind(selector): Promise<any> {
     return this.backendSrv.datasourceRequest({
       method: 'GET',
-      url: `${ this.instanceSettings.url }/api/v0/find?selector=${selector}`,
+      url: `${this.instanceSettings.url}/api/v0/find?selector=${selector}`,
       headers: {
         'Accept': undefined,
         'Content-Type': undefined
@@ -270,7 +271,7 @@ export class Warp10Datasource {
 
     let str = ''
     for (let gVar in vars) {
-      str += `${isNaN(vars[gVar]) ? `'${vars[gVar]}'` : vars[gVar] } '${ gVar }' STORE `
+      str += `${isNaN(vars[gVar]) ? `'${vars[gVar]}'` : vars[gVar]} '${gVar}' STORE `
     }
 
     return str
@@ -279,7 +280,7 @@ export class Warp10Datasource {
   private computePanelRepeatVars(opts): string {
     let str = ''
     if (opts.scopedVars) {
-      for(let k in opts.scopedVars) {
+      for (let k in opts.scopedVars) {
         let v = opts.scopedVars[k]
         if (v.selected) {
           str += `'${v.value}' '${k}' STORE `

@@ -26,8 +26,12 @@ export class Warp10QueryCtrl extends QueryCtrl {
     this.target.friendlyQuery = Object.assign(new Warp10Query(), this.target.friendlyQuery)
     // acces to static members from dom
     this.staticQuery = new Warp10Query()
-    System.import('plugins/grafana-warp10-datasource/assets/lib/webcomponents-lite.js').then((e) => {
+    System.import('plugins/grafana-warp10-datasource/assets/lib/webcomponents-lite.js')
+    .then((e) => {
       console.log('webcomponent loaded', e)
+    })
+    .catch((e) => {
+      console.log("It's ok, it's not a module", e)
     })
   }
 

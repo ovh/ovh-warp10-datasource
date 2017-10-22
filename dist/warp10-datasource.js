@@ -43,14 +43,14 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                                 query.advancedMode = true;
                             query.ws = wsHeader + "\n" + (query.advancedMode ? query.expr : query.friendlyQuery.warpScript);
                             queries.push(query);
-                            console.log('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery);
+                            console.debug('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery);
                         }
                         //}
                     }
                     if (queries.length === 0) {
-                        var p = this.$q.defer();
-                        p.resolve({ data: [] });
-                        return p.promise;
+                        var d = this.$q.defer();
+                        d.resolve({ data: [] });
+                        return d.promise;
                     }
                     queries = queries.map(this.executeExec.bind(this));
                     return this.$q.all(queries)
@@ -85,9 +85,10 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                         return { data: data };
                     })
                         .catch(function (err) {
-                        var p = _this.$q.defer();
-                        p.resolve({ data: [] });
-                        return p.promise;
+                        console.warn('[Warp10] Failed to execute query', err);
+                        var d = _this.$q.defer();
+                        d.resolve({ data: [] });
+                        return d.promise;
                     });
                 };
                 /**

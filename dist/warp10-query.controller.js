@@ -31,8 +31,12 @@ System.register(["app/plugins/sdk", "./query"], function (exports_1, context_1) 
                     _this.target.friendlyQuery = Object.assign(new query_1.Warp10Query(), _this.target.friendlyQuery);
                     // acces to static members from dom
                     _this.staticQuery = new query_1.Warp10Query();
-                    System.import('plugins/grafana-warp10-datasource/assets/lib/webcomponents-lite.js').then(function (e) {
+                    System.import('plugins/grafana-warp10-datasource/assets/lib/webcomponents-lite.js')
+                        .then(function (e) {
                         console.log('webcomponent loaded', e);
+                    })
+                        .catch(function (e) {
+                        console.log("It's ok, it's not a module", e);
                     });
                     return _this;
                 }
