@@ -66,6 +66,10 @@ export class Warp10Datasource {
               target: (opts.targets[i].hideLabels) ? gts.c : gts.nameWithLabels,
               datapoints: []
             }
+            // show attributes
+            if (opts.targets[i].hideAttributes !== undefined && !opts.targets[i].hideAttributes) {
+              grafanaGts.target += gts.formatedAttributes
+            }
 
             for (let dp of gts.v) {
               grafanaGts.datapoints.push([dp[dp.length - 1], dp[0] / 1000])

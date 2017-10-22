@@ -60,4 +60,16 @@ export class GTS {
         }
         return gtss
     }
+
+    /**
+     * Return all GTS attributes
+     * @return {string} all GTS
+     */
+    get formatedAttributes() {
+        let attrs = []
+        for(let attr in this.a) {
+            attrs.push(`${ attr }=${ this.a[attr] }`)
+        }
+        return `{${ attrs.join(',') }}`
+    }
 }

@@ -63,6 +63,21 @@ System.register([], function (exports_1, context_1) {
                     }
                     return gtss;
                 };
+                Object.defineProperty(GTS.prototype, "formatedAttributes", {
+                    /**
+                     * Return all GTS attributes
+                     * @return {string} all GTS
+                     */
+                    get: function () {
+                        var attrs = [];
+                        for (var attr in this.a) {
+                            attrs.push(attr + "=" + this.a[attr]);
+                        }
+                        return "{" + attrs.join(',') + "}";
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 return GTS;
             }());
             exports_1("GTS", GTS);

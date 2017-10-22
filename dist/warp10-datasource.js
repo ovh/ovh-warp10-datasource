@@ -75,6 +75,10 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                                     target: (opts.targets[i].hideLabels) ? gts.c : gts.nameWithLabels,
                                     datapoints: []
                                 };
+                                // show attributes
+                                if (opts.targets[i].hideAttributes !== undefined && !opts.targets[i].hideAttributes) {
+                                    grafanaGts.target += gts.formatedAttributes;
+                                }
                                 for (var _b = 0, _c = gts.v; _b < _c.length; _b++) {
                                     var dp = _c[_b];
                                     grafanaGts.datapoints.push([dp[dp.length - 1], dp[0] / 1000]);

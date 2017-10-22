@@ -4,6 +4,7 @@ query-editor-row.warp10-query(query-ctrl='ctrl' has-text-edit-mode='true')
 
   .gf-form-inline
     gf-form-switch.gf-form(label='Hide labels' checked='ctrl.target.hideLabels' on-change='ctrl.refresh()')
+    gf-form-switch.gf-form(label='Hide attributes' checked='ctrl.target.hideAttributes' on-change='ctrl.refresh()')
     gf-form-switch.gf-form.pull-right(label='WarpScript editor' checked='ctrl.target.advancedMode')
 
   .gf-form-inline(ng-show='ctrl.target.advancedMode')
