@@ -77,7 +77,7 @@ query-editor-row.warp10-query(query-ctrl='ctrl' has-text-edit-mode='true')
         select(ng-model='ctrl.target.friendlyQuery.filter')
           option(value='' selected) None
           option(ng-repeat='filter in ctrl.target.friendlyQuery.filters' ng-value="$index") {{ filter.name }}
-    h6 Configure your filter
+    h6(ng-if='["S", "M", "N"].includes(ctrl.staticQuery.filters[ctrl.target.friendlyQuery.filter].type)') Configure your filter
     .gf-form-inline
       // String case
       .gf-form(ng-if='ctrl.staticQuery.filters[ctrl.target.friendlyQuery.filter].type == "S"')

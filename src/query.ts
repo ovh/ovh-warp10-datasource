@@ -109,6 +109,7 @@ export class Warp10Query {
       }
       q += `[ SWAP [ ${ labelsStr.join(' ') } ] ${ param } filter.${ chosenFilter.name } ] FILTER \n`
     }
+    q += 'SORT \n'
     q += `// END OF GENERATED QUERY \n`
     return q
   }

@@ -99,6 +99,7 @@ System.register([], function (exports_1, context_1) {
                             }
                             q += "[ SWAP [ " + labelsStr_1.join(' ') + " ] " + param + " filter." + chosenFilter.name + " ] FILTER \n";
                         }
+                        q += 'SORT \n';
                         q += "// END OF GENERATED QUERY \n";
                         return q;
                     },
