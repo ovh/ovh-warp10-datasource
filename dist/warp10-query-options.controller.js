@@ -5,13 +5,13 @@ System.register([], function (exports_1, context_1) {
     return {
         setters: [],
         execute: function () {
-            Warp10QueryOptionsCtrl = (function () {
+            Warp10QueryOptionsCtrl = /** @class */ (function () {
                 function Warp10QueryOptionsCtrl() {
                     console.debug('New Warp10QueryOptionsCtrl');
                 }
+                Warp10QueryOptionsCtrl.template = '<!-- Warp10-query-option.controller --> ';
                 return Warp10QueryOptionsCtrl;
             }());
-            Warp10QueryOptionsCtrl.template = '<!-- Warp10-query-option.controller --> ';
             exports_1("Warp10QueryOptionsCtrl", Warp10QueryOptionsCtrl);
         }
     };

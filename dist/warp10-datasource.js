@@ -15,7 +15,7 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
             }
         ],
         execute: function () {
-            Warp10Datasource = (function () {
+            Warp10Datasource = /** @class */ (function () {
                 function Warp10Datasource(instanceSettings, $q, backendSrv, templateSrv, $log) {
                     this.instanceSettings = instanceSettings;
                     this.$q = $q;

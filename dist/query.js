@@ -5,7 +5,7 @@ System.register([], function (exports_1, context_1) {
     return {
         setters: [],
         execute: function () {
-            Warp10Query = (function () {
+            Warp10Query = /** @class */ (function () {
                 function Warp10Query() {
                     this.readToken = '';
                     this.className = '';

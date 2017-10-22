@@ -26,6 +26,6 @@
     "gulp-plumber-notifier": "^0.0.3",
     "gulp-pug": "^3.3.0",
     "gulp-typescript": "^3.1.7",
-    "typescript": "^2.3.4"
+    "typescript": "^2.5.3"
   }
 }

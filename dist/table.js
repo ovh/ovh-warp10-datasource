@@ -5,7 +5,7 @@ System.register([], function (exports_1, context_1) {
     return {
         setters: [],
         execute: function () {
-            Table = (function () {
+            Table = /** @class */ (function () {
                 function Table() {
                     this.type = 'table';
                 }
@@ -18,7 +18,7 @@ System.register([], function (exports_1, context_1) {
                 return Table;
             }());
             exports_1("Table", Table);
-            Column = (function () {
+            Column = /** @class */ (function () {
                 function Column() {
                 }
                 return Column;

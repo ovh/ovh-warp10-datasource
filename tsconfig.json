@@ -9,6 +9,7 @@
         "noUnusedLocals":false,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        "noStrictGenericChecks": true,
         "allowJs": true,
         "sourceMap": false,
         "baseUrl": "./",

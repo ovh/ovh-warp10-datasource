@@ -5,12 +5,12 @@ System.register([], function (exports_1, context_1) {
     return {
         setters: [],
         execute: function () {
-            Warp10AnnotationQueryCtrl = (function () {
+            Warp10AnnotationQueryCtrl = /** @class */ (function () {
                 function Warp10AnnotationQueryCtrl() {
                 }
+                Warp10AnnotationQueryCtrl.templateUrl = 'template/annotation.html';
                 return Warp10AnnotationQueryCtrl;
             }());
-            Warp10AnnotationQueryCtrl.templateUrl = 'template/annotation.html';
             exports_1("Warp10AnnotationQueryCtrl", Warp10AnnotationQueryCtrl);
         }
     };

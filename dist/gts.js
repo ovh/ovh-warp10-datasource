@@ -5,7 +5,7 @@ System.register([], function (exports_1, context_1) {
     return {
         setters: [],
         execute: function () {
-            GTS = (function () {
+            GTS = /** @class */ (function () {
                 function GTS() {
                 }
                 Object.defineProperty(GTS.prototype, "nameWithLabels", {

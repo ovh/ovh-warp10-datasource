@@ -9,7 +9,7 @@ System.register(["./datasource"], function (exports_1, context_1) {
             }
         ],
         execute: function () {
-            Warp10ConfigCtrl = (function () {
+            Warp10ConfigCtrl = /** @class */ (function () {
                 function Warp10ConfigCtrl(backendSrv, $routeParams) {
                     this.backendSrv = backendSrv;
                     this.$routeParams = $routeParams;
@@ -36,9 +36,9 @@ System.register(["./datasource"], function (exports_1, context_1) {
                 Warp10ConfigCtrl.prototype._delExtraVar = function (key) {
                     delete this.current.jsonData[key];
                 };
+                Warp10ConfigCtrl.templateUrl = 'template/config.html';
                 return Warp10ConfigCtrl;
             }());
-            Warp10ConfigCtrl.templateUrl = 'template/config.html';
             exports_1("Warp10ConfigCtrl", Warp10ConfigCtrl);
         }
     };

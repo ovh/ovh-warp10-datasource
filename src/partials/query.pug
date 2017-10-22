@@ -1,4 +1,3 @@
-script(src='https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.0.1/webcomponents-lite.js')
 link(rel='import' href='/public/plugins/grafana-warp10-datasource/template/ace-editor.html')
 
 query-editor-row.warp10-query(query-ctrl='ctrl' has-text-edit-mode='true')
@@ -6,7 +5,6 @@ query-editor-row.warp10-query(query-ctrl='ctrl' has-text-edit-mode='true')
   .gf-form-inline
     gf-form-switch.gf-form(label='Hide labels' checked='ctrl.target.hideLabels' on-change='ctrl.refresh()')
     gf-form-switch.gf-form.pull-right(label='WarpScript editor' checked='ctrl.target.advancedMode')
-    //button.btn.btn-secondary.full-height(ng-if='!ctrl.target.advancedMode' ng-click='ctrl._buildQuery()') Build query
 
   .gf-form-inline(ng-show='ctrl.target.advancedMode')
     ace-editor(theme='ace/theme/monokai' mode='ace/mode/warpscript')

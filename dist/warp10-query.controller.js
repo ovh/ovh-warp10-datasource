@@ -22,7 +22,7 @@ System.register(["app/plugins/sdk", "./query"], function (exports_1, context_1) 
             }
         ],
         execute: function () {
-            Warp10QueryCtrl = (function (_super) {
+            Warp10QueryCtrl = /** @class */ (function (_super) {
                 __extends(Warp10QueryCtrl, _super);
                 function Warp10QueryCtrl($scope, uiSegmentSrv, $injector) {
                     var _this = _super.call(this, $scope, $injector) || this;
@@ -31,7 +31,9 @@ System.register(["app/plugins/sdk", "./query"], function (exports_1, context_1) 
                     _this.target.friendlyQuery = Object.assign(new query_1.Warp10Query(), _this.target.friendlyQuery);
                     // acces to static members from dom
                     _this.staticQuery = new query_1.Warp10Query();
-                    console.debug('$scope', $scope);
+                    System.import('plugins/grafana-warp10-datasource/assets/lib/webcomponents-lite.js').then(function (e) {
+                        console.log('webcomponent loaded', e);
+                    });
                     return _this;
                 }
                 /*getOptions() {
@@ -90,9 +92,9 @@ System.register(["app/plugins/sdk", "./query"], function (exports_1, context_1) 
                         _this.refresh();
                     }, 1000);
                 };
+                Warp10QueryCtrl.templateUrl = 'template/query.html';
                 return Warp10QueryCtrl;
             }(sdk_1.QueryCtrl));
-            Warp10QueryCtrl.templateUrl = 'template/query.html';
             exports_1("Warp10QueryCtrl", Warp10QueryCtrl);
         }
     };
