@@ -35,4 +35,9 @@ export class Warp10ConfigCtrl {
   _delExtraVar(key) {
     delete this.current.jsonData[key]
   }
+
+  _editKey(key) {
+    this.newExtraKey = key
+    this.newExtraVal = this.current.jsonData[key]
+  }
 }

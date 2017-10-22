@@ -36,6 +36,10 @@ System.register(["./datasource"], function (exports_1, context_1) {
                 Warp10ConfigCtrl.prototype._delExtraVar = function (key) {
                     delete this.current.jsonData[key];
                 };
+                Warp10ConfigCtrl.prototype._editKey = function (key) {
+                    this.newExtraKey = key;
+                    this.newExtraVal = this.current.jsonData[key];
+                };
                 Warp10ConfigCtrl.templateUrl = 'template/config.html';
                 return Warp10ConfigCtrl;
             }());
