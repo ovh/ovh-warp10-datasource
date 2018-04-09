@@ -1,3 +1,5 @@
+///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+
 import { loadPluginCss } from 'app/plugins/sdk'
 
 import { Warp10Datasource } from './warp10-datasource'

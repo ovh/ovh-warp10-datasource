@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "module": "system",
-        "target": "es5",
+        "target": "ES5",
         "noImplicitAny": false,
         "noImplicitReturns":false,
         "noImplicitThis":false,
@@ -11,21 +11,9 @@
         "emitDecoratorMetadata": true,
         "noStrictGenericChecks": true,
         "allowJs": true,
-        "sourceMap": false,
-        "baseUrl": "./",
-        "paths": {
-            "app/*": [ "../../../public/app/*" ],
-            "vendor/*": [ "../../../public/vendor/*" ]
-        }
+        "sourceMap": true,
     },
-    "files": [
-        "./src/**.ts"
-    ],
-    "include": [
-        "../../../public/app/**/*.ts"
-    ],
     "exclude": [
-        "../../../public/vendor/**/*",
-        "../../../public/**/*.d.ts"
+        "node_modules"
     ]
 }
