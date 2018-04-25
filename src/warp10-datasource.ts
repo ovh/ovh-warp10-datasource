@@ -1,10 +1,10 @@
-import { QueryOptions } from './interfaces/query-options'
-import { AnnotationOptions } from './interfaces/annotation-options'
-import { GTS } from './gts'
+import QueryOptions from './interfaces/query-options'
+import AnnotationOptions from './interfaces/annotation-options'
+import GTS from './gts'
 import { Table } from './table'
-import { Warp10Query } from './query'
+import Query from './query'
 
-export class Warp10Datasource {
+export default class Warp10Datasource {
 
   constructor(private instanceSettings: any,
     private $q: any,
@@ -23,7 +23,7 @@ export class Warp10Datasource {
     for (let query of opts.targets) {
       //if (!query.hide) {
       if (query.friendlyQuery)
-        query.friendlyQuery = Object.assign(new Warp10Query(), query.friendlyQuery)
+        query.friendlyQuery = Object.assign(new Query(), query.friendlyQuery)
       // Grafana can send empty Object at the first time, we need to check is there is something
       if (query.expr || query.friendlyQuery) {
         if (query.advancedMode === undefined)

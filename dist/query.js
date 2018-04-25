@@ -112,7 +112,7 @@ System.register([], function (exports_1, context_1) {
                 });
                 return Warp10Query;
             }());
-            exports_1("Warp10Query", Warp10Query);
+            exports_1("default", Warp10Query);
         }
     };
 });

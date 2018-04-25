@@ -36,7 +36,7 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                         var query = _a[_i];
                         //if (!query.hide) {
                         if (query.friendlyQuery)
-                            query.friendlyQuery = Object.assign(new query_1.Warp10Query(), query.friendlyQuery);
+                            query.friendlyQuery = Object.assign(new query_1.default(), query.friendlyQuery);
                         // Grafana can send empty Object at the first time, we need to check is there is something
                         if (query.expr || query.friendlyQuery) {
                             if (query.advancedMode === undefined)
@@ -45,7 +45,6 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                             queries.push(query);
                             console.debug('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery);
                         }
-                        //}
                     }
                     if (queries.length === 0) {
                         var d = this.$q.defer();
@@ -69,7 +68,7 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                                 data.push(t);
                                 return;
                             }
-                            for (var _i = 0, _a = gts_1.GTS.stackFilter(res.data); _i < _a.length; _i++) {
+                            for (var _i = 0, _a = gts_1.default.stackFilter(res.data); _i < _a.length; _i++) {
                                 var gts = _a[_i];
                                 var grafanaGts = {
                                     target: (opts.targets[i].hideLabels) ? gts.c : gts.nameWithLabels,
@@ -143,7 +142,7 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                           d.resolve([])
                           return d.promise
                         }*/
-                        for (var _i = 0, _a = gts_1.GTS.stackFilter(res.data); _i < _a.length; _i++) {
+                        for (var _i = 0, _a = gts_1.default.stackFilter(res.data); _i < _a.length; _i++) {
                             var gts = _a[_i];
                             var tags = [];
                             for (var label in gts.l) {
@@ -291,7 +290,7 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                 };
                 return Warp10Datasource;
             }());
-            exports_1("Warp10Datasource", Warp10Datasource);
+            exports_1("default", Warp10Datasource);
         }
     };
 });

@@ -1,8 +1,9 @@
-export class GTS {
+export default class GTS {
 
     c: string
     l: Object
     a: Object
+    la?: number
     v: any[][]
 
     constructor() {}
@@ -20,9 +21,14 @@ export class GTS {
      * @param {Object} g object to test
      * @return {boolean} is it a GTS ?
      */
-    static isGTS(g: any) {
-        return g != undefined && g.hasOwnProperty('c') && g.hasOwnProperty('v') && g.hasOwnProperty('l')
-          && typeof g.c === 'string' && typeof g.l === 'object' && Array.isArray(g.v)
+    static isGTS(g: any): boolean {
+        return g != undefined
+            && g.hasOwnProperty('c')
+            && g.hasOwnProperty('v')
+            && g.hasOwnProperty('l')
+            && typeof g.c === 'string'
+            && typeof g.l === 'object'
+            && Array.isArray(g.v)
     }
 
     /**
@@ -30,7 +36,7 @@ export class GTS {
      * @param {Array<any>} gs array to check
      * @return {boolean} contains only GTS types ?
      */
-    static isGTSArray(gs: any) {
+    static isGTSArray(gs: any): boolean {
         if (!Array.isArray(gs))
             return false
         for (let g of gs) {
@@ -46,16 +52,15 @@ export class GTS {
      * @return {Array<GTS>} all GTS
      */
     static stackFilter(stack: any[]): GTS[] {
-        let gtss = []
+        let gtss: GTS[] = []
         for (let entry of stack) {
             if (GTS.isGTS(entry))
-                gtss.push((<any>Object).assign(new GTS(), entry))
+                gtss.push(Object.assign(new GTS(), entry))
 
             else if (GTS.isGTSArray(entry)) {
-                entry = entry.map((gts) => {
-                    return (<any>Object).assign(new GTS(), gts)
-                })
-                gtss = gtss.concat(entry)
+                gtss = gtss.concat(entry.map(gts => {
+                    return Object.assign(new GTS(), gts)
+                }))
             }
         }
         return gtss
@@ -65,7 +70,7 @@ export class GTS {
      * Return all GTS attributes
      * @return {string} all GTS
      */
-    get formatedAttributes() {
+    get formatedAttributes(): string {
         let attrs = []
         for(let attr in this.a) {
             attrs.push(`${ attr }=${ this.a[attr] }`)

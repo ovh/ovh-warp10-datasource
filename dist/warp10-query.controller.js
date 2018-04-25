@@ -1,4 +1,5 @@
-System.register(["app/plugins/sdk", "./query"], function (exports_1, context_1) {
+///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+System.register(["app/plugins/sdk", "./query", "./ace-mode-warpscript"], function (exports_1, context_1) {
     "use strict";
     var __extends = (this && this.__extends) || (function () {
         var extendStatics = Object.setPrototypeOf ||
@@ -11,7 +12,7 @@ System.register(["app/plugins/sdk", "./query"], function (exports_1, context_1) 
         };
     })();
     var __moduleName = context_1 && context_1.id;
-    var sdk_1, query_1, Warp10QueryCtrl;
+    var sdk_1, query_1, ace_mode_warpscript_1, Warp10QueryCtrl;
     return {
         setters: [
             function (sdk_1_1) {
@@ -19,30 +20,27 @@ System.register(["app/plugins/sdk", "./query"], function (exports_1, context_1) 
             },
             function (query_1_1) {
                 query_1 = query_1_1;
+            },
+            function (ace_mode_warpscript_1_1) {
+                ace_mode_warpscript_1 = ace_mode_warpscript_1_1;
             }
         ],
-        execute: function () {
+        execute: function () {///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+            ace_mode_warpscript_1.default();
             Warp10QueryCtrl = /** @class */ (function (_super) {
                 __extends(Warp10QueryCtrl, _super);
                 function Warp10QueryCtrl($scope, uiSegmentSrv, $injector) {
                     var _this = _super.call(this, $scope, $injector) || this;
                     _this.$scope = $scope;
                     _this.uiSegmentSrv = uiSegmentSrv;
-                    _this.target.friendlyQuery = Object.assign(new query_1.Warp10Query(), _this.target.friendlyQuery);
+                    _this.onChangeInternal = function () {
+                        _this.refresh();
+                    };
+                    _this.target.friendlyQuery = Object.assign(new query_1.default(), _this.target.friendlyQuery);
                     // acces to static members from dom
-                    _this.staticQuery = new query_1.Warp10Query();
-                    System.import('plugins/grafana-warp10-datasource/assets/lib/webcomponents-lite.js')
-                        .then(function (e) {
-                        console.log('webcomponent loaded', e);
-                    })
-                        .catch(function (e) {
-                        console.log("It's ok, it's not a module", e);
-                    });
+                    _this.staticQuery = new query_1.default();
                     return _this;
                 }
-                /*getOptions() {
-                  //return Promise.resolve([this.uiSegmentSrv.newSegment('test'), this.uiSegmentSrv.newSegment('abcd')])
-                }*/
                 Warp10QueryCtrl.prototype._addLabel = function () {
                     if (!this.extraLabelKey || !this.extraLabelValue)
                         return;
@@ -85,21 +83,21 @@ System.register(["app/plugins/sdk", "./query"], function (exports_1, context_1) 
                     this._addLabel();
                     this._addReducerLabel();
                 };
+                Warp10QueryCtrl.prototype.getCompleter = function () {
+                    var o = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        o[_i] = arguments[_i];
+                    }
+                    console.debug('[Warp10Query] COMPLETER called', o);
+                };
                 Warp10QueryCtrl.prototype.toggleEditorMode = function () {
                     console.debug('Toggle readonly', this.readOnly);
                     this.readOnly = !this.readOnly;
                 };
-                Warp10QueryCtrl.prototype.onChangeInternal = function () {
-                    var _this = this;
-                    clearTimeout(this.changeTicker);
-                    this.changeTicker = setTimeout(function () {
-                        _this.refresh();
-                    }, 1000);
-                };
                 Warp10QueryCtrl.templateUrl = 'template/query.html';
                 return Warp10QueryCtrl;
             }(sdk_1.QueryCtrl));
-            exports_1("Warp10QueryCtrl", Warp10QueryCtrl);
+            exports_1("default", Warp10QueryCtrl);
         }
     };
 });

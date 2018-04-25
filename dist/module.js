@@ -25,10 +25,10 @@ System.register(["app/plugins/sdk", "./warp10-datasource", "./warp10-config.cont
             }
         ],
         execute: function () {///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-            exports_1("Datasource", warp10_datasource_1.Warp10Datasource);
-            exports_1("ConfigCtrl", warp10_config_controller_1.Warp10ConfigCtrl);
-            exports_1("QueryCtrl", warp10_query_controller_1.Warp10QueryCtrl);
-            exports_1("AnnotationsQueryCtrl", warp10_annotation_controller_1.Warp10AnnotationQueryCtrl);
+            exports_1("Datasource", warp10_datasource_1.default);
+            exports_1("ConfigCtrl", warp10_config_controller_1.default);
+            exports_1("QueryCtrl", warp10_query_controller_1.default);
+            exports_1("AnnotationsQueryCtrl", warp10_annotation_controller_1.default);
             sdk_1.loadPluginCss({
                 dark: getCSSPath('dark'),
                 light: getCSSPath('light')

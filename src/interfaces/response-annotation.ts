@@ -1,4 +1,4 @@
-export interface AnnotationResponse {
+export default interface AnnotationResponse {
 
     annotation: {
       //should match the annotation name in Grafana

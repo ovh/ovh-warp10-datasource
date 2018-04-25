@@ -1,5 +1,5 @@
 import { Moment } from '../../node_modules/moment/moment'
-export interface AnnotationOptions {
+export default interface AnnotationOptions {
 
     range: {
         from: Moment

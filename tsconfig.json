@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
         "module": "system",
+        "moduleResolution": "classic",
+        "declaration": true,
         "target": "ES5",
         "noImplicitAny": false,
         "noImplicitReturns":false,
@@ -10,10 +12,9 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "noStrictGenericChecks": true,
-        "allowJs": true,
         "sourceMap": true,
     },
     "exclude": [
-        "node_modules"
+        "node_modules/"
     ]
 }

@@ -1,5 +1,3 @@
-link(rel='import' href='/public/plugins/grafana-warp10-datasource/template/ace-editor.html')
-
 query-editor-row.warp10-query(query-ctrl='ctrl' has-text-edit-mode='true')
 
   .gf-form-inline
@@ -8,7 +6,17 @@ query-editor-row.warp10-query(query-ctrl='ctrl' has-text-edit-mode='true')
     gf-form-switch.gf-form.pull-right(label='WarpScript editor' checked='ctrl.target.advancedMode')
 
   .gf-form-inline(ng-show='ctrl.target.advancedMode')
-    ace-editor(theme='ace/theme/monokai' mode='ace/mode/warpscript')
+    code-editor(content="ctrl.target.expr"
+                datasource="ctrl.datasource"
+                on-change="ctrl.onChangeInternal()"
+                get-completer="ctrl.getCompleter()"
+                data-mode="warpscript"
+                data-show-gutter="true"
+                data-behaviours-enabled="true"
+                data-snippets-enabled="true"
+                data-max-lines="50"
+                code-editor-focus="ctrl.isLastQuery")
+    //ace-editor(theme='ace/theme/monokai' mode='ace/mode/warpscript')
       textarea(ng-model='ctrl.target.expr' ng-change='ctrl.onChangeInternal()')
 
   .gf-form-block(ng-show='!ctrl.target.advancedMode')

@@ -6,11 +6,11 @@
   "annotations": true,
   "info": {
     "description": "Warp10 platform datasource plugin",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "updated": "2017-06-14",
     "author": {
-      "name": "Warp10 community",
-      "url": "https://groups.google.com/forum/#!forum/warp10-users"
+      "name": "miton18",
+      "url": "https://github.com/miton18/grafana-warp10/tree/feat/v2"
     },
     "keywords": [
       "warp10",
@@ -22,19 +22,16 @@
       "small": "assets/warp10-c.png",
       "large": "assets/warp10-h.png"
     },
-    "links": [
-      {
-        "name": "GitHub",
-        "url": "https://github.com/cityzendata/grafana-warp10"
-      },
-      {
-        "name": "Google group",
-        "url": "https://groups.google.com/forum/#!forum/warp10-users"
-      }
-    ]
+    "links": [{
+      "name": "GitHub",
+      "url": "https://github.com/ovh/grafana-warp10"
+    }, {
+      "name": "Google group Warp10",
+      "url": "https://groups.google.com/forum/#!forum/warp10-users"
+    }]
   },
   "dependencies": {
-    "grafanaVersion": "4.3.x",
+    "grafanaVersion": "5.0.4",
     "plugins": []
   }
 }

@@ -1,7 +1,15 @@
-
-export class Warp10AnnotationQueryCtrl {
+export default class Warp10AnnotationQueryCtrl {
 
   static templateUrl = 'template/annotation.html'
 
-  constructor() {}
+  annotation: any
+
+  constructor($scope, $injector) {
+    if (!this.annotation)
+      this.annotation = {}
+
+    if (!this.annotation.query)
+      this.annotation.query = ''
+    console.log('ANNOT', this)
+  }
 }
