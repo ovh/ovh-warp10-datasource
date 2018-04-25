@@ -1,0 +1,47 @@
+h3.page-heading HTTP Address
+.gf-form-group
+  .gf-form-inline
+    .gf-form
+      span.gf-form-label.width-7 URL
+      input.gf-form-input.width-30(ng-model='ctrl.current.url')
+      info-popover(mode='right-absolute')
+        | Do not append /api/v0/exec at the end of the URL
+    .gf-form
+      span.gf-form-label.width-7 Access
+      .gf-form-select-wrapper.gf-form-select-wrapper--has-help-icon.width-30
+        select.gf-form-input(ng-model='ctrl.current.access')
+          option(label="direct" value="direct") direct
+          option(label="proxy" value="proxy") proxy
+        info-popover.gf-form-help-icon.gf-form-help-icon--right-absolute.drop-help.drop-hide-out-of-bounds.drop-target(mode='right-absolute')
+          | Direct = url is used directly from browser
+          | Proxy = Grafana backend will proxy the request
+
+h3.page-heading Execution constants
+.grafana-info-box
+  p.
+    This constants can be used in every templating or query.
+    Register your consant name and value and
+    prefix your constant name with "$" in your queries/templating.
+  p example: &nbsp;
+    code $token
+
+.gf-form-group
+  .gf-form(ng-repeat="(key, val) in ctrl.current.jsonData")
+    button.btn.btn-danger.full-height(ng-click="ctrl._delExtraVar(key)")
+      i.fa.fa-trash(aria-hidden='true')
+    a.btn.full-height(ng-click="ctrl._editKey(key)")
+      i.fa.fa-pencil(aria-hidden='true')
+    span.gf-form-label {{ key }}
+    span.spaced-row
+      i.fa.fa-angle-double-right(aria-hidden='true')
+    span.gf-form-label {{ val }}
+  // New var
+h6 Add a new constant
+.gf-form
+  label.gf-form-label.width-6 Name
+  input.gf-form-input.width-12(ng-model='ctrl.newExtraKey')
+  button.btn.btn-success.full-height(ng-click="ctrl._addExtraVar()")
+      i.fa.fa-plus(aria-hidden='true')
+.gf-form-inline
+  label.gf-form-label.width-6 Value
+  textarea.gf-form-input(rows="10" ng-model='ctrl.newExtraVal' ng-keyup='$event.keycode == 13? ctrl._addExtraVar() : null')

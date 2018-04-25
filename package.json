@@ -1,46 +1,32 @@
 {
-  "name": "grafana-warp10-datasource",
-  "private": true,
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "grafana-warp10",
+  "version": "2.0.0",
+  "description": "Warp10 datasource Grafana plugin",
+  "main": "module.ts",
+  "repository": "git@github.com:cityzendata/grafana-warp10.git",
+  "author": "miton18 <rcd18@hotmail.fr>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=7.9.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cityzendata/grafana-warp10.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/cityzendata/grafana-warp10/issues"
-  },
-  "devDependencies": {
-    "grunt": "~0.4.5",
-    "babel": "~6.5.1",
-    "grunt-babel": "~6.0.0",
-    "grunt-contrib-copy": "~0.8.2",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-contrib-uglify": "~0.11.0",
-    "grunt-mocha-test": "~0.12.7",
-    "grunt-systemjs-builder": "^0.2.5",
-    "load-grunt-tasks": "~3.2.0",
-    "grunt-execute": "~0.2.2",
-    "grunt-contrib-clean": "~0.6.0",
-    "prunk": "~1.2.1",
-    "jsdom": "~3.1.2",
-    "q": "~1.4.1",
-    "chai": "~3.5.0"
+    "docker": "docker build -t grafana . && docker run -i -p 3000:3000 grafana"
   },
   "dependencies": {
-    "ace-builds": "^1.2.5",
-    "babel-plugin-transform-es2015-for-of": "^6.6.0",
-    "babel-plugin-transform-es2015-modules-systemjs": "^6.5.0",
-    "babel-preset-es2015": "^6.5.0",
-    "lodash": "~4.0.0",
-    "mocha": "^2.4.5",
-    "moment": "^2.14.1"
+    "ace-builds": "^1.2.6",
+    "angular-ui-ace": "^0.2.3",
+    "grafana-sdk-mocks": "github:grafana/grafana-sdk-mocks",
+    "gulp-livereload": "^3.8.1",
+    "moment": "^2.18.1"
   },
-  "homepage": "https://github.com/cityzendata/grafana-warp10#readme"
+  "devDependencies": {
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-less": "^3.3.0",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-plumber-notifier": "^0.0.3",
+    "gulp-pug": "^3.3.0",
+    "gulp-typescript": "^3.1.7",
+    "typescript": "^2.5.3"
+  }
 }

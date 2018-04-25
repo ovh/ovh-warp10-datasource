@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "system",
+        "target": "ES5",
+        "noImplicitAny": false,
+        "noImplicitReturns":false,
+        "noImplicitThis":false,
+        "noImplicitUseStrict":false,
+        "noUnusedLocals":false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "noStrictGenericChecks": true,
+        "allowJs": true,
+        "sourceMap": true,
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
