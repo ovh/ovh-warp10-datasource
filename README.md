@@ -92,13 +92,14 @@ WarpScript example:
 
 ## Available variables
 On your WarpScript you can use (all timestamps are in µSeconds):
-|Name         |Description                                                    |Example                     |
-|-------------|---------------------------------------------------------------|----------------------------|
-|**$end**     | Timestamp of the most recent point in the Grafana time window | 1498038153276000           |
-|**$endISO**  | *end* value in ISO-8601 format                                | '2017-06-21T09:42:33.276Z' |
-|**$start**   | Timestamp of the less recent point in the Grafana time window | 1498034553276000           |
-|**$startISO**| *start* value in ISO-8601 format                              | '2017-06-21T08:42:33.276Z' |
-|**$interval**| Difference between $end and $start                            | 3600000000                 |
+
+| Name          | Description                                                   | Example                    |
+|---------------|---------------------------------------------------------------|----------------------------|
+| **$end**      | Timestamp of the most recent point in the Grafana time window | 1498038153276000           |
+| **$endISO**   | *end* value in ISO-8601 format                                | '2017-06-21T09:42:33.276Z' |
+| **$start**    | Timestamp of the less recent point in the Grafana time window | 1498034553276000           |
+| **$startISO** | *start* value in ISO-8601 format                              | '2017-06-21T08:42:33.276Z' |
+| **$interval** | Difference between $end and $start                            | 3600000000                 |
 
 # Use Annotations
 You can add Annotation on your graph: Dashboard > "Manage dashboard" > "Annotations"

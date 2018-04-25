@@ -8,7 +8,7 @@ export default class Warp10QueryCtrl extends QueryCtrl {
     target: {
         friendlyQuery: Query;
         hide: boolean;
-        target: string;
+        expr: string;
     };
     changeTicker: any;
     staticQuery: Query;

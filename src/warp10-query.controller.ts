@@ -12,7 +12,7 @@ export default class Warp10QueryCtrl extends QueryCtrl {
   target: {
     friendlyQuery: Query,
     hide: boolean,
-    target: string
+    expr: string
   }
   changeTicker: any
   staticQuery: Query
@@ -31,6 +31,9 @@ export default class Warp10QueryCtrl extends QueryCtrl {
     this.target.friendlyQuery = Object.assign(new Query(), this.target.friendlyQuery)
     // acces to static members from dom
     this.staticQuery = new Query()
+
+    // prevent wrapped ace-editor to crash
+    if (!this.target.expr) this.target.expr = ''
   }
 
   _addLabel() {

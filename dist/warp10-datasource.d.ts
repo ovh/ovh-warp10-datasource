@@ -23,7 +23,7 @@ export default class Warp10Datasource {
      * @param options
      * @return {Promise<any>} results
      */
-    annotationQuery(opts: AnnotationOptions): Promise<any[]>;
+    annotationQuery(opts: AnnotationOptions): Promise<any>;
     /**
      * used by query editor to get metric suggestions and templating.
      * @param options

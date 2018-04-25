@@ -24,7 +24,6 @@ export default class Warp10ConfigCtrl {
   }
 
   _addExtraVar() {
-    console.log(this.newExtraKey,  this.newExtraVal, typeof this.newExtraVal)
     if (this.newExtraKey && this.newExtraVal) {
       this.current.jsonData[this.newExtraKey] = this.newExtraVal
       this.newExtraKey = ''

@@ -6,8 +6,8 @@
   "annotations": true,
   "info": {
     "description": "Warp10 platform datasource plugin",
-    "version": "2.1.0",
-    "updated": "2017-06-14",
+    "version": "2.1.1",
+    "updated": "2018-04-25",
     "author": {
       "name": "miton18",
       "url": "https://github.com/miton18/grafana-warp10/tree/feat/v2"

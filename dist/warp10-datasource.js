@@ -32,8 +32,8 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                     var _this = this;
                     var queries = [];
                     var wsHeader = this.computeTimeVars(opts) + this.computeGrafanaContext() + this.computePanelRepeatVars(opts);
-                    for (var _i = 0, _a = opts.targets; _i < _a.length; _i++) {
-                        var query = _a[_i];
+                    opts.targets.forEach(function (queryRef) {
+                        var query = Object.assign({}, queryRef); // Deep copy
                         //if (!query.hide) {
                         if (query.friendlyQuery)
                             query.friendlyQuery = Object.assign(new query_1.default(), query.friendlyQuery);
@@ -45,7 +45,8 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                             queries.push(query);
                             console.debug('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery);
                         }
-                    }
+                        //}
+                    });
                     if (queries.length === 0) {
                         var d = this.$q.defer();
                         d.resolve({ data: [] });
@@ -68,8 +69,7 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                                 data.push(t);
                                 return;
                             }
-                            for (var _i = 0, _a = gts_1.default.stackFilter(res.data); _i < _a.length; _i++) {
-                                var gts = _a[_i];
+                            gts_1.default.stackFilter(res.data).forEach(function (gts) {
                                 var grafanaGts = {
                                     target: (opts.targets[i].hideLabels) ? gts.c : gts.nameWithLabels,
                                     datapoints: []
@@ -78,12 +78,11 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                                 if (opts.targets[i].hideAttributes !== undefined && !opts.targets[i].hideAttributes) {
                                     grafanaGts.target += gts.formatedAttributes;
                                 }
-                                for (var _b = 0, _c = gts.v; _b < _c.length; _b++) {
-                                    var dp = _c[_b];
+                                gts.v.forEach(function (dp) {
                                     grafanaGts.datapoints.push([dp[dp.length - 1], dp[0] / 1000]);
-                                }
+                                });
                                 data.push(grafanaGts);
-                            }
+                            });
                         });
                         return { data: data };
                     })
@@ -136,20 +135,12 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                     return this.executeExec({ ws: ws })
                         .then(function (res) {
                         var annotations = [];
-                        /*if (!) {
-                          console.error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
-                          var d = this.$q.defer()
-                          d.resolve([])
-                          return d.promise
-                        }*/
-                        for (var _i = 0, _a = gts_1.default.stackFilter(res.data); _i < _a.length; _i++) {
-                            var gts = _a[_i];
+                        var _loop_1 = function (gts) {
                             var tags = [];
                             for (var label in gts.l) {
                                 tags.push(label + ":" + gts.l[label]);
                             }
-                            for (var _b = 0, _c = gts.v; _b < _c.length; _b++) {
-                                var dp = _c[_b];
+                            gts.v.forEach(function (dp) {
                                 annotations.push({
                                     annotation: {
                                         name: opts.annotation.name,
@@ -161,7 +152,17 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                                     text: dp[dp.length - 1],
                                     tags: (tags.length > 0) ? tags.join(',') : null
                                 });
-                            }
+                            });
+                        };
+                        /*if (!) {
+                          console.error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
+                          var d = this.$q.defer()
+                          d.resolve([])
+                          return d.promise
+                        }*/
+                        for (var _i = 0, _a = gts_1.default.stackFilter(res.data); _i < _a.length; _i++) {
+                            var gts = _a[_i];
+                            _loop_1(gts);
                         }
                         return annotations;
                     });
@@ -176,15 +177,14 @@ System.register(["./gts", "./table", "./query"], function (exports_1, context_1)
                         .then(function (res) {
                         // only one object on the stack, good user
                         if (res.data.length === 1 && typeof res.data[0] === 'object') {
-                            var entries = [];
-                            for (var _i = 0, _a = res.data[0]; _i < _a.length; _i++) {
-                                var key = _a[_i];
-                                entries.push({
+                            var entries_1 = [];
+                            res.data[0].forEach(function (key) {
+                                entries_1.push({
                                     text: key,
                                     value: res.data[0][key]
                                 });
-                            }
-                            return entries;
+                            });
+                            return entries_1;
                         }
                         // some elements on the stack, return all of them as entry
                         return res.data.map(function (entry, i) {

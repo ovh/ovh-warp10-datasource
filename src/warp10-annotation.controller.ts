@@ -10,6 +10,5 @@ export default class Warp10AnnotationQueryCtrl {
 
     if (!this.annotation.query)
       this.annotation.query = ''
-    console.log('ANNOT', this)
   }
 }

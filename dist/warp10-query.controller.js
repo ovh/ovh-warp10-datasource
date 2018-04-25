@@ -39,6 +39,9 @@ System.register(["app/plugins/sdk", "./query", "./ace-mode-warpscript"], functio
                     _this.target.friendlyQuery = Object.assign(new query_1.default(), _this.target.friendlyQuery);
                     // acces to static members from dom
                     _this.staticQuery = new query_1.default();
+                    // prevent wrapped ace-editor to crash
+                    if (!_this.target.expr)
+                        _this.target.expr = '';
                     return _this;
                 }
                 Warp10QueryCtrl.prototype._addLabel = function () {
