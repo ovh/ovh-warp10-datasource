@@ -1,4 +1,4 @@
-export class Warp10Datasource {
+export default class Warp10Datasource {
   id: number = null
   orgId: number = null
   isDefault = false

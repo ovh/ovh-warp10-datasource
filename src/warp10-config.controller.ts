@@ -1,16 +1,16 @@
-import { Warp10Datasource } from './datasource'
+import Datasource from './datasource'
 
-export class Warp10ConfigCtrl {
+export default class Warp10ConfigCtrl {
 
   static templateUrl = 'template/config.html'
-  current: Warp10Datasource
+  current: Datasource
 
   // Dom needs
   newExtraKey: any
   newExtraVal: any
 
   constructor(private backendSrv: any, private $routeParams: any) {
-    this.current = new Warp10Datasource()
+    this.current = new Datasource()
     this.current.id = this.$routeParams.id
     if (this.current.id)
       this._loadDatasourceConfig()
@@ -24,7 +24,6 @@ export class Warp10ConfigCtrl {
   }
 
   _addExtraVar() {
-    console.log(this.newExtraKey,  this.newExtraVal, typeof this.newExtraVal)
     if (this.newExtraKey && this.newExtraVal) {
       this.current.jsonData[this.newExtraKey] = this.newExtraVal
       this.newExtraKey = ''

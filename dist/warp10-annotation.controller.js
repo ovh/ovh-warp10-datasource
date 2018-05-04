@@ -6,12 +6,16 @@ System.register([], function (exports_1, context_1) {
         setters: [],
         execute: function () {
             Warp10AnnotationQueryCtrl = /** @class */ (function () {
-                function Warp10AnnotationQueryCtrl() {
+                function Warp10AnnotationQueryCtrl($scope, $injector) {
+                    if (!this.annotation)
+                        this.annotation = {};
+                    if (!this.annotation.query)
+                        this.annotation.query = '';
                 }
                 Warp10AnnotationQueryCtrl.templateUrl = 'template/annotation.html';
                 return Warp10AnnotationQueryCtrl;
             }());
-            exports_1("Warp10AnnotationQueryCtrl", Warp10AnnotationQueryCtrl);
+            exports_1("default", Warp10AnnotationQueryCtrl);
         }
     };
 });

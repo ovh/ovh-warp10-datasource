@@ -12,7 +12,7 @@ System.register([], function (exports_1, context_1) {
                 Warp10QueryOptionsCtrl.template = '<!-- Warp10-query-option.controller --> ';
                 return Warp10QueryOptionsCtrl;
             }());
-            exports_1("Warp10QueryOptionsCtrl", Warp10QueryOptionsCtrl);
+            exports_1("default", Warp10QueryOptionsCtrl);
         }
     };
 });

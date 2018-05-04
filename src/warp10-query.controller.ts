@@ -1,16 +1,21 @@
-import { QueryCtrl }   from 'app/plugins/sdk'
-import { Warp10Query } from './query'
+///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
-export class Warp10QueryCtrl extends QueryCtrl {
+import { QueryCtrl }   from 'app/plugins/sdk'
+import Query from './query'
+import initWarp10AceMode from './ace-mode-warpscript'
+
+initWarp10AceMode()
+
+export default class Warp10QueryCtrl extends QueryCtrl {
 
   static templateUrl = 'template/query.html'
   target: {
-    friendlyQuery: Warp10Query,
+    friendlyQuery: Query,
     hide: boolean,
-    target: string
+    expr: string
   }
   changeTicker: any
-  staticQuery: Warp10Query
+  staticQuery: Query
 
   extraLabelKey: string
   extraLabelValue: string
@@ -23,21 +28,13 @@ export class Warp10QueryCtrl extends QueryCtrl {
 
   constructor(public $scope: any, private uiSegmentSrv: any, $injector: any) {
     super($scope, $injector)
-    this.target.friendlyQuery = Object.assign(new Warp10Query(), this.target.friendlyQuery)
+    this.target.friendlyQuery = Object.assign(new Query(), this.target.friendlyQuery)
     // acces to static members from dom
-    this.staticQuery = new Warp10Query()
-    System.import('plugins/grafana-warp10-datasource/assets/lib/webcomponents-lite.js')
-    .then((e) => {
-      console.log('webcomponent loaded', e)
-    })
-    .catch((e) => {
-      console.log("It's ok, it's not a module", e)
-    })
-  }
+    this.staticQuery = new Query()
 
-  /*getOptions() {
-    //return Promise.resolve([this.uiSegmentSrv.newSegment('test'), this.uiSegmentSrv.newSegment('abcd')])
-  }*/
+    // prevent wrapped ace-editor to crash
+    if (!this.target.expr) this.target.expr = ''
+  }
 
   _addLabel() {
     if (!this.extraLabelKey || !this.extraLabelValue) return
@@ -86,15 +83,16 @@ export class Warp10QueryCtrl extends QueryCtrl {
     this._addReducerLabel()
   }
 
+  getCompleter(...o) {
+    console.debug('[Warp10Query] COMPLETER called', o)
+  }
+
   toggleEditorMode() {
     console.debug('Toggle readonly', this.readOnly)
     this.readOnly = !this.readOnly
   }
 
-  onChangeInternal() {
-    clearTimeout(this.changeTicker)
-    this.changeTicker = setTimeout(() => {
-      this.refresh()
-    }, 1000)
+  onChangeInternal = () => {
+    this.refresh()
   }
 }

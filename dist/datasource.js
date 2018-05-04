@@ -27,7 +27,7 @@ System.register([], function (exports_1, context_1) {
                 }
                 return Warp10Datasource;
             }());
-            exports_1("Warp10Datasource", Warp10Datasource);
+            exports_1("default", Warp10Datasource);
         }
     };
 });

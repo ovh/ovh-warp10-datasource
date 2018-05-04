@@ -1,5 +1,5 @@
 
-export class Warp10Query {
+export default class Warp10Query {
 
   readToken = ''
   className = ''

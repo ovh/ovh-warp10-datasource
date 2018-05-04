@@ -1,16 +1,16 @@
-import { QueryOptions } from './interfaces/query-options'
-import { AnnotationOptions } from './interfaces/annotation-options'
-import { GTS } from './gts'
+import QueryOptions from './interfaces/query-options'
+import AnnotationOptions from './interfaces/annotation-options'
+import GTS from './gts'
 import { Table } from './table'
-import { Warp10Query } from './query'
+import Query from './query'
 
-export class Warp10Datasource {
+export default class Warp10Datasource {
 
   constructor(private instanceSettings: any,
     private $q: any,
     private backendSrv: any,
     private templateSrv: any,
-    private $log: any) { }
+    private $log: any) {}
 
   /**
    * used by panels to get data
@@ -20,10 +20,11 @@ export class Warp10Datasource {
   query(opts: QueryOptions): Promise<any> {
     let queries = []
     let wsHeader = this.computeTimeVars(opts) + this.computeGrafanaContext() + this.computePanelRepeatVars(opts)
-    for (let query of opts.targets) {
+    opts.targets.forEach(queryRef => {
+      let query = Object.assign({}, queryRef) // Deep copy
       //if (!query.hide) {
       if (query.friendlyQuery)
-        query.friendlyQuery = Object.assign(new Warp10Query(), query.friendlyQuery)
+        query.friendlyQuery = Object.assign(new Query(), query.friendlyQuery)
       // Grafana can send empty Object at the first time, we need to check is there is something
       if (query.expr || query.friendlyQuery) {
         if (query.advancedMode === undefined)
@@ -33,7 +34,7 @@ export class Warp10Datasource {
         console.debug('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery)
       }
       //}
-    }
+    })
 
     if (queries.length === 0) {
       let d = this.$q.defer();
@@ -61,7 +62,7 @@ export class Warp10Datasource {
             return
           }
 
-          for (let gts of GTS.stackFilter(res.data)) {
+          GTS.stackFilter(res.data).forEach(gts => {
             let grafanaGts = {
               target: (opts.targets[i].hideLabels) ? gts.c : gts.nameWithLabels,
               datapoints: []
@@ -71,11 +72,11 @@ export class Warp10Datasource {
               grafanaGts.target += gts.formatedAttributes
             }
 
-            for (let dp of gts.v) {
+            gts.v.forEach(dp => {
               grafanaGts.datapoints.push([dp[dp.length - 1], dp[0] / 1000])
-            }
+            })
             data.push(grafanaGts)
-          }
+          })
         })
         return { data }
       })
@@ -123,7 +124,7 @@ export class Warp10Datasource {
    * @param options
    * @return {Promise<any>} results
    */
-  annotationQuery(opts: AnnotationOptions) {
+  annotationQuery(opts: AnnotationOptions): Promise<any>{
     let ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query
 
     return this.executeExec({ ws })
@@ -143,7 +144,7 @@ export class Warp10Datasource {
             tags.push(`${label}:${gts.l[label]}`)
           }
 
-          for (let dp of gts.v) {
+          gts.v.forEach(dp => {
             annotations.push({
               annotation: {
                 name: opts.annotation.name,
@@ -155,7 +156,7 @@ export class Warp10Datasource {
               text: dp[dp.length - 1],
               tags: (tags.length > 0) ? tags.join(',') : null
             })
-          }
+          })
         }
         return annotations
       })
@@ -172,12 +173,12 @@ export class Warp10Datasource {
         // only one object on the stack, good user
         if (res.data.length === 1 && typeof res.data[0] === 'object') {
           let entries = []
-          for (let key of res.data[0]) {
+          res.data[0].forEach(key => {
             entries.push({
               text: key,
               value: res.data[0][key]
             })
-          }
+          })
           return entries
         }
         // some elements on the stack, return all of them as entry

@@ -13,7 +13,7 @@ System.register(["./datasource"], function (exports_1, context_1) {
                 function Warp10ConfigCtrl(backendSrv, $routeParams) {
                     this.backendSrv = backendSrv;
                     this.$routeParams = $routeParams;
-                    this.current = new datasource_1.Warp10Datasource();
+                    this.current = new datasource_1.default();
                     this.current.id = this.$routeParams.id;
                     if (this.current.id)
                         this._loadDatasourceConfig();
@@ -26,7 +26,6 @@ System.register(["./datasource"], function (exports_1, context_1) {
                     });
                 };
                 Warp10ConfigCtrl.prototype._addExtraVar = function () {
-                    console.log(this.newExtraKey, this.newExtraVal, typeof this.newExtraVal);
                     if (this.newExtraKey && this.newExtraVal) {
                         this.current.jsonData[this.newExtraKey] = this.newExtraVal;
                         this.newExtraKey = '';
@@ -43,7 +42,7 @@ System.register(["./datasource"], function (exports_1, context_1) {
                 Warp10ConfigCtrl.templateUrl = 'template/config.html';
                 return Warp10ConfigCtrl;
             }());
-            exports_1("Warp10ConfigCtrl", Warp10ConfigCtrl);
+            exports_1("default", Warp10ConfigCtrl);
         }
     };
 });

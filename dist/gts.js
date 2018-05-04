@@ -25,8 +25,13 @@ System.register([], function (exports_1, context_1) {
                  * @return {boolean} is it a GTS ?
                  */
                 GTS.isGTS = function (g) {
-                    return g != undefined && g.hasOwnProperty('c') && g.hasOwnProperty('v') && g.hasOwnProperty('l')
-                        && typeof g.c === 'string' && typeof g.l === 'object' && Array.isArray(g.v);
+                    return g != undefined
+                        && g.hasOwnProperty('c')
+                        && g.hasOwnProperty('v')
+                        && g.hasOwnProperty('l')
+                        && typeof g.c === 'string'
+                        && typeof g.l === 'object'
+                        && Array.isArray(g.v);
                 };
                 /**
                  * Check all elements of any array to know if there are only GTS types
@@ -55,10 +60,9 @@ System.register([], function (exports_1, context_1) {
                         if (GTS.isGTS(entry))
                             gtss.push(Object.assign(new GTS(), entry));
                         else if (GTS.isGTSArray(entry)) {
-                            entry = entry.map(function (gts) {
+                            gtss = gtss.concat(entry.map(function (gts) {
                                 return Object.assign(new GTS(), gts);
-                            });
-                            gtss = gtss.concat(entry);
+                            }));
                         }
                     }
                     return gtss;
@@ -80,7 +84,7 @@ System.register([], function (exports_1, context_1) {
                 });
                 return GTS;
             }());
-            exports_1("GTS", GTS);
+            exports_1("default", GTS);
         }
     };
 });

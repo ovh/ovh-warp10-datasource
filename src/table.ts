@@ -14,9 +14,9 @@ export class Table {
   }
 }
 
-class Column {
+export class Column {
   text: string
   type: string
-  sort: boolean
-  desc: boolean
+  sort?: boolean
+  desc?: boolean
 }
