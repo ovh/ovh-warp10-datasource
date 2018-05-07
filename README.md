@@ -144,3 +144,8 @@ To understand the variable resolution, this is how a query is built
 [ $READ_TOKEN '~.*' {} $end $interval ] FETCH
 [ SWAP bucketiser.max $end $interval $datapointsCount/ datapointsCount ] BUCKETIZE
 ```
+
+## Related links
+
+ * Contribute: https://github.com/ovh/grafana-warp10/blob/master/CONTRIBUTING.md
+ * Report bugs: https://github.com/ovh/grafana-warp10/issues
