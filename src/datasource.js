@@ -43,8 +43,8 @@ export class Warp10Datasource {
   }
 
   parseTemplatingResult(o) {
-    console.debug('tesmplating result', o);
-    return o.data.map((data, indice) => {
+    console.debug('templating result', o);
+    return o.data[0].map((data, indice) => {
       return {text: data.toString() || indice, value: data};
     });
   }
