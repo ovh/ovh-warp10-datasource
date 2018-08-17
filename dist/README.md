@@ -1,95 +1,103 @@
-## Grafana - Warp 10 Datasource Plugin
+Warp10-Grafana Datasource Plugin
+===
 
-This is a plugin that allows Grafana 4 to support Warp 10 as datasource.
+# Install the plugin
 
-Grafana 3 plugin is in [`grafana-3`](https://github.com/cityzendata/grafana-warp10/tree/grafana-3) branch, Grafana 2.6 plugin in [`grafana-2.6`](https://github.com/cityzendata/grafana-warp10/tree/grafana-2.6).
+Just clone the repository in the Grafana *plugins* folder
+```sh
+git clone git@github.com:ovh/grafana-warp10.git /var/lib/grafana/plugins/grafana-warp10
+```
+Grafana will use the *dist/* folder by default
 
+# Add a new Warp10 Datasource
 
-### Installation:
+- go to the Grafana menu (top left) > "datasources" > "add data source"
+- choose a name
+- set Warp10 as type
+- paste the Warp10 platform URL ( do not append /api/v0/... )
 
-Copy the content of the folder `dist` to a folder `warp10` inside the folder for plugins in Grafana 3.
-In most cases,  this path is located at `[GRAFANA_INSTALL_DIR]/data/plugins`.
+## Add execution variables
 
+You can define variables at datasource level (~ organisation level) which can be available for all dashboards. you can put tokens, constants, macros, ...
+In case of a macro definition, the variable value must start with *<%* and end with *%>*. In the query you can prepend *@* to the macro name to execute it.
 
-### Use
+# Make a query
 
-It works more or less like any other Grafana datasource.
+On a new dashboard, in a graph edition, choose your previous datasource and click *add query*.
 
-Grafana will push to the plugin the `start` and `end` values of the graph.
-The plugin will push those values onto the WarpScript stack some variables you can use on your Warpscript scripts:
+You can write your WarpScript on the editor below, for beginners, you can uncheck *warpScript editor*, a user friendly query editor will appear.
 
-* `$start` and `$end`, corresponding to the `start` and `end` values of the graph in microseconds
-* `$startISO` and `$endISO`, corresponding to the `start` and `end` values in the graph as ISO date format
-(useful for the FETCH function, for example)
-* `$interval`, corresponding to `$end - $start`
+A query is composed by 2 component, the WarpScript from WarpScript editor and the WarpScript from friendly query builder, check or uncheck the *WarpScript editor* will execute the corresponding WarpScript.
 
+to graph something on Grafana you need to return some GTS
 
-Then you can use these variables in your WarpScript script, for example
-for a FETCH.
+## WarpScript example
 
-Examples of WarpScript scripts:
+/!\ The plugin look for GTS or GTS array in your stack, all other stack entry will be ignored
 
-1. Generated sinusoids
+```WarpScript
+NEWGTS
+'io.warp10.grafana.test' RENAME @myMacro
+'func' 'sinus' 2 ->MAP RELABEL
+'sinus' STORE
 
+NEWGTS
+'io.warp10.grafana.testmetric' RENAME
+'func' 'cosinus' 2 ->MAP RELABEL
+'cosinus' STORE
 
-        NEWGTS  
-        'com.cityzendata.grafana.testmetric' RENAME
-        'func' 'sinus' 2 ->MAP RELABEL  
-        'sinus' STORE  
+100 // Not graphable -> ignored
+'b' // Not graphable -> ignored
 
-        NEWGTS  
-        'com.cityzendata.grafana.testmetric' RENAME
-        'func' 'cosinus' 2 ->MAP RELABEL  
-        'cosinus' STORE  
+$interval 20 / TOLONG 'step' STORE
 
+<% $step + %> 'stepMacro' STORE
+<% 'index' STORE $sinus $index NaN NaN NaN $index SIN  ADDVALUE DROP %> 'execMacroSinus' STORE
+<% 'index' STORE $cosinus $index NaN NaN NaN $index COS  ADDVALUE DROP %> 'execMacroCoinus' STORE
 
-        $end $start - 'interval' STORE
-        $interval 20 / TOLONG 'step' STORE  
+$start $end $stepMacro $execMacroSinus FORSTEP
+$start $end $stepMacro $execMacroCoinus FORSTEP
+$sinus $cosinus
+```
 
-        <% $step + %> 'stepMacro' STORE
-        <% 'index' STORE $sinus $index NaN NaN NaN $index SIN  ADDVALUE DROP %> 'execMacroSinus' STORE
-        <% 'index' STORE $cosinus $index NaN NaN NaN $index COS  ADDVALUE DROP %> 'execMacroCoinus' STORE  
+### Table case
+There is a way to build custom tables instead of formating GTS array
+If your stack have only 1 element and this element have `columns` and `rows` property
+Then you can choose *Table* as *Table transform* in Table Options section
 
-        $start $end $stepMacro $execMacroSinus FORSTEP
-        $start $end $stepMacro $execMacroCoinus FORSTEP
-        $sinus $cosinus 2 ->LIST  
-
-
-1. Classic FETCH query
-
-
-        'YOUR_TOKEN_HERE'
-        'classname'
-        'labelKey' 'labelValue' ->MAP
-        $startISO $endISO
-        FETCH
-
-  or  
-
-
-          'YOUR_TOKEN_HERE'
-          'classname'
-          'labelKey' 'labelValue' ->MAP
-          $end $interval
-          FETCH  
-
-![Warp10-grafana plugin](warp10-grafana.png)
-
+WarpScript example:
+```WarpScript
+{
+  'columns' [
+    {
+      'text' 'columnA'
+      'type' 'number'
+      'sort' true
+      'desc' true
+    }
+    {
+      'text' 'columnB'
+      'type' 'number'
+    }
+  ]
+  'rows' [
+    [ 10 20 ]
+    [ 100 200 ]
+  ]
+}
+```
 
 ### Worldmap integration
 
 You can use `grafana-warp10-datasource` as datasource for showing position data on grafana using `grafana-worldmap-panel` plugin.
 
-In order to do it, you need to install a modified version of the `grafana-worldmap-panel` plugin: [LostInBrittany/worldmap-panel](https://github.com/LostInBrittany/worldmap-panel).
+In order to do it, you need to install the `grafana-worldmap-panel` plugin: [Worldmap Panel](https://grafana.com/plugins/grafana-worldmap-panel).
 
-> A [pull request](https://github.com/grafana/worldmap-panel/pull/104) has been submitted to `grafana-worldmap-panel` in order to 
-add the changes to the official version of the plugin.
-
-When both `grafana-warp10-datasource` and the modified `grafana-worldmap-panel` installed, you can define a new Wordmap widget,
+When both `grafana-warp10-datasource` and the `grafana-worldmap-panel` installed, you can define a new Worldmap widget,
 with a Warp&nbsp;10 datasource and `json result` as *Location Data* in the *Worlmap* tab:
 
-![Warp&nbsp;10 datasource](./assets/README-worldmap-datasource-tab.jpg)
-![`json result` as *Location Data* in the *Worlmap* tab](./assets/README-worldmap-worldmap-tab.jpg)
+![Warp&nbsp;10 datasource](https://raw.githubusercontent.com/ovh/grafana-warp10/master/dist/assets/README-worldmap-datasource-tab.jpg)
+![`json result` as *Location Data* in the *Worlmap* tab](https://raw.githubusercontent.com/ovh/grafana-warp10/master/dist/assets/README-worldmap-worldmap-tab.jpg)
 
 Now in your WarpScript you can generate data in the JSON format supported by Worldmap, for example :
 
@@ -100,7 +108,7 @@ JSON->
 
 And then you can see the chosen locations in the map:
 
-![Worlmap view without values](./assets/README-worldmap-view-without-values.jpg)
+![Worlmap view without values](https://raw.githubusercontent.com/ovh/grafana-warp10/master/dist/assets/README-worldmap-view-without-values.jpg)
 
 You can also give a `value` to each location, in order to show the locations with different sizes and colors, as Worldmap allows:
 
@@ -109,22 +117,64 @@ You can also give a `value` to each location, in order to show the locations wit
 JSON->
 ```
 
-![Worlmap view with values](./assets/README-worldmap-view-with-values.jpg)
+![Worlmap view with values](https://raw.githubusercontent.com/ovh/grafana-warp10/master/dist/assets/README-worldmap-view-with-values.jpg)
+
+## Available variables
+On your WarpScript you can use (all timestamps are in µSeconds):
+
+| Name          | Description                                                   | Example                    |
+|---------------|---------------------------------------------------------------|----------------------------|
+| **$end**      | Timestamp of the most recent point in the Grafana time window | 1498038153276000           |
+| **$endISO**   | *end* value in ISO-8601 format                                | '2017-06-21T09:42:33.276Z' |
+| **$start**    | Timestamp of the less recent point in the Grafana time window | 1498034553276000           |
+| **$startISO** | *start* value in ISO-8601 format                              | '2017-06-21T08:42:33.276Z' |
+| **$interval** | Difference between $end and $start                            | 3600000000                 |
+
+# Use Annotations
+You can add Annotation on your graph: Dashboard > "Manage dashboard" > "Annotations"
+Just add you WarpScript
+
+/!\ You must return a single GTS on TOP of your stack
+
+## Annotation example
+```warpScript
+NEWGTS
+'alerts' RENAME
+{ 'a' 'b' 'c' 'd' } RELABEL
+$end $interval 2 / - NaN DUP DUP 'Restart WebServer' ADDVALUE
+$end $interval 3 / - NaN DUP DUP 'Update v1.0.2' ADDVALUE
+```
+
+# Templating variable evaluation
+
+To understand the variable resolution, this is how a query is built
+
+- Inject dashboard variables (**$end**, **$interval**, etc...)
+- Inject datasource variables
+- Inject templating variables resoled in the configuration order (a templating variable can call the previous templating variables in its resolution)
+- Inject user query (can use all previous variables)
+
+/!\ all of the templating values are casted into strings by Grafana engine.
+
+# User friendly query builder
+- [x] Basic Fetch
+- [x] Bucketizer
+- [x] Reducer
+- [ ] Renamer
+- [ ] Mapper
+- [ ] Filter
+- [ ] Extend limits (LIMIT, MAXOPS, MAXFETCH, ...)
+- [ ] Anomaly detection
 
 
+# Data fetching example
+```
+100 'datapointsCount' STORE
+[ $READ_TOKEN '~.*' {} $end $interval ] FETCH
+[ SWAP bucketiser.max $end $interval $datapointsCount/ datapointsCount ] BUCKETIZE
+```
 
-### TODO
+## Related links
 
-
-* UI redesign for query editor
-* Click-by-click FETCH and BUCKETIZE
-* Almost no testing has been done yet, except for metrics support.
-* Missing support for Annotations
-
-
-### License
-
-
-Copyright &copy; 2016 Cityzen Data
-
-APACHE LICENSE Version 2.0, January 2004
+ * Contribute: https://github.com/ovh/grafana-warp10/blob/master/CONTRIBUTING.md
+ * Report bugs: https://github.com/ovh/grafana-warp10/issues

@@ -1,51 +1,38 @@
-'use strict';
-
-System.register(['./datasource', './query-controller'], function (_export, _context) {
-  "use strict";
-
-  var Warp10Datasource, Warp10DatasourceQueryCtrl, Warp10ConfigCtrl, Warp10QueryOptionsCtrl, Warp10AnnotationsQueryCtrl;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
+///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+System.register(["app/plugins/sdk", "./warp10-datasource", "./warp10-config.controller", "./warp10-query.controller", "./warp10-annotation.controller"], function (exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
+    function getCSSPath(sheet) {
+        return "plugins/grafana-warp10-datasource/style/" + sheet + ".css";
     }
-  }
-
-  return {
-    setters: [function (_datasource) {
-      Warp10Datasource = _datasource.Warp10Datasource;
-    }, function (_queryController) {
-      Warp10DatasourceQueryCtrl = _queryController.Warp10DatasourceQueryCtrl;
-    }],
-    execute: function () {
-      _export('ConfigCtrl', Warp10ConfigCtrl = function Warp10ConfigCtrl() {
-        _classCallCheck(this, Warp10ConfigCtrl);
-      });
-
-      Warp10ConfigCtrl.templateUrl = 'partials/config.html';
-
-      _export('QueryOptionsCtrl', Warp10QueryOptionsCtrl = function Warp10QueryOptionsCtrl() {
-        _classCallCheck(this, Warp10QueryOptionsCtrl);
-      });
-
-      Warp10QueryOptionsCtrl.templateUrl = 'partials/query.options.html';
-
-      _export('AnnotationsQueryCtrl', Warp10AnnotationsQueryCtrl = function Warp10AnnotationsQueryCtrl() {
-        _classCallCheck(this, Warp10AnnotationsQueryCtrl);
-      });
-
-      Warp10AnnotationsQueryCtrl.templateUrl = 'partials/annotations.editor.html';
-
-      _export('Datasource', Warp10Datasource);
-
-      _export('QueryCtrl', Warp10DatasourceQueryCtrl);
-
-      _export('ConfigCtrl', Warp10ConfigCtrl);
-
-      _export('QueryOptionsCtrl', Warp10QueryOptionsCtrl);
-
-      _export('AnnotationsQueryCtrl', Warp10AnnotationsQueryCtrl);
-    }
-  };
+    var sdk_1, warp10_datasource_1, warp10_config_controller_1, warp10_query_controller_1, warp10_annotation_controller_1;
+    return {
+        setters: [
+            function (sdk_1_1) {
+                sdk_1 = sdk_1_1;
+            },
+            function (warp10_datasource_1_1) {
+                warp10_datasource_1 = warp10_datasource_1_1;
+            },
+            function (warp10_config_controller_1_1) {
+                warp10_config_controller_1 = warp10_config_controller_1_1;
+            },
+            function (warp10_query_controller_1_1) {
+                warp10_query_controller_1 = warp10_query_controller_1_1;
+            },
+            function (warp10_annotation_controller_1_1) {
+                warp10_annotation_controller_1 = warp10_annotation_controller_1_1;
+            }
+        ],
+        execute: function () {///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+            exports_1("Datasource", warp10_datasource_1.default);
+            exports_1("ConfigCtrl", warp10_config_controller_1.default);
+            exports_1("QueryCtrl", warp10_query_controller_1.default);
+            exports_1("AnnotationsQueryCtrl", warp10_annotation_controller_1.default);
+            sdk_1.loadPluginCss({
+                dark: getCSSPath('dark'),
+                light: getCSSPath('light')
+            });
+        }
+    };
 });
-//# sourceMappingURL=module.js.map
