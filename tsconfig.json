@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "module": "system",
+        "moduleResolution": "classic",
+        "declaration": true,
+        "target": "ES5",
+        "noImplicitAny": false,
+        "noImplicitReturns":false,
+        "noImplicitThis":false,
+        "noImplicitUseStrict":false,
+        "noUnusedLocals":false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "noStrictGenericChecks": true,
+        "sourceMap": true,
+    },
+    "exclude": [
+        "node_modules/"
+    ]
+}
