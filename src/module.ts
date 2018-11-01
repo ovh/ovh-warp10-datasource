@@ -9,7 +9,7 @@ import AnnotationsQueryCtrl from './warp10-annotation.controller'
 import QueryOptionsCtrl from './warp10-query-options.controller'
 
 function getCSSPath(sheet) {
-  return `plugins/grafana-warp10-datasource/style/${ sheet }.css`
+  return `plugins/ovh-warp10-datasource/style/${ sheet }.css`
 }
 loadPluginCss({
   dark: getCSSPath('dark'),

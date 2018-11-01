@@ -1,11 +1,11 @@
-Warp10-Grafana Datasource Plugin
+Grafana Warp10 Datasource Plugin
 ===
 
 # Install the plugin
 
 Just clone the repository in the Grafana *plugins* folder
 ```sh
-git clone git@github.com:ovh/grafana-warp10.git /var/lib/grafana/plugins/grafana-warp10
+git clone git@github.com:ovh/ovh-warp10-datasource.git /var/lib/grafana/plugins/ovh-warp10-datasource
 ```
 Grafana will use the *dist/* folder by default
 
@@ -89,15 +89,15 @@ WarpScript example:
 
 ### Worldmap integration
 
-You can use `grafana-warp10-datasource` as datasource for showing position data on grafana using `grafana-worldmap-panel` plugin.
+You can use `ovh-warp10-datasource` as datasource for showing position data on grafana using `grafana-worldmap-panel` plugin.
 
 In order to do it, you need to install the `grafana-worldmap-panel` plugin: [Worldmap Panel](https://grafana.com/plugins/grafana-worldmap-panel).
 
-When both `grafana-warp10-datasource` and the `grafana-worldmap-panel` installed, you can define a new Worldmap widget,
+When both `ovh-warp10-datasource` and the `grafana-worldmap-panel` installed, you can define a new Worldmap widget,
 with a Warp&nbsp;10 datasource and `json result` as *Location Data* in the *Worlmap* tab:
 
-![Warp&nbsp;10 datasource](https://raw.githubusercontent.com/ovh/grafana-warp10/master/dist/assets/README-worldmap-datasource-tab.jpg)
-![`json result` as *Location Data* in the *Worlmap* tab](https://raw.githubusercontent.com/ovh/grafana-warp10/master/dist/assets/README-worldmap-worldmap-tab.jpg)
+![Warp&nbsp;10 datasource](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-datasource-tab.jpg)
+![`json result` as *Location Data* in the *Worlmap* tab](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-worldmap-tab.jpg)
 
 Now in your WarpScript you can generate data in the JSON format supported by Worldmap, for example :
 
@@ -108,7 +108,7 @@ JSON->
 
 And then you can see the chosen locations in the map:
 
-![Worlmap view without values](https://raw.githubusercontent.com/ovh/grafana-warp10/master/dist/assets/README-worldmap-view-without-values.jpg)
+![Worlmap view without values](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-view-without-values.jpg)
 
 You can also give a `value` to each location, in order to show the locations with different sizes and colors, as Worldmap allows:
 
@@ -117,7 +117,7 @@ You can also give a `value` to each location, in order to show the locations wit
 JSON->
 ```
 
-![Worlmap view with values](https://raw.githubusercontent.com/ovh/grafana-warp10/master/dist/assets/README-worldmap-view-with-values.jpg)
+![Worlmap view with values](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-view-with-values.jpg)
 
 ## Available variables
 On your WarpScript you can use (all timestamps are in µSeconds):
@@ -176,5 +176,5 @@ To understand the variable resolution, this is how a query is built
 
 ## Related links
 
- * Contribute: https://github.com/ovh/grafana-warp10/blob/master/CONTRIBUTING.md
- * Report bugs: https://github.com/ovh/grafana-warp10/issues
+ * Contribute: https://github.com/ovh/ovh-warp10-datasource/blob/master/CONTRIBUTING.md
+ * Report bugs: https://github.com/ovh/ovh-warp10-datasource/issues

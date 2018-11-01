@@ -3,7 +3,7 @@ export default class Warp10Datasource {
   orgId: number = null
   isDefault = false
   name = ''
-  type = 'grafana-warp10-datasource'
+  type = 'ovh-warp10-datasource'
   access = 'direct'
 
   user = ''

@@ -1,5 +1,5 @@
 {
-  "id": "grafana-warp10-datasource",
+  "id": "ovh-warp10-datasource",
   "type": "datasource",
   "name": "Warp10",
   "metrics": true,
@@ -10,7 +10,7 @@
     "updated": "2018-04-25",
     "author": {
       "name": "ovh",
-      "url": "https://github.com/ovh/grafana-warp10"
+      "url": "https://github.com/ovh/ovh-warp10-datasource"
     },
     "keywords": [
       "warp10",
@@ -24,7 +24,7 @@
     },
     "links": [{
       "name": "GitHub",
-      "url": "https://github.com/ovh/grafana-warp10"
+      "url": "https://github.com/ovh/ovh-warp10-datasource"
     }, {
       "name": "Google group Warp10",
       "url": "https://groups.google.com/forum/#!forum/warp10-users"

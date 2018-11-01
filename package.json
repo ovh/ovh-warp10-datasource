@@ -1,9 +1,9 @@
 {
-  "name": "grafana-warp10",
+  "name": "ovh-warp10-datasource",
   "version": "2.1.1",
   "description": "Warp10 datasource Grafana plugin",
   "main": "module.ts",
-  "repository": "git@github.com:ovh/grafana-warp10.git",
+  "repository": "git@github.com:ovh/ovh-warp10-datasource.git",
   "author": "ovh <contact@metrics.ovh.net>",
   "license": "Apache-2.0",
   "engines": {

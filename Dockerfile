@@ -1,3 +1,3 @@
 FROM grafana/grafana
 
-ADD ./ /var/lib/grafana/plugins/grafana-warp10
+ADD ./ /var/lib/grafana/plugins/ovh-warp10-datasource
