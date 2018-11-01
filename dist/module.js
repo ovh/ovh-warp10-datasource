@@ -3,7 +3,7 @@ System.register(["app/plugins/sdk", "./warp10-datasource", "./warp10-config.cont
     "use strict";
     var __moduleName = context_1 && context_1.id;
     function getCSSPath(sheet) {
-        return "plugins/grafana-warp10-datasource/style/" + sheet + ".css";
+        return "plugins/ovh-warp10-datasource/style/" + sheet + ".css";
     }
     var sdk_1, warp10_datasource_1, warp10_config_controller_1, warp10_query_controller_1, warp10_annotation_controller_1;
     return {

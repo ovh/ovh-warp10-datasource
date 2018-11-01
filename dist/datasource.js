@@ -11,7 +11,7 @@ System.register([], function (exports_1, context_1) {
                     this.orgId = null;
                     this.isDefault = false;
                     this.name = '';
-                    this.type = 'grafana-warp10-datasource';
+                    this.type = 'ovh-warp10-datasource';
                     this.access = 'direct';
                     this.user = '';
                     this.password = '';

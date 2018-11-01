@@ -1,4 +1,4 @@
-Contributing to Grafana-Warp10
+Contributing to OVH-Warp10-Datasource
 ==========================
 
 This project accepts contributions. In order to contribute, you should
@@ -26,8 +26,8 @@ You can submit your patches via GitHub
 Licensing for new files:
 ------------------------
 
-Grafana-Warp10 is licensed under Apache License Version 2.0 license. Anything contributed to
-Grafana-Warp10 must be released under this license.
+OVH-Warp10-Datasource is licensed under Apache License Version 2.0 license. Anything contributed to
+OVH-Warp10-Datasource must be released under this license.
 
 Developer Certificate of Origin:
 --------------------------------
