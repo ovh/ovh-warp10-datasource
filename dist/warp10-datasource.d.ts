@@ -49,4 +49,11 @@ export default class Warp10Datasource {
     private computeGrafanaContext;
     private computeTimeVars;
     private computePanelRepeatVars;
+    /**
+     * Test if a named scoped variable is set to all
+     *
+     * @param name string The name of scoped variable
+     * @return bool If the scoped variable is set to all
+     */
+    private scopedVarIsAll;
 }
