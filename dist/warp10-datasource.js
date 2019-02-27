@@ -1,7 +1,7 @@
 System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, context_1) {
     "use strict";
-    var __moduleName = context_1 && context_1.id;
     var gts_1, table_1, geo_1, query_1, Warp10Datasource;
+    var __moduleName = context_1 && context_1.id;
     return {
         setters: [
             function (gts_1_1) {

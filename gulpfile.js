@@ -11,61 +11,70 @@ const readme = 'README.md'
 const templateFiles = 'src/partials/*.pug'
 const styleFiles = ['src/style/light.less', 'src/style/dark.less']
 
-gulp.task('build', ['assets', 'tsc', 'pug', 'less', 'plugin'])
-gulp.task('default', ['build', 'watch'])
 
-gulp.task('tsc', () => {
-    return gulp
+gulp.task('tsc', (done) => {
+    gulp
     .src(tscFiles)
     .pipe(P.plumberNotifier())
     .pipe(tsProject())
     .pipe(gulp.dest('dist/'))
-    .pipe(P.livereload())
+    .pipe(P.livereload());
+    done();
 })
 
-gulp.task('pug', () => {
-    return gulp
+gulp.task('pug', (done) => {
+    gulp
     .src(templateFiles)
     .pipe(P.plumberNotifier())
     .pipe(P.pug({}))
     .pipe(gulp.dest('dist/template'))
-    .pipe(P.livereload())
+    .pipe(P.livereload());
+    done();
 })
 
-gulp.task('less', () => {
-    return gulp
+gulp.task('less', (done) => {
+    gulp
     .src(styleFiles)
     .pipe(P.plumberNotifier())
     .pipe(P.less({}))
     .pipe(gulp.dest('dist/style'))
-    .pipe(P.livereload())
+    .pipe(P.livereload());
+    done();
 })
 
-gulp.task('assets', () => {
+gulp.task('assets', (done) => {
     gulp
     .src(assetsFiles)
     .pipe(P.plumberNotifier())
     .pipe(gulp.dest('dist/assets'))
-    .pipe(P.livereload())
+    .pipe(P.livereload());
+    done();
 })
 
-gulp.task('plugin', () => {
+gulp.task('plugin', (done) => {
     gulp
     .src([pluginDefinition, readme])
     .pipe(P.plumberNotifier())
     .pipe(gulp.dest('dist/'))
-    .pipe(P.livereload())
+    .pipe(P.livereload());
+    done();
 })
 
-gulp.task('clean', () => {
-    return del(['dist/'])
+gulp.task('clean', (done) => {
+    del(['dist/']);
+    done;
 })
 
-gulp.task('watch', () => {
+gulp.task('watch', (done) => {
     P.livereload.listen()
-    gulp.watch(tscFiles, ['tsc'])
-    gulp.watch(assetsFiles, ['assets'])
-    gulp.watch([pluginDefinition, readme], ['plugin'])
-    gulp.watch(templateFiles, ['pug'])
-    gulp.watch('src/style/**.less', ['less'])
+    gulp.watch(tscFiles, gulp.series('tsc'))
+    gulp.watch(assetsFiles, gulp.series('assets'))
+    gulp.watch([pluginDefinition, readme], gulp.series('plugin'))
+    gulp.watch(templateFiles, gulp.series('pug'))
+    gulp.watch('src/style/**.less', gulp.series('less'));
+    done();
 })
+
+
+gulp.task('build', gulp.series('assets', 'tsc', 'pug', 'less', 'plugin'))
+gulp.task('default', gulp.series('build', 'watch'))
