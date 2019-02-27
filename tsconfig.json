@@ -4,6 +4,9 @@
         "moduleResolution": "classic",
         "declaration": true,
         "target": "ES5",
+        "typeRoots": [
+          "./node_modules/@types"
+        ],
         "noImplicitAny": false,
         "noImplicitReturns":false,
         "noImplicitThis":false,
@@ -15,6 +18,6 @@
         "sourceMap": true,
     },
     "exclude": [
-        "node_modules/"
+        "node_modules"
     ]
 }

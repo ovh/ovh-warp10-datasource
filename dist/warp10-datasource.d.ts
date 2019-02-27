@@ -35,18 +35,18 @@ export default class Warp10Datasource {
      * @param ws WarpScript string
      * @return {Promise<any>} Response
      */
-    private executeExec(query);
+    private executeExec;
     /**
      * Find all metrics with the given selector
      * @param selector
      * @return {Promise<any>} results
      */
-    private executeFind(selector);
+    private executeFind;
     /**
      * Compute Datasource variables and templating variables, store it on top of the stack
      * @return {string} WarpScript header
      */
-    private computeGrafanaContext();
-    private computeTimeVars(opts);
-    private computePanelRepeatVars(opts);
+    private computeGrafanaContext;
+    private computeTimeVars;
+    private computePanelRepeatVars;
 }
