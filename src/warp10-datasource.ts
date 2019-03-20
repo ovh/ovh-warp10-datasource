@@ -296,11 +296,28 @@ export default class Warp10Datasource {
     if (opts.scopedVars) {
       for (let k in opts.scopedVars) {
         let v = opts.scopedVars[k]
-        if (v.selected) {
+        if (v.selected || this.scopedVarIsAll(k)) {
           str += `'${v.value}' '${k}' STORE `
         }
       }
     }
     return str
+  }
+
+  /**
+   * Test if a named scoped variable is set to all
+   *
+   * @param name string The name of scoped variable
+   * @return bool If the scoped variable is set to all
+   */
+  private scopedVarIsAll(name: string): boolean {
+    for (let i = 0; i < this.templateSrv.variables.length; i++) {
+      const v = this.templateSrv.variables[i]
+      if (v.name === name && v.current.value === '$__all') {
+        return true
+      }
+    }
+
+    return false
   }
 }

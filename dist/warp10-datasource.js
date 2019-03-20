@@ -291,12 +291,27 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     if (opts.scopedVars) {
                         for (var k in opts.scopedVars) {
                             var v = opts.scopedVars[k];
-                            if (v.selected) {
+                            if (v.selected || this.scopedVarIsAll(k)) {
                                 str += "'" + v.value + "' '" + k + "' STORE ";
                             }
                         }
                     }
                     return str;
+                };
+                /**
+                 * Test if a named scoped variable is set to all
+                 *
+                 * @param name string The name of scoped variable
+                 * @return bool If the scoped variable is set to all
+                 */
+                Warp10Datasource.prototype.scopedVarIsAll = function (name) {
+                    for (var i = 0; i < this.templateSrv.variables.length; i++) {
+                        var v = this.templateSrv.variables[i];
+                        if (v.name === name && v.current.value === '$__all') {
+                            return true;
+                        }
+                    }
+                    return false;
                 };
                 return Warp10Datasource;
             }());
