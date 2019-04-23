@@ -163,7 +163,7 @@ export default class Warp10Datasource {
               title: gts.c,
               time: Math.trunc(dp[0] / (1000)),
               text: dp[dp.length - 1],
-              tags: (tags.length > 0) ? tags.join(',') : null
+              tags: tags
             })
           })
         }
