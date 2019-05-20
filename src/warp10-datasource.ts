@@ -313,7 +313,7 @@ export default class Warp10Datasource {
   private scopedVarIsAll(name: string): boolean {
     for (let i = 0; i < this.templateSrv.variables.length; i++) {
       const v = this.templateSrv.variables[i]
-      if (v.name === name && v.current.value === '$__all') {
+      if (v.name === name && v.current.value.length === 1 && v.current.value[0] === '$__all') {
         return true
       }
     }

@@ -160,7 +160,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                                     title: gts.c,
                                     time: Math.trunc(dp[0] / (1000)),
                                     text: dp[dp.length - 1],
-                                    tags: (tags.length > 0) ? tags.join(',') : null
+                                    tags: tags
                                 });
                             });
                         };
@@ -307,7 +307,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                 Warp10Datasource.prototype.scopedVarIsAll = function (name) {
                     for (var i = 0; i < this.templateSrv.variables.length; i++) {
                         var v = this.templateSrv.variables[i];
-                        if (v.name === name && v.current.value === '$__all') {
+                        if (v.name === name && v.current.value.length === 1 && v.current.value[0] === '$__all') {
                             return true;
                         }
                     }
