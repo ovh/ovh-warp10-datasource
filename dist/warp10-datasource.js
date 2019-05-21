@@ -263,10 +263,12 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         var myVar = _a[_i];
                         var value = myVar.current.text;
                         if (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all')
+			{
 			    if (myVar.allValue)
                                 value = myVar.allValue;
 			    else
 				value = myVar.options.slice(1).map(function (e) { return e.text; }).join(" + ");
+			}
                         if (isNaN(value) || value.startsWith('0'))
                             value = "'" + value + "'";
                         wsHeader += (value || 'NULL') + " '" + myVar.name + "' STORE ";
