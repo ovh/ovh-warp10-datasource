@@ -262,8 +262,13 @@ export default class Warp10Datasource {
     for (let myVar of this.templateSrv.variables) {
       let value = myVar.current.text
 
-      if (myVar.current.value === '$__all' && myVar.allValue !== null)
-        value = myVar.allValue
+      if (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all')
+      {
+        if (myVar.allValue)
+	  value = myVar.allValue;
+        else
+	  value = myVar.options.slice(1).map(e => e.text).join(" + ");
+      }
 
       if (isNaN(value) || value.startsWith('0'))
         value = `'${value}'`
