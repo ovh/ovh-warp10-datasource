@@ -262,13 +262,12 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
                         var value = myVar.current.text;
-                        if (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all')
-			{
-			    if (myVar.allValue)
+                        if (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all') {
+                            if (myVar.allValue !== null)
                                 value = myVar.allValue;
-			    else
-				value = myVar.options.slice(1).map(function (e) { return e.text; }).join(" + ");
-			}
+                            else
+                                value = myVar.options.slice(1).map(function (e) { return e.text; }).join(" + ");
+                        }
                         if (isNaN(value) || value.startsWith('0'))
                             value = "'" + value + "'";
                         wsHeader += (value || 'NULL') + " '" + myVar.name + "' STORE ";

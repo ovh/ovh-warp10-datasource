@@ -264,10 +264,10 @@ export default class Warp10Datasource {
 
       if (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all')
       {
-        if (myVar.allValue)
-	  value = myVar.allValue;
+        if (myVar.allValue !== null)
+          value = myVar.allValue;
         else
-	  value = myVar.options.slice(1).map(e => e.text).join(" + ");
+          value = myVar.options.slice(1).map(e => e.text).join(" + ");
       }
 
       if (isNaN(value) || value.startsWith('0'))
