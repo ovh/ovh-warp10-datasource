@@ -22,6 +22,7 @@ System.register([], function (exports_1, context_1) {
                     this.basicAuthPassword = '';
                     this.database = '';
                     this.jsonData = {};
+                    this.secureJsonData = {};
                     this.secureJsonFields = {};
                     this.withCredentials = false;
                 }

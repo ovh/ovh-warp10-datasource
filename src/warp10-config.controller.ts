@@ -8,19 +8,18 @@ export default class Warp10ConfigCtrl {
   // Dom needs
   newExtraKey: any
   newExtraVal: any
+  newSecretKey: string
+  newSecretVal: string
 
   constructor(private backendSrv: any, private $routeParams: any) {
-    this.current = new Datasource()
-    this.current.id = this.$routeParams.id
-    if (this.current.id)
-      this._loadDatasourceConfig()
-  }
+    console.debug('[Warp10] ConfigController', this)
 
-  _loadDatasourceConfig() {
-    this.backendSrv.get('/api/datasources/' + this.current.id)
-    .then((ds: any) => {
-      Object.assign(this.current, ds)
-    })
+    if (!this.current.secureJsonData) {
+      this.current.secureJsonData = {}
+    }
+    if (!this.current.secureJsonFields) {
+      this.current.secureJsonFields = {}
+    }
   }
 
   _addExtraVar() {
@@ -39,4 +38,19 @@ export default class Warp10ConfigCtrl {
     this.newExtraKey = key
     this.newExtraVal = this.current.jsonData[key]
   }
+
+  /*_addSecretVar() {
+    if (this.newSecretKey && this.newSecretVal) {
+      this.current.secureJsonData[this.newSecretKey] = this.newSecretVal
+      //this.current.secureJsonFields[this.newSecretKey] = this.newSecretVal
+      this.newSecretKey = ''
+      this.newSecretVal = ''
+    }
+    console.debug(this)
+  }
+
+  _delSecretVar(key) {
+     this.current.secureJsonData[key] = undefined
+     this.current.secureJsonFields[key] = undefined
+  }*/
 }

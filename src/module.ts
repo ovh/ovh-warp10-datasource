@@ -11,9 +11,15 @@ import QueryOptionsCtrl from './warp10-query-options.controller'
 function getCSSPath(sheet) {
   return `plugins/ovh-warp10-datasource/style/${ sheet }.css`
 }
+
 loadPluginCss({
   dark: getCSSPath('dark'),
   light: getCSSPath('light')
 })
 
-export { Datasource, QueryCtrl, ConfigCtrl, AnnotationsQueryCtrl }
+export {
+  Datasource,
+  QueryCtrl,
+  ConfigCtrl,
+  AnnotationsQueryCtrl
+}

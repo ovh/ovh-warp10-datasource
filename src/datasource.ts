@@ -18,6 +18,7 @@ export default class Warp10Datasource {
 
   database = ''
   jsonData: any = {}
+  secureJsonData: any = {}
 
   secureJsonFields = {}
   withCredentials = false

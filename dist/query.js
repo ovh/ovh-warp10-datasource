@@ -19,6 +19,7 @@ System.register([], function (exports_1, context_1) {
                     this.filterParamNumber = 0;
                     this.filterParamMap = {};
                     this.filterParamClass = '';
+                    this.nameFormat = '';
                     this.bucketizers = [
                         'sum', 'max', 'min', 'mean', 'mean.circular', 'bucketizer.mean.circular.exclude-nulls', 'first', 'last', 'join', 'median', 'count', 'and', 'or'
                     ];
@@ -102,6 +103,9 @@ System.register([], function (exports_1, context_1) {
                                     break;
                             }
                             q += "[ SWAP [ " + labelsStr_1.join(' ') + " ] " + param + " filter." + chosenFilter.name + " ] FILTER \n";
+                        }
+                        if (this.nameFormat && (this.nameFormat !== "")) {
+                            q += "<% DROP DUP DUP ATTRIBUTES SWAP LABELS APPEND \"" + this.nameFormat + "\" SWAP TEMPLATE RENAME %> LMAP\n";
                         }
                         q += 'SORT \n';
                         q += "// END OF GENERATED QUERY \n";

@@ -10,7 +10,6 @@
     "node": ">=7.9.0"
   },
   "scripts": {
-    "postinstall": "node ./postinstallscript.js",
     "docker": "docker build -t grafana . && docker run -i -p 3000:3000 grafana",
     "build": "npx gulp build",
     "start": "npx gulp"
@@ -21,13 +20,12 @@
   "devDependencies": {
     "del": "^3.0.0",
     "grafana-sdk-mocks": "github:grafana/grafana-sdk-mocks",
-    "gulp": "^4.0.0 ",
+    "gulp": "^4.0.2",
     "gulp-less": "^4.0.1",
     "gulp-livereload": "^4.0.1",
-    "gulp-load-plugins": "^1.5.0",
-    "gulp-plumber-notifier": "0.0.3",
+    "gulp-load-plugins": "^1.6.0",
     "gulp-pug": "^4.0.1",
-    "gulp-typescript": "^5.0.0",
+    "gulp-typescript": "^5.0.1",
     "typescript": "^3.3.3333"
   }
 }

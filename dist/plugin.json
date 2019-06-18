@@ -4,6 +4,7 @@
   "name": "Warp10",
   "metrics": true,
   "annotations": true,
+  "alerting": false,
   "info": {
     "description": "Warp10 platform datasource plugin",
     "version": "2.1.1",

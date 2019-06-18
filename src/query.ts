@@ -13,6 +13,7 @@ export default class Warp10Query {
   filterParamNumber = 0
   filterParamMap: {[key: string]: string} = {}
   filterParamClass = ''
+  nameFormat = ''
 
   bucketizers = [
     'sum', 'max', 'min', 'mean', 'mean.circular', 'bucketizer.mean.circular.exclude-nulls', 'first', 'last', 'join', 'median', 'count', 'and', 'or'
@@ -114,6 +115,11 @@ export default class Warp10Query {
       }
       q += `[ SWAP [ ${ labelsStr.join(' ') } ] ${ param } filter.${ chosenFilter.name } ] FILTER \n`
     }
+
+    if (this.nameFormat && (this.nameFormat !== "")) {
+      q += `<% DROP DUP DUP ATTRIBUTES SWAP LABELS APPEND "${ this.nameFormat }" SWAP TEMPLATE RENAME %> LMAP\n`
+    }
+
     q += 'SORT \n'
     q += `// END OF GENERATED QUERY \n`
     return q

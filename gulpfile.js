@@ -6,7 +6,7 @@ const del = require('del')
 const tsProject = P.typescript.createProject('tsconfig.json');
 const tscFiles = 'src/**.ts'
 const assetsFiles = 'src/assets/**/*.{png,svg,jpg,js}'
-const pluginDefinition = 'src/plugin.json'
+const pluginDefinition = 'plugin.json'
 const readme = 'README.md'
 const templateFiles = 'src/partials/*.pug'
 const styleFiles = ['src/style/light.less', 'src/style/dark.less']
@@ -15,7 +15,6 @@ const styleFiles = ['src/style/light.less', 'src/style/dark.less']
 gulp.task('tsc', (done) => {
     gulp
     .src(tscFiles)
-    .pipe(P.plumberNotifier())
     .pipe(tsProject())
     .pipe(gulp.dest('dist/'))
     .pipe(P.livereload());
@@ -25,7 +24,6 @@ gulp.task('tsc', (done) => {
 gulp.task('pug', (done) => {
     gulp
     .src(templateFiles)
-    .pipe(P.plumberNotifier())
     .pipe(P.pug({}))
     .pipe(gulp.dest('dist/template'))
     .pipe(P.livereload());
@@ -35,7 +33,6 @@ gulp.task('pug', (done) => {
 gulp.task('less', (done) => {
     gulp
     .src(styleFiles)
-    .pipe(P.plumberNotifier())
     .pipe(P.less({}))
     .pipe(gulp.dest('dist/style'))
     .pipe(P.livereload());
@@ -45,7 +42,6 @@ gulp.task('less', (done) => {
 gulp.task('assets', (done) => {
     gulp
     .src(assetsFiles)
-    .pipe(P.plumberNotifier())
     .pipe(gulp.dest('dist/assets'))
     .pipe(P.livereload());
     done();
@@ -54,7 +50,6 @@ gulp.task('assets', (done) => {
 gulp.task('plugin', (done) => {
     gulp
     .src([pluginDefinition, readme])
-    .pipe(P.plumberNotifier())
     .pipe(gulp.dest('dist/'))
     .pipe(P.livereload());
     done();

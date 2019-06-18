@@ -178,7 +178,11 @@ export default class Warp10Datasource {
    */
   metricFindQuery(ws: string): Promise<any> {
     return this.executeExec({ ws: this.computeGrafanaContext() + ws })
-      .then((res) => {
+      .then(res => {
+        if (!Array.isArray(res.data)) {
+          throw new Error('Warp10 expect the response to be a stack (an array), it isn\'t')
+        }
+
         // only one object on the stack, good user
         if (res.data.length === 1 && typeof res.data[0] === 'object') {
           let entries = []
