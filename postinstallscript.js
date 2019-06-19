@@ -5,7 +5,11 @@ fs.readFile( fileToPatch , (err, data) => {
     if (!err) {
         newData = data.toString('utf8').replace(/PropertyKey/g, 'KeyOfProperty');
 
-        fs.writeFile(fileToPatch, newData, (err) => { console.error(err.message)});
+        fs.writeFile(fileToPatch, newData, err => {
+            if (err) {
+                console.error(err.message || err)
+            }
+        });
         console.log(`File ${fileToPatch} patched`);
     }
 })
