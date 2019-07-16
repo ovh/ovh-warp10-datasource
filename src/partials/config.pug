@@ -1,4 +1,4 @@
-h3.page-heading HTTP Address
+h2.page-heading HTTP Address
 .gf-form-group
   .gf-form-inline
     .gf-form
@@ -6,6 +6,7 @@ h3.page-heading HTTP Address
       input.gf-form-input.width-30(ng-model='ctrl.current.url')
       info-popover(mode='right-absolute')
         | Do not append /api/v0/exec at the end of the URL
+  .gf-form-inline
     .gf-form
       span.gf-form-label.width-7 Access
       .gf-form-select-wrapper.gf-form-select-wrapper--has-help-icon.width-30
@@ -16,7 +17,7 @@ h3.page-heading HTTP Address
           | Direct = url is used directly from browser
           | Proxy = Grafana backend will proxy the request
 
-h3.page-heading Execution constants
+h2.page-heading.m-t-2 Constants
 .grafana-info-box
   p.
     This constants can be used in every templating or query.
@@ -26,22 +27,49 @@ h3.page-heading Execution constants
     code $token
 
 .gf-form-group
-  .gf-form(ng-repeat="(key, val) in ctrl.current.jsonData")
-    button.btn.btn-danger.full-height(ng-click="ctrl._delExtraVar(key)")
-      i.fa.fa-trash(aria-hidden='true')
-    a.btn.full-height(ng-click="ctrl._editKey(key)")
-      i.fa.fa-pencil(aria-hidden='true')
-    span.gf-form-label {{ key }}
-    span.spaced-row
-      i.fa.fa-angle-double-right(aria-hidden='true')
-    span.gf-form-label {{ val }}
-  // New var
-h6 Add a new constant
-.gf-form
-  label.gf-form-label.width-6 Name
-  input.gf-form-input.width-12(ng-model='ctrl.newExtraKey')
-  button.btn.btn-success.full-height(ng-click="ctrl._addExtraVar()")
-      i.fa.fa-plus(aria-hidden='true')
-.gf-form-inline
-  label.gf-form-label.width-6 Value
-  textarea.gf-form-input(rows="10" ng-model='ctrl.newExtraVal' ng-keyup='$event.keycode == 13? ctrl._addExtraVar() : null')
+  h5 Add a constant
+  .gf-form
+    label.gf-form-label.width-6 Name
+    input.gf-form-input.width-48(ng-model='ctrl.newExtraKey')
+  .gf-form
+    label.gf-form-label.width-6 Value
+    textarea.gf-form-input(rows="10" ng-model='ctrl.newExtraVal' ng-keyup='$event.keycode == 13 && ctrl._addExtraVar()')
+  button.btn.btn-success.full-height.width-6.offset-width-6(ng-click="ctrl._addExtraVar()") Add
+
+  .m-t-2
+    h5 Constant list
+    .gf-form(ng-repeat="(key, val) in ctrl.current.jsonData")
+      button.btn.btn-danger.full-height(ng-click="ctrl._delExtraVar(key)")
+        i.fa.fa-trash(aria-hidden='true')
+      a.btn.full-height(ng-click="ctrl._editKey(key)")
+        i.fa.fa-pencil(aria-hidden='true')
+      span.gf-form-label {{ key }}
+      span.spaced-row.align-center
+        i.fa.fa-angle-double-right(aria-hidden='true')
+      span.gf-form-label {{ val }}
+
+//h2.page-heading.m-t-2 Secrets (proxy mode required)
+//.grafana-info-box(ng-if='ctrl.current.access === "proxy"')
+  p.
+    This secrets can be used in every templating or query.
+    Register your consant name and value and
+  p example: &nbsp;
+    code(ng-non-bindable) {{token}}
+//.gf-form-group
+  .gf-form
+    label.gf-form-label.width-6 Name
+    input.gf-form-input.width-48(ng-model='ctrl.newSecretKey')
+  .gf-form
+    label.gf-form-label.width-6 Value
+    textarea.gf-form-input(rows="10" ng-model='ctrl.newSecretVal' ng-keyup='$event.keycode == 13 && ctrl._addSecretVar()')
+  button.btn.btn-success.full-height.width-6.offset-width-6(ng-click="ctrl._addSecretVar()") Add
+
+
+  .m-t-2
+    h5 Secret list
+    pre
+      code {{ctrl.current.secureJsonFields}}
+    .gf-form(ng-repeat="(key, val) in ctrl.current.secureJsonFields", ng-if='val')
+      button.btn.btn-danger.full-height(ng-click="ctrl._delSecretVar(key)")
+        i.fa.fa-trash(aria-hidden='true')
+      span.gf-form-label {{ key }}

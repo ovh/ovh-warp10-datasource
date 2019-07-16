@@ -160,7 +160,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                                     title: gts.c,
                                     time: Math.trunc(dp[0] / (1000)),
                                     text: dp[dp.length - 1],
-                                    tags: (tags.length > 0) ? tags.join(',') : null
+                                    tags: tags
                                 });
                             });
                         };
@@ -185,6 +185,9 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                 Warp10Datasource.prototype.metricFindQuery = function (ws) {
                     return this.executeExec({ ws: this.computeGrafanaContext() + ws })
                         .then(function (res) {
+                        if (!Array.isArray(res.data)) {
+                            throw new Error('Warp10 expect the response to be a stack (an array), it isn\'t');
+                        }
                         // only one object on the stack, good user
                         if (res.data.length === 1 && typeof res.data[0] === 'object') {
                             var entries_1 = [];
@@ -262,8 +265,12 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
                         var value = myVar.current.text;
-                        if (myVar.current.value === '$__all' && myVar.allValue !== null)
-                            value = myVar.allValue;
+                        if (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all') {
+                            if (myVar.allValue !== null)
+                                value = myVar.allValue;
+                            else
+                                value = myVar.options.slice(1).map(function (e) { return e.text; }).join(" + ");
+                        }
                         if (isNaN(value) || value.startsWith('0'))
                             value = "'" + value + "'";
                         wsHeader += (value || 'NULL') + " '" + myVar.name + "' STORE ";
@@ -307,7 +314,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                 Warp10Datasource.prototype.scopedVarIsAll = function (name) {
                     for (var i = 0; i < this.templateSrv.variables.length; i++) {
                         var v = this.templateSrv.variables[i];
-                        if (v.name === name && v.current.value === '$__all') {
+                        if (v.name === name && v.current.value.length === 1 && v.current.value[0] === '$__all') {
                             return true;
                         }
                     }

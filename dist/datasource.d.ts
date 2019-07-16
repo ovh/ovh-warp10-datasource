@@ -14,6 +14,7 @@ export default class Warp10Datasource {
     basicAuthPassword: string;
     database: string;
     jsonData: any;
+    secureJsonData: any;
     secureJsonFields: {};
     withCredentials: boolean;
 }

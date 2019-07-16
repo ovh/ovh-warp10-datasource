@@ -15,6 +15,7 @@ export default class Warp10Query {
         [key: string]: string;
     };
     filterParamClass: string;
+    nameFormat: string;
     bucketizers: string[];
     reducers: string[];
     filters: {

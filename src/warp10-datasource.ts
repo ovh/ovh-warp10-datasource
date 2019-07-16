@@ -163,7 +163,7 @@ export default class Warp10Datasource {
               title: gts.c,
               time: Math.trunc(dp[0] / (1000)),
               text: dp[dp.length - 1],
-              tags: (tags.length > 0) ? tags.join(',') : null
+              tags: tags
             })
           })
         }
@@ -178,7 +178,11 @@ export default class Warp10Datasource {
    */
   metricFindQuery(ws: string): Promise<any> {
     return this.executeExec({ ws: this.computeGrafanaContext() + ws })
-      .then((res) => {
+      .then(res => {
+        if (!Array.isArray(res.data)) {
+          throw new Error('Warp10 expect the response to be a stack (an array), it isn\'t')
+        }
+
         // only one object on the stack, good user
         if (res.data.length === 1 && typeof res.data[0] === 'object') {
           let entries = []
@@ -262,8 +266,13 @@ export default class Warp10Datasource {
     for (let myVar of this.templateSrv.variables) {
       let value = myVar.current.text
 
-      if (myVar.current.value === '$__all' && myVar.allValue !== null)
-        value = myVar.allValue
+      if (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all')
+      {
+        if (myVar.allValue !== null)
+          value = myVar.allValue;
+        else
+          value = myVar.options.slice(1).map(e => e.text).join(" + ");
+      }
 
       if (isNaN(value) || value.startsWith('0'))
         value = `'${value}'`
@@ -313,7 +322,7 @@ export default class Warp10Datasource {
   private scopedVarIsAll(name: string): boolean {
     for (let i = 0; i < this.templateSrv.variables.length; i++) {
       const v = this.templateSrv.variables[i]
-      if (v.name === name && v.current.value === '$__all') {
+      if (v.name === name && v.current.value.length === 1 && v.current.value[0] === '$__all') {
         return true
       }
     }
