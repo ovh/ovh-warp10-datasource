@@ -1,4 +1,4 @@
-Grafana Warp10 Datasource Plugin
+Grafana Warp 10™ Datasource Plugin
 ===
 
 # Install the plugin
@@ -9,12 +9,12 @@ git clone git@github.com:ovh/ovh-warp10-datasource.git /var/lib/grafana/plugins/
 ```
 Grafana will use the *dist/* folder by default
 
-# Add a new Warp10 Datasource
+# Add a new Warp 10™ Datasource
 
 - go to the Grafana menu (top left) > "datasources" > "add data source"
 - choose a name
 - set Warp10 as type
-- paste the Warp10 platform URL ( do not append /api/v0/... )
+- paste the Warp 10™ Platform `exec` endpoint URL ( do not append /api/v0/... )
 
 ## Add execution variables
 
@@ -25,13 +25,13 @@ In case of a macro definition, the variable value must start with *<%* and end w
 
 On a new dashboard, in a graph edition, choose your previous datasource and click *add query*.
 
-You can write your WarpScript on the editor below, for beginners, you can uncheck *warpScript editor*, a user friendly query editor will appear.
+You can write your WarpScript™ on the editor below, for beginners, you can uncheck *WarpScript editor*, a user friendly query editor will appear.
 
-A query is composed by 2 component, the WarpScript from WarpScript editor and the WarpScript from friendly query builder, check or uncheck the *WarpScript editor* will execute the corresponding WarpScript.
+A query is composed by 2 components, the WarpScript™ from the WarpScript™ editor and the WarpScript™ from the friendly query builder, check or uncheck the *WarpScript™ editor* will execute the corresponding WarpScript™.
 
-to graph something on Grafana you need to return some GTS
+to graph something on Grafana you need to return some Geo Time Series™ (GTS)
 
-## WarpScript example
+## WarpScript™ example
 
 /!\ The plugin look for GTS or GTS array in your stack, all other stack entry will be ignored
 
@@ -61,11 +61,12 @@ $sinus $cosinus
 ```
 
 ### Table case
+
 There is a way to build custom tables instead of formating GTS array
 If your stack have only 1 element and this element have `columns` and `rows` property
 Then you can choose *Table* as *Table transform* in Table Options section
 
-WarpScript example:
+WarpScript™ example:
 ```WarpScript
 {
   'columns' [
@@ -96,10 +97,10 @@ In order to do it, you need to install the `grafana-worldmap-panel` plugin: [Wor
 When both `ovh-warp10-datasource` and the `grafana-worldmap-panel` installed, you can define a new Worldmap widget,
 with a Warp&nbsp;10 datasource and `json result` as *Location Data* in the *Worlmap* tab:
 
-![Warp&nbsp;10 datasource](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-datasource-tab.jpg)
+![Warp&nbsp;10™ datasource](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-datasource-tab.jpg)
 ![`json result` as *Location Data* in the *Worlmap* tab](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-worldmap-tab.jpg)
 
-Now in your WarpScript you can generate data in the JSON format supported by Worldmap, for example :
+Now in your WarpScript™ you can generate data in the JSON format supported by Worldmap, for example :
 
 ```
 '[ { "key": "amsterdam", "latitude": 52.3702, "longitude": 4.8952, "name": "Amsterdam" }, { "key": "charleroi", "latitude": 50.4108, "longitude": 4.4446, "name": "Charleroi" }, { "key": "frankfurt", "latitude": 50.110924, "longitude": 8.682127, "name": "Frankfurt" }, { "key": "london", "latitude": 51.503399, "longitude": -0.119519, "name": "London" }, { "key": "paris", "latitude": 48.864716, "longitude": 2.349014, "name": "Paris" } ]'
@@ -120,7 +121,8 @@ JSON->
 ![Worlmap view with values](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-view-with-values.jpg)
 
 ## Available variables
-On your WarpScript you can use (all timestamps are in µSeconds):
+
+In your WarpScript™ you can use (all timestamps are in µSeconds):
 
 | Name          | Description                                                   | Example                    |
 |---------------|---------------------------------------------------------------|----------------------------|
@@ -131,12 +133,15 @@ On your WarpScript you can use (all timestamps are in µSeconds):
 | **$interval** | Difference between $end and $start                            | 3600000000                 |
 
 # Use Annotations
+
 You can add Annotation on your graph: Dashboard > "Manage dashboard" > "Annotations"
-Just add you WarpScript
+
+Just add you WarpScript™
 
 /!\ You must return a single GTS on TOP of your stack
 
 ## Annotation example
+
 ```warpScript
 NEWGTS
 'alerts' RENAME

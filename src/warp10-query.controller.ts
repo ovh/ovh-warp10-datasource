@@ -84,7 +84,7 @@ export default class Warp10QueryCtrl extends QueryCtrl {
   }
 
   getCompleter(...o) {
-    console.debug('[Warp10Query] COMPLETER called', o)
+    console.debug('[Warp 10™ Query] COMPLETER called', o)
   }
 
   toggleEditorMode() {
