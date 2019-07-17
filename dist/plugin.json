@@ -1,7 +1,7 @@
 {
   "id": "ovh-warp10-datasource",
   "type": "datasource",
-  "name": "Warp10",
+  "name": "Warp 10",
   "metrics": true,
   "annotations": true,
   "alerting": false,
