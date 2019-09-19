@@ -90,7 +90,7 @@ export default class Warp10Datasource {
         return { data }
       })
       .catch((err) => {
-        console.warn('[Warp10] Failed to execute query', err)
+        console.warn('[Warp 10] Failed to execute query', err)
         let d = this.$q.defer();
         d.resolve({ data: [] });
         return d.promise;
@@ -108,7 +108,7 @@ export default class Warp10Datasource {
           return {
             status: 'error',
             message: JSON.parse(res.data) || res.data,
-            title: 'Failed to execute basic WarpScript'
+            title: 'Failed to execute basic WarpScript™'
           }
         } else {
           return {
@@ -123,7 +123,7 @@ export default class Warp10Datasource {
         return {
           status: 'error',
           message: `Status code: ${res.err.status}`,
-          title: 'Failed to contact Warp10 platform'
+          title: 'Failed to contact Warp 10 platform'
         }
       })
   }
@@ -180,7 +180,7 @@ export default class Warp10Datasource {
     return this.executeExec({ ws: this.computeGrafanaContext() + ws })
       .then(res => {
         if (!Array.isArray(res.data)) {
-          throw new Error('Warp10 expect the response to be a stack (an array), it isn\'t')
+          throw new Error('Warp 10 expects the response to be a stack (an array), it isn\'t')
         }
 
         // only one object on the stack, good user

@@ -1,12 +1,12 @@
 {
   "id": "ovh-warp10-datasource",
   "type": "datasource",
-  "name": "Warp10",
+  "name": "Warp 10",
   "metrics": true,
   "annotations": true,
   "alerting": false,
   "info": {
-    "description": "Warp10 platform datasource plugin",
+    "description": "Warp 10™ Platform datasource plugin",
     "version": "2.1.1",
     "updated": "2018-04-25",
     "author": {
@@ -27,8 +27,11 @@
       "name": "GitHub",
       "url": "https://github.com/ovh/ovh-warp10-datasource"
     }, {
-      "name": "Google group Warp10",
+      "name": "Warp 10™ Users Google Group",
       "url": "https://groups.google.com/forum/#!forum/warp10-users"
+    }, {
+      "name": "Warp 10™ Open Source Project Repository",
+      "url": "https://github.com/senx/warp10-platform"
     }]
   },
   "dependencies": {
