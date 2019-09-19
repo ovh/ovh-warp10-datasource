@@ -12,7 +12,7 @@ export default class Warp10ConfigCtrl {
   newSecretVal: string
 
   constructor(private backendSrv: any, private $routeParams: any) {
-    console.debug('[Warp 10™] ConfigController', this)
+    console.debug('[Warp 10] ConfigController', this)
 
     if (!this.current.secureJsonData) {
       this.current.secureJsonData = {}

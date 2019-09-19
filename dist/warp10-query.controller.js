@@ -94,7 +94,7 @@ System.register(["app/plugins/sdk", "./query", "./ace-mode-warpscript"], functio
                     for (var _i = 0; _i < arguments.length; _i++) {
                         o[_i] = arguments[_i];
                     }
-                    console.debug('[Warp 10™ Query] COMPLETER called', o);
+                    console.debug('[Warp 10 Query] COMPLETER called', o);
                 };
                 Warp10QueryCtrl.prototype.toggleEditorMode = function () {
                     console.debug('Toggle readonly', this.readOnly);

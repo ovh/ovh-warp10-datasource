@@ -97,7 +97,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         return { data: data };
                     })
                         .catch(function (err) {
-                        console.warn('[Warp 10™] Failed to execute query', err);
+                        console.warn('[Warp 10] Failed to execute query', err);
                         var d = _this.$q.defer();
                         d.resolve({ data: [] });
                         return d.promise;
@@ -130,7 +130,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         return {
                             status: 'error',
                             message: "Status code: " + res.err.status,
-                            title: 'Failed to contact Warp 10™ Platform'
+                            title: 'Failed to contact Warp 10 Platform'
                         };
                     });
                 };
@@ -186,7 +186,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     return this.executeExec({ ws: this.computeGrafanaContext() + ws })
                         .then(function (res) {
                         if (!Array.isArray(res.data)) {
-                            throw new Error('Warp 10™ expects the response to be a stack (an array), it isn\'t');
+                            throw new Error('Warp 10 expects the response to be a stack (an array), it isn\'t');
                         }
                         // only one object on the stack, good user
                         if (res.data.length === 1 && typeof res.data[0] === 'object') {

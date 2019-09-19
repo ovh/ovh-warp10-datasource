@@ -9,7 +9,7 @@ System.register([], function (exports_1, context_1) {
                 function Warp10ConfigCtrl(backendSrv, $routeParams) {
                     this.backendSrv = backendSrv;
                     this.$routeParams = $routeParams;
-                    console.debug('[Warp 10™] ConfigController', this);
+                    console.debug('[Warp 10] ConfigController', this);
                     if (!this.current.secureJsonData) {
                         this.current.secureJsonData = {};
                     }
