@@ -1,6 +1,9 @@
 declare var ace
 
 export default function() {
+  if (!window['ace']) {
+    return
+  }
 
   ace.define('ace/mode/warpscript_keywords', function(require, exports, module) {
 
