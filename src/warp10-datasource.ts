@@ -123,7 +123,7 @@ export default class Warp10Datasource {
         return {
           status: 'error',
           message: `Status code: ${res.err.status}`,
-          title: 'Failed to contact Warp 10 platform'
+          title: 'Failed to contact Warp 10 Platform'
         }
       })
   }
