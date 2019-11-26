@@ -157,6 +157,7 @@ System.register([], function (exports_1, context_1) {
                     content: '<% ${1:true} %>\n\t<% ${2:} %>\n\t<% ${3:} %>\nIFTE \n'
                 }];
         });
+        return true;
     }
     exports_1("default", default_1);
     return {

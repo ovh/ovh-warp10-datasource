@@ -170,4 +170,5 @@ export default function() {
       content: '<% ${1:true} %>\n\t<% ${2:} %>\n\t<% ${3:} %>\nIFTE \n'
     }]
   })
+  return true
 }
