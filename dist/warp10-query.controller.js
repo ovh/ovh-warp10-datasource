@@ -16,6 +16,11 @@ System.register(["app/plugins/sdk", "./query", "./ace-mode-warpscript"], functio
     })();
     var sdk_1, query_1, ace_mode_warpscript_1, Warp10QueryCtrl;
     var __moduleName = context_1 && context_1.id;
+    function initAce() {
+        if (!ace_mode_warpscript_1.default()) {
+            setTimeout(initAce, 500);
+        }
+    }
     return {
         setters: [
             function (sdk_1_1) {
@@ -29,7 +34,7 @@ System.register(["app/plugins/sdk", "./query", "./ace-mode-warpscript"], functio
             }
         ],
         execute: function () {///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-            ace_mode_warpscript_1.default();
+            initAce();
             Warp10QueryCtrl = /** @class */ (function (_super) {
                 __extends(Warp10QueryCtrl, _super);
                 function Warp10QueryCtrl($scope, uiSegmentSrv, $injector) {

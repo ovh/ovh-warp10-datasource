@@ -4,7 +4,12 @@ import { QueryCtrl }   from 'app/plugins/sdk'
 import Query from './query'
 import initWarp10AceMode from './ace-mode-warpscript'
 
-initWarp10AceMode()
+function initAce () {
+  if (! initWarp10AceMode()) {
+    setTimeout(initAce, 500);
+  }
+}
+initAce()
 
 export default class Warp10QueryCtrl extends QueryCtrl {
 
