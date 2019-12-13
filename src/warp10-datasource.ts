@@ -266,7 +266,7 @@ export default class Warp10Datasource {
     for (let myVar of this.templateSrv.variables) {
       let value = myVar.current.text
 
-      if (myVar.current.value === '$__all' || (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all'))
+      if (myVar.current.value != null && (myVar.current.value === '$__all' || (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all'))) {
       {
         if (myVar.allValue !== null)
           value = myVar.allValue;
