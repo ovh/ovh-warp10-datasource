@@ -183,26 +183,46 @@ export default class Warp10Datasource {
           throw new Error('Warp 10 expects the response to be a stack (an array), it isn\'t')
         }
 
-        // only one object on the stack, good user
-        if (res.data.length === 1 && typeof res.data[0] === 'object') {
-          let entries = []
+        // Grafana can handle different text/value for the variable drop list. User has three possibilites in the WarpScript result:
+        // 1 - let a list on the stack : text = value for each entry. 
+        // 2 - let a map on the stack : text = map key, value = map value. value will be used in the WarpScript variable.
+        // 3 - let some strings or numbers on the stack : it will be considered as a list, refer to case 1.
+        // Values could be strings or number, ignore other objects.
+
+        let entries = [];
+        if (1 == res.data.length && Array.isArray(res.data[0])) {
+          // case 1
+          res.data[0].forEach(elt => {
+            if (typeof elt === 'string' || elt instanceof String || typeof elt === 'number') {
+              entries.push({
+                text: elt.toString(),
+                value: elt.toString() // Grafana will turn every value to strings anyway !
+              })
+            }
+          });
+        } else if (res.data.length === 1 && typeof res.data[0] === 'object') {
+          // case 2
           Object.keys(res.data[0]).forEach(key => {
-            entries.push({
-              text: key,
-              value: res.data[0][key],
-              expandable : true
-            })
-          })
-          console.log('query out' , entries);
-          return entries
+            let value = res.data[0][key];
+            if (typeof value === 'string' || value instanceof String || typeof value === 'number') {
+              entries.push({
+                text: key.toString(), // in WarpScript, key might not be a string. 
+                value: value.toString() // Grafana will turn every value to strings anyway !
+              })
+            }
+          });
+        } else {
+          // case 3
+          res.data.forEach(elt => {
+            if (typeof elt === 'string' || elt instanceof String || typeof elt === 'number') {
+              entries.push({
+                text: elt.toString(),
+                value: elt.toString() // Grafana will turn every value to strings anyway !
+              })
+            }
+          });
         }
-        // some elements on the stack, return all of them as entry
-        return res.data.map((entry, i) => {
-          return {
-            text: entry.toString() || i,
-            value: entry
-          }
-        })
+        return entries;
       })
   }
 
@@ -256,32 +276,44 @@ export default class Warp10Datasource {
   private computeGrafanaContext(): string {
     let wsHeader = ''
     // Datasource vars
-    console.log("this.templateSrv.variables",this.templateSrv.variables)
-    
     for (let myVar in this.instanceSettings.jsonData) {
       let value = this.instanceSettings.jsonData[myVar]
       if (typeof value === 'string')
         value = value.replace(/'/g, '"')
       if (typeof value === 'string' && !value.startsWith('<%') && !value.endsWith('%>'))
         value = `'${value}'`
-      wsHeader += `${value || 'NULL'} '${myVar}' STORE `
+      wsHeader += `${value || 'NULL'} '${myVar}' STORE\n`
     }
     // Dashboad templating vars
+    // current.text is the label. In case of multivalue, it is a string 'valueA + valueB'
+    // current.value is a string, depending on query output. In case of multivalue, it is an array of strings. array contains "$__all" if user selects All.
+    console.log("this.templateSrv.variables", this.templateSrv.variables)
+
     for (let myVar of this.templateSrv.variables) {
-      let value = myVar.current.text
+      let value = myVar.current.value;
 
-      if (myVar.current.value != null && (myVar.current.value === '$__all' || (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all')))
-      {
-        if (myVar.allValue !== null)
-          value = myVar.allValue;
-        else
-          value = myVar.options.slice(1).map(e => e.text).join(" + ");
+      if (Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) {
+        // user check the "select all" checkbox
+        // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value.
+        let allValues: String[] = myVar.options.filter(o => o.value !== "$__all").map(o => o.value);
+        wsHeader += `[ ${allValues.map(s => `'${s}'`).join(" ")} ] '${myVar.name}' STORE\n`; // all is stored as string in generated WarpScript.
+        //also create a ready to use regexp, suffixed by _wsregexp
+        wsHeader += ` '~' $${myVar.name} REOPTALT + '${myVar.name}_wsregexp' STORE\n`
+      } else if (Array.isArray(value)) {
+        // user checks several choices
+        wsHeader += `[ ${value.map(s => `'${s}'`).join(" ")} ] '${myVar.name}' STORE\n`; // all is stored as string in generated WarpScript.
+        //also create a ready to use regexp, suffixed by _wsregexp
+        wsHeader += ` '~' $${myVar.name} REOPTALT + '${myVar.name}_wsregexp' STORE\n`
+      } else {
+        // no multiple selection, variable is the string. As type is lost by Grafana, there is no safe way to assume something different than a string here.
+        // User can use _long or _double suffixed variable
+        wsHeader += `'${value}' '${myVar.name}' STORE\n`;
+        //additionnal conversion for WarpScript illiterates users:
+        wsHeader += ` <% $${myVar.name} TOLONG %> <% MINLONG %> <% %> TRY '${myVar.name}_long' STORE\n`;
+        wsHeader += ` <% $${myVar.name} TODOUBLE %> <% NaN %> <% %> TRY '${myVar.name}_double' STORE\n`;
       }
-
-      if (isNaN(value) || value.startsWith('0'))
-        value = `'${value}'`
-      wsHeader += `${value || 'NULL'} '${myVar.name}' STORE `
     }
+
     return wsHeader
   }
 

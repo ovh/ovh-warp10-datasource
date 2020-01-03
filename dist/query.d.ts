@@ -32,5 +32,5 @@ export default class Warp10Query {
     addFilterParamMapLabel(key: string, val: string): void;
     delFilterParamMapLabel(key: string): void;
     private static formatStringVar;
-    readonly warpScript: string;
+    get warpScript(): string;
 }

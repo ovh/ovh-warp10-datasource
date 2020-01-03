@@ -46,7 +46,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                                 query.advancedMode = true;
                             query.ws = wsHeader + "\n" + (query.advancedMode ? query.expr : query.friendlyQuery.warpScript);
                             queries.push(query);
-                            console.debug('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery);
+                            console.debug('New Query: ', query.ws);
                         }
                         //}
                     });
@@ -188,24 +188,47 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         if (!Array.isArray(res.data)) {
                             throw new Error('Warp 10 expects the response to be a stack (an array), it isn\'t');
                         }
-                        // only one object on the stack, good user
-                        if (res.data.length === 1 && typeof res.data[0] === 'object') {
-                            var entries_1 = [];
-                            res.data[0].forEach(function (key) {
-                                entries_1.push({
-                                    text: key,
-                                    value: res.data[0][key]
-                                });
+                        // Grafana can handle different text/value for the variable drop list. User has three possibilites in the WarpScript result:
+                        // 1 - let a list on the stack : text = value for each entry. 
+                        // 2 - let a map on the stack : text = map key, value = map value. value will be used in the WarpScript variable.
+                        // 3 - let some strings or numbers on the stack : it will be considered as a list, refer to case 1.
+                        // Values could be strings or number, ignore other objects.
+                        var entries = [];
+                        if (1 == res.data.length && Array.isArray(res.data[0])) {
+                            // case 1
+                            res.data[0].forEach(function (elt) {
+                                if (typeof elt === 'string' || elt instanceof String || typeof elt === 'number') {
+                                    entries.push({
+                                        text: elt.toString(),
+                                        value: elt.toString() // Grafana will turn every value to strings anyway !
+                                    });
+                                }
                             });
-                            return entries_1;
                         }
-                        // some elements on the stack, return all of them as entry
-                        return res.data.map(function (entry, i) {
-                            return {
-                                text: entry.toString() || i,
-                                value: entry
-                            };
-                        });
+                        else if (res.data.length === 1 && typeof res.data[0] === 'object') {
+                            // case 2
+                            Object.keys(res.data[0]).forEach(function (key) {
+                                var value = res.data[0][key];
+                                if (typeof value === 'string' || value instanceof String || typeof value === 'number') {
+                                    entries.push({
+                                        text: key.toString(),
+                                        value: value.toString() // Grafana will turn every value to strings anyway !
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            // case 3
+                            res.data.forEach(function (elt) {
+                                if (typeof elt === 'string' || elt instanceof String || typeof elt === 'number') {
+                                    entries.push({
+                                        text: elt.toString(),
+                                        value: elt.toString() // Grafana will turn every value to strings anyway !
+                                    });
+                                }
+                            });
+                        }
+                        return entries;
                     });
                 };
                 /**
@@ -259,21 +282,37 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                             value = value.replace(/'/g, '"');
                         if (typeof value === 'string' && !value.startsWith('<%') && !value.endsWith('%>'))
                             value = "'" + value + "'";
-                        wsHeader += (value || 'NULL') + " '" + myVar + "' STORE ";
+                        wsHeader += (value || 'NULL') + " '" + myVar + "' STORE\n";
                     }
                     // Dashboad templating vars
+                    // current.text is the label. In case of multivalue, it is a string 'valueA + valueB'
+                    // current.value is a string, depending on query output. In case of multivalue, it is an array of strings. array contains "$__all" if user selects All.
+                    console.log("this.templateSrv.variables", this.templateSrv.variables);
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
-                        var value = myVar.current.text;
-                        if (myVar.current.value != null && (myVar.current.value === '$__all' || (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all'))) {
-                            if (myVar.allValue !== null)
-                                value = myVar.allValue;
-                            else
-                                value = myVar.options.slice(1).map(function (e) { return e.text; }).join(" + ");
+                        var value = myVar.current.value;
+                        if (Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) {
+                            // user check the "select all" checkbox
+                            // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value.
+                            var allValues = myVar.options.filter(function (o) { return o.value !== "$__all"; }).map(function (o) { return o.value; });
+                            wsHeader += "[ " + allValues.map(function (s) { return "'" + s + "'"; }).join(" ") + " ] '" + myVar.name + "' STORE\n"; // all is stored as string in generated WarpScript.
+                            //also create a ready to use regexp, suffixed by _wsregexp
+                            wsHeader += " '~' $" + myVar.name + " REOPTALT + '" + myVar.name + "_wsregexp' STORE\n";
                         }
-                        if (isNaN(value) || value.startsWith('0'))
-                            value = "'" + value + "'";
-                        wsHeader += (value || 'NULL') + " '" + myVar.name + "' STORE ";
+                        else if (Array.isArray(value)) {
+                            // user checks several choices
+                            wsHeader += "[ " + value.map(function (s) { return "'" + s + "'"; }).join(" ") + " ] '" + myVar.name + "' STORE\n"; // all is stored as string in generated WarpScript.
+                            //also create a ready to use regexp, suffixed by _wsregexp
+                            wsHeader += " '~' $" + myVar.name + " REOPTALT + '" + myVar.name + "_wsregexp' STORE\n";
+                        }
+                        else {
+                            // no multiple selection, variable is the string. As type is lost by Grafana, there is no safe way to assume something different than a string here.
+                            // User can use _long or _double suffixed variable
+                            wsHeader += "'" + value + "' '" + myVar.name + "' STORE\n";
+                            //additionnal conversion for WarpScript illiterates users:
+                            wsHeader += " <% $" + myVar.name + " TOLONG %> <% MINLONG %> <% %> TRY '" + myVar.name + "_long' STORE\n";
+                            wsHeader += " <% $" + myVar.name + " TODOUBLE %> <% NaN %> <% %> TRY '" + myVar.name + "_double' STORE\n";
+                        }
                     }
                     return wsHeader;
                 };
