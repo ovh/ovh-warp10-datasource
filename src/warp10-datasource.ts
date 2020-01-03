@@ -32,7 +32,7 @@ export default class Warp10Datasource {
           query.advancedMode = true
         query.ws = `${wsHeader}\n${query.advancedMode ? query.expr : query.friendlyQuery.warpScript}`
         queries.push(query)
-        console.debug('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery)
+        console.debug('New Query: ', query.ws)
       }
       //}
     })
@@ -186,12 +186,14 @@ export default class Warp10Datasource {
         // only one object on the stack, good user
         if (res.data.length === 1 && typeof res.data[0] === 'object') {
           let entries = []
-          res.data[0].forEach(key => {
+          Object.keys(res.data[0]).forEach(key => {
             entries.push({
               text: key,
-              value: res.data[0][key]
+              value: res.data[0][key],
+              expandable : true
             })
           })
+          console.log('query out' , entries);
           return entries
         }
         // some elements on the stack, return all of them as entry
@@ -254,6 +256,8 @@ export default class Warp10Datasource {
   private computeGrafanaContext(): string {
     let wsHeader = ''
     // Datasource vars
+    console.log("this.templateSrv.variables",this.templateSrv.variables)
+    
     for (let myVar in this.instanceSettings.jsonData) {
       let value = this.instanceSettings.jsonData[myVar]
       if (typeof value === 'string')
