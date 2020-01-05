@@ -293,12 +293,24 @@ export default class Warp10Datasource {
       let value = myVar.current.value;
 
       if (Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) {
-        // user check the "select all" checkbox
-        // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value.
-        let allValues: String[] = myVar.options.filter(o => o.value !== "$__all").map(o => o.value);
-        wsHeader += `[ ${allValues.map(s => `'${s}'`).join(" ")} ] '${myVar.name}' STORE\n`; // all is stored as string in generated WarpScript.
-        //also create a ready to use regexp, suffixed by _wsregexp
-        wsHeader += ` '~' $${myVar.name} REOPTALT + '${myVar.name}_wsregexp' STORE\n`
+        // User checked the "select all" checkbox
+        if (myVar.allValue && myVar.allValue !== "") {
+          // User also defined a custom value in the variable settings
+          let customValue: String = myVar.allValue;
+          wsHeader += `[ '${customValue}' ] '${myVar.name}' STORE\n`
+          // If user already starts its custom value with ~, remove it.
+          if (customValue.startsWith("~")) {
+            customValue = customValue.slice(1);
+          }
+          wsHeader += ` '~${customValue}' '${myVar.name}_wsregexp' STORE\n`
+        } else {
+          // if no custom all value is defined :
+          // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value. 
+          let allValues: String[] = myVar.options.filter(o => o.value !== "$__all").map(o => o.value);
+          wsHeader += `[ ${allValues.map(s => `'${s}'`).join(" ")} ] '${myVar.name}' STORE\n`; // all is stored as string in generated WarpScript.
+          //also create a ready to use regexp, suffixed by _wsregexp
+          wsHeader += ` '~' $${myVar.name} REOPTALT + '${myVar.name}_wsregexp' STORE\n`
+        }
       } else if (Array.isArray(value)) {
         // user checks several choices
         wsHeader += `[ ${value.map(s => `'${s}'`).join(" ")} ] '${myVar.name}' STORE\n`; // all is stored as string in generated WarpScript.
@@ -309,8 +321,8 @@ export default class Warp10Datasource {
         // User can use _long or _double suffixed variable
         wsHeader += `'${value}' '${myVar.name}' STORE\n`;
         //additionnal conversion for WarpScript illiterates users:
-        wsHeader += ` <% $${myVar.name} TOLONG %> <% MINLONG %> <% %> TRY '${myVar.name}_long' STORE\n`;
-        wsHeader += ` <% $${myVar.name} TODOUBLE %> <% NaN %> <% %> TRY '${myVar.name}_double' STORE\n`;
+        wsHeader += ` <% $${myVar.name} TOLONG %> <% NULL %> <% %> TRY '${myVar.name}_long' STORE\n`;
+        wsHeader += ` <% $${myVar.name} TODOUBLE %> <% NULL %> <% %> TRY '${myVar.name}_double' STORE\n`;
       }
     }
 

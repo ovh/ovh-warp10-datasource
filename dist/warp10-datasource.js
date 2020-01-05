@@ -292,12 +292,25 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         var myVar = _a[_i];
                         var value = myVar.current.value;
                         if (Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) {
-                            // user check the "select all" checkbox
-                            // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value.
-                            var allValues = myVar.options.filter(function (o) { return o.value !== "$__all"; }).map(function (o) { return o.value; });
-                            wsHeader += "[ " + allValues.map(function (s) { return "'" + s + "'"; }).join(" ") + " ] '" + myVar.name + "' STORE\n"; // all is stored as string in generated WarpScript.
-                            //also create a ready to use regexp, suffixed by _wsregexp
-                            wsHeader += " '~' $" + myVar.name + " REOPTALT + '" + myVar.name + "_wsregexp' STORE\n";
+                            // User checked the "select all" checkbox
+                            if (null != myVar.allValue && myVar.allValue !== "") {
+                                // User also defined a custom value in the variable settings
+                                var customValue = myVar.allValue;
+                                wsHeader += "[ '" + customValue + "' ] '" + myVar.name + "' STORE\n";
+                                // If user already starts its custom value with ~, remove it.
+                                if (customValue.startsWith("~")) {
+                                    customValue = customValue.slice(1);
+                                }
+                                wsHeader += " '~" + customValue + "' '" + myVar.name + "_wsregexp' STORE\n";
+                            }
+                            else {
+                                // if no custom all value is defined :
+                                // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value. 
+                                var allValues = myVar.options.filter(function (o) { return o.value !== "$__all"; }).map(function (o) { return o.value; });
+                                wsHeader += "[ " + allValues.map(function (s) { return "'" + s + "'"; }).join(" ") + " ] '" + myVar.name + "' STORE\n"; // all is stored as string in generated WarpScript.
+                                //also create a ready to use regexp, suffixed by _wsregexp
+                                wsHeader += " '~' $" + myVar.name + " REOPTALT + '" + myVar.name + "_wsregexp' STORE\n";
+                            }
                         }
                         else if (Array.isArray(value)) {
                             // user checks several choices
@@ -310,8 +323,8 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                             // User can use _long or _double suffixed variable
                             wsHeader += "'" + value + "' '" + myVar.name + "' STORE\n";
                             //additionnal conversion for WarpScript illiterates users:
-                            wsHeader += " <% $" + myVar.name + " TOLONG %> <% MINLONG %> <% %> TRY '" + myVar.name + "_long' STORE\n";
-                            wsHeader += " <% $" + myVar.name + " TODOUBLE %> <% NaN %> <% %> TRY '" + myVar.name + "_double' STORE\n";
+                            wsHeader += " <% $" + myVar.name + " TOLONG %> <% NULL %> <% %> TRY '" + myVar.name + "_long' STORE\n";
+                            wsHeader += " <% $" + myVar.name + " TODOUBLE %> <% NULL %> <% %> TRY '" + myVar.name + "_double' STORE\n";
                         }
                     }
                     return wsHeader;
