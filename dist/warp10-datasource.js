@@ -97,10 +97,17 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         return { data: data };
                     })
                         .catch(function (err) {
+                        var headers = err.headers();
+                        var wsHeadersOffset = wsHeader.split('\n').length;
+                        var errorline = Number.parseInt(headers['x-warp10-error-line']) - wsHeadersOffset;
+                        var errorMessage = headers['x-warp10-error-message'];
+                        // We must substract the generated header size everywhere in the error message.
+                        errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, function (match, group1) { return '[Line #' + (Number.parseInt(group1) - wsHeadersOffset).toString() + ']'; });
+                        // Also print the full error in the console
                         console.warn('[Warp 10] Failed to execute query', err);
                         var d = _this.$q.defer();
-                        d.resolve({ data: [] });
-                        return d.promise;
+                        // Grafana handle this nicely !
+                        throw { message: "WarpScript Failure on Line " + errorline + ", " + errorMessage };
                     });
                 };
                 /**
@@ -293,7 +300,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         var value = myVar.current.value;
                         if (Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) {
                             // User checked the "select all" checkbox
-                            if (null != myVar.allValue && myVar.allValue !== "") {
+                            if (myVar.allValue && myVar.allValue !== "") {
                                 // User also defined a custom value in the variable settings
                                 var customValue = myVar.allValue;
                                 wsHeader += "[ '" + customValue + "' ] '" + myVar.name + "' STORE\n";
@@ -327,6 +334,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                             wsHeader += " <% $" + myVar.name + " TODOUBLE %> <% NULL %> <% %> TRY '" + myVar.name + "_double' STORE\n";
                         }
                     }
+                    wsHeader += "LINEON\n";
                     return wsHeader;
                 };
                 Warp10Datasource.prototype.computeTimeVars = function (opts) {

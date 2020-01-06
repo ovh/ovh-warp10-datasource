@@ -90,10 +90,17 @@ export default class Warp10Datasource {
         return { data }
       })
       .catch((err) => {
-        console.warn('[Warp 10] Failed to execute query', err)
+        let headers = err.headers();
+        let wsHeadersOffset: number = wsHeader.split('\n').length;
+        let errorline: number = Number.parseInt(headers['x-warp10-error-line']) - wsHeadersOffset;
+        let errorMessage: String = headers['x-warp10-error-message'];
+        // We must substract the generated header size everywhere in the error message.
+        errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, (match, group1) => '[Line #' + (Number.parseInt(group1) - wsHeadersOffset).toString() + ']');
+        // Also print the full error in the console
+        console.warn('[Warp 10] Failed to execute query', err);
         let d = this.$q.defer();
-        d.resolve({ data: [] });
-        return d.promise;
+        // Grafana handle this nicely !
+        throw { message: `WarpScript Failure on Line ${errorline}, ${errorMessage}` };
       })
   }
 
@@ -325,7 +332,7 @@ export default class Warp10Datasource {
         wsHeader += ` <% $${myVar.name} TODOUBLE %> <% NULL %> <% %> TRY '${myVar.name}_double' STORE\n`;
       }
     }
-
+    wsHeader += "LINEON\n";
     return wsHeader
   }
 
