@@ -294,7 +294,7 @@ export default class Warp10Datasource {
     // Dashboad templating vars
     // current.text is the label. In case of multivalue, it is a string 'valueA + valueB'
     // current.value is a string, depending on query output. In case of multivalue, it is an array of strings. array contains "$__all" if user selects All.
-    console.log("this.templateSrv.variables", this.templateSrv.variables)
+    //console.log("this.templateSrv.variables", this.templateSrv.variables)
 
     for (let myVar of this.templateSrv.variables) {
       let value = myVar.current.value;
