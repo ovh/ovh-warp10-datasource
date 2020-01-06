@@ -29,7 +29,7 @@ export default class Warp10Datasource {
       // Grafana can send empty Object at the first time, we need to check is there is something
       if (query.expr || query.friendlyQuery) {
         if (query.advancedMode === undefined)
-          query.advancedMode = true
+          query.advancedMode = false
         query.ws = `${wsHeader}\n${query.advancedMode ? query.expr : query.friendlyQuery.warpScript}`
         queries.push(query)
         console.debug('New Query: ', query.ws)

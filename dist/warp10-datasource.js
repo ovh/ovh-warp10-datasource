@@ -43,7 +43,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         // Grafana can send empty Object at the first time, we need to check is there is something
                         if (query.expr || query.friendlyQuery) {
                             if (query.advancedMode === undefined)
-                                query.advancedMode = true;
+                                query.advancedMode = false;
                             query.ws = wsHeader + "\n" + (query.advancedMode ? query.expr : query.friendlyQuery.warpScript);
                             queries.push(query);
                             console.debug('New Query: ', query.ws);
@@ -294,7 +294,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     // Dashboad templating vars
                     // current.text is the label. In case of multivalue, it is a string 'valueA + valueB'
                     // current.value is a string, depending on query output. In case of multivalue, it is an array of strings. array contains "$__all" if user selects All.
-                    console.log("this.templateSrv.variables", this.templateSrv.variables);
+                    //console.log("this.templateSrv.variables", this.templateSrv.variables)
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
                         var value = myVar.current.value;
