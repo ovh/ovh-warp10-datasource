@@ -32,7 +32,7 @@ export default class Warp10Datasource {
           query.advancedMode = true
         query.ws = `${wsHeader}\n${query.advancedMode ? query.expr : query.friendlyQuery.warpScript}`
         queries.push(query)
-        console.debug('New Query: ', (query.advancedMode) ? query.expr : query.friendlyQuery)
+        console.debug('New Query: ', query.ws)
       }
       //}
     })
