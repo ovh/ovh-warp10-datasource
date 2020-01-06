@@ -303,35 +303,37 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                             if (myVar.allValue && myVar.allValue !== "") {
                                 // User also defined a custom value in the variable settings
                                 var customValue = myVar.allValue;
-                                wsHeader += "[ '" + customValue + "' ] '" + myVar.name + "' STORE\n";
-                                // If user already starts its custom value with ~, remove it.
-                                if (customValue.startsWith("~")) {
-                                    customValue = customValue.slice(1);
-                                }
-                                wsHeader += " '~" + customValue + "' '" + myVar.name + "_wsregexp' STORE\n";
+                                wsHeader += "[ '" + customValue + "' ] '" + myVar.name + "_list' STORE\n";
+                                // custom all value is taken as it is. User may or may not use a regexp.
+                                wsHeader += " '" + customValue + "' '" + myVar.name + "' STORE\n";
                             }
                             else {
                                 // if no custom all value is defined :
                                 // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value. 
                                 var allValues = myVar.options.filter(function (o) { return o.value !== "$__all"; }).map(function (o) { return o.value; });
-                                wsHeader += "[ " + allValues.map(function (s) { return "'" + s + "'"; }).join(" ") + " ] '" + myVar.name + "' STORE\n"; // all is stored as string in generated WarpScript.
-                                //also create a ready to use regexp, suffixed by _wsregexp
-                                wsHeader += " '~' $" + myVar.name + " REOPTALT + '" + myVar.name + "_wsregexp' STORE\n";
+                                wsHeader += "[ " + allValues.map(function (s) { return "'" + s + "'"; }).join(" ") + " ] '" + myVar.name + "_list' STORE\n"; // all is stored as string in generated WarpScript.
+                                // create a ready to use regexp in the variable
+                                wsHeader += " '~' $" + myVar.name + "_list REOPTALT + '" + myVar.name + "' STORE\n";
                             }
                         }
                         else if (Array.isArray(value)) {
                             // user checks several choices
-                            wsHeader += "[ " + value.map(function (s) { return "'" + s + "'"; }).join(" ") + " ] '" + myVar.name + "' STORE\n"; // all is stored as string in generated WarpScript.
-                            //also create a ready to use regexp, suffixed by _wsregexp
-                            wsHeader += " '~' $" + myVar.name + " REOPTALT + '" + myVar.name + "_wsregexp' STORE\n";
+                            wsHeader += "[ " + value.map(function (s) { return "'" + s + "'"; }).join(" ") + " ] '" + myVar.name + "_list' STORE\n"; // all is stored as string in generated WarpScript.
+                            if (1 == value.length) {
+                                // one value checked : copy it as it is in WarpScript variable
+                                wsHeader += " '" + value[0] + "' '" + myVar.name + "' STORE\n";
+                            }
+                            else {
+                                // several values checked : do a regexp
+                                //also create a ready to use regexp, suffixed by _wsregexp
+                                wsHeader += " '~' $" + myVar.name + "_list REOPTALT + '" + myVar.name + "' STORE\n";
+                            }
                         }
                         else {
                             // no multiple selection, variable is the string. As type is lost by Grafana, there is no safe way to assume something different than a string here.
-                            // User can use _long or _double suffixed variable
+                            // List is also created to create scripts compatible whatever the defined selection mode
+                            wsHeader += "[ '" + value + "' ] '" + myVar.name + "_list' STORE\n";
                             wsHeader += "'" + value + "' '" + myVar.name + "' STORE\n";
-                            //additionnal conversion for WarpScript illiterates users:
-                            wsHeader += " <% $" + myVar.name + " TOLONG %> <% NULL %> <% %> TRY '" + myVar.name + "_long' STORE\n";
-                            wsHeader += " <% $" + myVar.name + " TODOUBLE %> <% NULL %> <% %> TRY '" + myVar.name + "_double' STORE\n";
                         }
                     }
                     wsHeader += "LINEON\n";
