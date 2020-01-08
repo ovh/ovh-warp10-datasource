@@ -98,12 +98,17 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     })
                         .catch(function (err) {
                         var headers = err.headers();
-                        var wsHeadersOffset = wsHeader.split('\n').length;
-                        var errorline = Number.parseInt(headers['x-warp10-error-line']) - wsHeadersOffset;
-                        var errorMessage = headers['x-warp10-error-message'];
-                        // We must substract the generated header size everywhere in the error message.
-                        errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, function (match, group1) { return '[Line #' + (Number.parseInt(group1) - wsHeadersOffset).toString() + ']'; });
-                        // Also print the full error in the console
+                        // security: ensure both error description headers are here.
+                        var errorline = -1;
+                        var errorMessage = "Unable to read x-warp10-error-line and x-warp10-error-line headers in server answer";
+                        if (headers['x-warp10-error-line'] !== undefined && headers['x-warp10-error-message'] !== undefined) {
+                            var wsHeadersOffset_1 = wsHeader.split('\n').length;
+                            errorline = Number.parseInt(headers['x-warp10-error-line']) - wsHeadersOffset_1;
+                            errorMessage = headers['x-warp10-error-message'];
+                            // We must substract the generated header size everywhere in the error message.
+                            errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, function (match, group1) { return '[Line #' + (Number.parseInt(group1) - wsHeadersOffset_1).toString() + ']'; });
+                            // Also print the full error in the console
+                        }
                         console.warn('[Warp 10] Failed to execute query', err);
                         var d = _this.$q.defer();
                         // Grafana handle this nicely !
@@ -294,7 +299,6 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     // Dashboad templating vars
                     // current.text is the label. In case of multivalue, it is a string 'valueA + valueB'
                     // current.value is a string, depending on query output. In case of multivalue, it is an array of strings. array contains "$__all" if user selects All.
-                    //console.log("this.templateSrv.variables", this.templateSrv.variables)
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
                         var value = myVar.current.value;

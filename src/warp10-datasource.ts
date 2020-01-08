@@ -90,13 +90,18 @@ export default class Warp10Datasource {
         return { data }
       })
       .catch((err) => {
-        let headers = err.headers();
-        let wsHeadersOffset: number = wsHeader.split('\n').length;
-        let errorline: number = Number.parseInt(headers['x-warp10-error-line']) - wsHeadersOffset;
-        let errorMessage: String = headers['x-warp10-error-message'];
-        // We must substract the generated header size everywhere in the error message.
-        errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, (match, group1) => '[Line #' + (Number.parseInt(group1) - wsHeadersOffset).toString() + ']');
-        // Also print the full error in the console
+        const headers = err.headers();
+        // security: ensure both error description headers are here.
+        let errorline: number = -1;
+        let errorMessage: String = "Unable to read x-warp10-error-line and x-warp10-error-line headers in server answer";
+        if (headers['x-warp10-error-line'] !== undefined && headers['x-warp10-error-message'] !== undefined) {
+          const wsHeadersOffset: number = wsHeader.split('\n').length;
+          errorline = Number.parseInt(headers['x-warp10-error-line']) - wsHeadersOffset;
+          errorMessage = headers['x-warp10-error-message'];
+          // We must substract the generated header size everywhere in the error message.
+          errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, (match, group1) => '[Line #' + (Number.parseInt(group1) - wsHeadersOffset).toString() + ']');
+          // Also print the full error in the console
+        }
         console.warn('[Warp 10] Failed to execute query', err);
         let d = this.$q.defer();
         // Grafana handle this nicely !
@@ -140,7 +145,7 @@ export default class Warp10Datasource {
    * @param options
    * @return {Promise<any>} results
    */
-  annotationQuery(opts: AnnotationOptions): Promise<any>{
+  annotationQuery(opts: AnnotationOptions): Promise<any> {
     let ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query
 
     return this.executeExec({ ws })
@@ -210,7 +215,7 @@ export default class Warp10Datasource {
         } else if (res.data.length === 1 && typeof res.data[0] === 'object') {
           // case 2
           Object.keys(res.data[0]).forEach(key => {
-            let value = res.data[0][key];
+            const value = res.data[0][key];
             if (typeof value === 'string' || value instanceof String || typeof value === 'number') {
               entries.push({
                 text: key.toString(), // in WarpScript, key might not be a string. 
@@ -294,23 +299,22 @@ export default class Warp10Datasource {
     // Dashboad templating vars
     // current.text is the label. In case of multivalue, it is a string 'valueA + valueB'
     // current.value is a string, depending on query output. In case of multivalue, it is an array of strings. array contains "$__all" if user selects All.
-    //console.log("this.templateSrv.variables", this.templateSrv.variables)
 
     for (let myVar of this.templateSrv.variables) {
-      let value = myVar.current.value;
+      const value = myVar.current.value;
 
       if (Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) {
         // User checked the "select all" checkbox
         if (myVar.allValue && myVar.allValue !== "") {
           // User also defined a custom value in the variable settings
-          let customValue: String = myVar.allValue;
+          const customValue: String = myVar.allValue;
           wsHeader += `[ '${customValue}' ] '${myVar.name}_list' STORE\n`
           // custom all value is taken as it is. User may or may not use a regexp.
           wsHeader += ` '${customValue}' '${myVar.name}' STORE\n`
         } else {
           // if no custom all value is defined :
           // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value. 
-          let allValues: String[] = myVar.options.filter(o => o.value !== "$__all").map(o => o.value);
+          const allValues: String[] = myVar.options.filter(o => o.value !== "$__all").map(o => o.value);
           wsHeader += `[ ${allValues.map(s => `'${s}'`).join(" ")} ] '${myVar.name}_list' STORE\n`; // all is stored as string in generated WarpScript.
           // create a ready to use regexp in the variable
           wsHeader += ` '~' $${myVar.name}_list REOPTALT + '${myVar.name}' STORE\n`

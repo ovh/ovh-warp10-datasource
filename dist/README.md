@@ -238,14 +238,15 @@ To understand the variable resolution, this is how a query is built
 
 [ $rawResult [] 'beertender.rawvalue' filter.byclass ] FILTER 0 GET 'rawvalue' STORE
 
-// empty : 30.68e6
-// full (hot): 30.45e6
-// full (cold): 30.475e6
-30.8e6  $rawvalue - [ SWAP 0 mapper.max.x 0 0 0 ] MAP 0 GET
- 
-2800 / [ SWAP 100 mapper.min.x 0 0 0 ] MAP 0 GET
+// do a linear interpolation to convert raw sensor value into percent.
+// empty : 30.8e6
+// full (cold): 30.52e6
+30.8e6  $rawvalue - // you can substract GTS and constants
+[ SWAP 0 mapper.max.x 0 0 0 ] MAP 0 GET // clamp min value to zero
+2800 /  //divide by 2800
+[ SWAP 100 mapper.min.x 0 0 0 ] MAP 0 GET // clamp max value to 100
+[ SWAP bucketizer.mean 0 1 h 0 ] BUCKETIZE // keep one point per hour, the mean of each hour.
 
-[ SWAP bucketizer.mean 0 1 h 0 ] BUCKETIZE
 
 'level in percent' RENAME 
 
