@@ -303,7 +303,7 @@ export default class Warp10Datasource {
     for (let myVar of this.templateSrv.variables) {
       const value = myVar.current.value;
 
-      if (Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) {
+      if (((Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) || value === "$__all")) {
         // User checked the "select all" checkbox
         if (myVar.allValue && myVar.allValue !== "") {
           // User also defined a custom value in the variable settings

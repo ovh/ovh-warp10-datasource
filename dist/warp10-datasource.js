@@ -302,7 +302,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     for (var _i = 0, _a = this.templateSrv.variables; _i < _a.length; _i++) {
                         var myVar = _a[_i];
                         var value = myVar.current.value;
-                        if (Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) {
+                        if (((Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) || value === "$__all")) {
                             // User checked the "select all" checkbox
                             if (myVar.allValue && myVar.allValue !== "") {
                                 // User also defined a custom value in the variable settings
