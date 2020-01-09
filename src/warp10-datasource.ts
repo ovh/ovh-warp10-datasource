@@ -29,7 +29,7 @@ export default class Warp10Datasource {
       // Grafana can send empty Object at the first time, we need to check is there is something
       if (query.expr || query.friendlyQuery) {
         if (query.advancedMode === undefined)
-          query.advancedMode = true
+          query.advancedMode = false
         query.ws = `${wsHeader}\n${query.advancedMode ? query.expr : query.friendlyQuery.warpScript}`
         queries.push(query)
         console.debug('New Query: ', query.ws)
@@ -90,10 +90,22 @@ export default class Warp10Datasource {
         return { data }
       })
       .catch((err) => {
-        console.warn('[Warp 10] Failed to execute query', err)
+        const headers = err.headers();
+        // security: ensure both error description headers are here.
+        let errorline: number = -1;
+        let errorMessage: String = "Unable to read x-warp10-error-line and x-warp10-error-line headers in server answer";
+        if (headers['x-warp10-error-line'] !== undefined && headers['x-warp10-error-message'] !== undefined) {
+          const wsHeadersOffset: number = wsHeader.split('\n').length;
+          errorline = Number.parseInt(headers['x-warp10-error-line']) - wsHeadersOffset;
+          errorMessage = headers['x-warp10-error-message'];
+          // We must substract the generated header size everywhere in the error message.
+          errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, (match, group1) => '[Line #' + (Number.parseInt(group1) - wsHeadersOffset).toString() + ']');
+          // Also print the full error in the console
+        }
+        console.warn('[Warp 10] Failed to execute query', err);
         let d = this.$q.defer();
-        d.resolve({ data: [] });
-        return d.promise;
+        // Grafana handle this nicely !
+        throw { message: `WarpScript Failure on Line ${errorline}, ${errorMessage}` };
       })
   }
 
@@ -133,7 +145,7 @@ export default class Warp10Datasource {
    * @param options
    * @return {Promise<any>} results
    */
-  annotationQuery(opts: AnnotationOptions): Promise<any>{
+  annotationQuery(opts: AnnotationOptions): Promise<any> {
     let ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query
 
     return this.executeExec({ ws })
@@ -183,24 +195,46 @@ export default class Warp10Datasource {
           throw new Error('Warp 10 expects the response to be a stack (an array), it isn\'t')
         }
 
-        // only one object on the stack, good user
-        if (res.data.length === 1 && typeof res.data[0] === 'object') {
-          let entries = []
-          res.data[0].forEach(key => {
-            entries.push({
-              text: key,
-              value: res.data[0][key]
-            })
-          })
-          return entries
+        // Grafana can handle different text/value for the variable drop list. User has three possibilites in the WarpScript result:
+        // 1 - let a list on the stack : text = value for each entry. 
+        // 2 - let a map on the stack : text = map key, value = map value. value will be used in the WarpScript variable.
+        // 3 - let some strings or numbers on the stack : it will be considered as a list, refer to case 1.
+        // Values could be strings or number, ignore other objects.
+
+        let entries = [];
+        if (1 == res.data.length && Array.isArray(res.data[0])) {
+          // case 1
+          res.data[0].forEach(elt => {
+            if (typeof elt === 'string' || elt instanceof String || typeof elt === 'number') {
+              entries.push({
+                text: elt.toString(),
+                value: elt.toString() // Grafana will turn every value to strings anyway !
+              })
+            }
+          });
+        } else if (res.data.length === 1 && typeof res.data[0] === 'object') {
+          // case 2
+          Object.keys(res.data[0]).forEach(key => {
+            const value = res.data[0][key];
+            if (typeof value === 'string' || value instanceof String || typeof value === 'number') {
+              entries.push({
+                text: key.toString(), // in WarpScript, key might not be a string. 
+                value: value.toString() // Grafana will turn every value to strings anyway !
+              })
+            }
+          });
+        } else {
+          // case 3
+          res.data.forEach(elt => {
+            if (typeof elt === 'string' || elt instanceof String || typeof elt === 'number') {
+              entries.push({
+                text: elt.toString(),
+                value: elt.toString() // Grafana will turn every value to strings anyway !
+              })
+            }
+          });
         }
-        // some elements on the stack, return all of them as entry
-        return res.data.map((entry, i) => {
-          return {
-            text: entry.toString() || i,
-            value: entry
-          }
-        })
+        return entries;
       })
   }
 
@@ -260,24 +294,50 @@ export default class Warp10Datasource {
         value = value.replace(/'/g, '"')
       if (typeof value === 'string' && !value.startsWith('<%') && !value.endsWith('%>'))
         value = `'${value}'`
-      wsHeader += `${value || 'NULL'} '${myVar}' STORE `
+      wsHeader += `${value || 'NULL'} '${myVar}' STORE\n`
     }
     // Dashboad templating vars
+    // current.text is the label. In case of multivalue, it is a string 'valueA + valueB'
+    // current.value is a string, depending on query output. In case of multivalue, it is an array of strings. array contains "$__all" if user selects All.
+
     for (let myVar of this.templateSrv.variables) {
-      let value = myVar.current.text
+      const value = myVar.current.value;
 
-      if (myVar.current.value != null && (myVar.current.value === '$__all' || (myVar.current.value.length === 1 && myVar.current.value[0] === '$__all')))
-      {
-        if (myVar.allValue !== null)
-          value = myVar.allValue;
-        else
-          value = myVar.options.slice(1).map(e => e.text).join(" + ");
+      if (Array.isArray(value) && (value.length == 1 && value[0] === '$__all')) {
+        // User checked the "select all" checkbox
+        if (myVar.allValue && myVar.allValue !== "") {
+          // User also defined a custom value in the variable settings
+          const customValue: String = myVar.allValue;
+          wsHeader += `[ '${customValue}' ] '${myVar.name}_list' STORE\n`
+          // custom all value is taken as it is. User may or may not use a regexp.
+          wsHeader += ` '${customValue}' '${myVar.name}' STORE\n`
+        } else {
+          // if no custom all value is defined :
+          // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value. 
+          const allValues: String[] = myVar.options.filter(o => o.value !== "$__all").map(o => o.value);
+          wsHeader += `[ ${allValues.map(s => `'${s}'`).join(" ")} ] '${myVar.name}_list' STORE\n`; // all is stored as string in generated WarpScript.
+          // create a ready to use regexp in the variable
+          wsHeader += ` '~' $${myVar.name}_list REOPTALT + '${myVar.name}' STORE\n`
+        }
+      } else if (Array.isArray(value)) {
+        // user checks several choices
+        wsHeader += `[ ${value.map(s => `'${s}'`).join(" ")} ] '${myVar.name}_list' STORE\n`; // all is stored as string in generated WarpScript.
+        if (1 == value.length) {
+          // one value checked : copy it as it is in WarpScript variable
+          wsHeader += ` '${value[0]}' '${myVar.name}' STORE\n`
+        } else {
+          // several values checked : do a regexp
+          //also create a ready to use regexp, suffixed by _wsregexp
+          wsHeader += ` '~' $${myVar.name}_list REOPTALT + '${myVar.name}' STORE\n`
+        }
+      } else {
+        // no multiple selection, variable is the string. As type is lost by Grafana, there is no safe way to assume something different than a string here.
+        // List is also created to create scripts compatible whatever the defined selection mode
+        wsHeader += `[ '${value}' ] '${myVar.name}_list' STORE\n`;
+        wsHeader += `'${value}' '${myVar.name}' STORE\n`;
       }
-
-      if (isNaN(value) || value.startsWith('0'))
-        value = `'${value}'`
-      wsHeader += `${value || 'NULL'} '${myVar.name}' STORE `
     }
+    wsHeader += "LINEON\n";
     return wsHeader
   }
 
