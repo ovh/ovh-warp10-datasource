@@ -15,6 +15,7 @@ Grafana will use the *dist/* folder by default
 - Choose a name
 - Set Warp10 as type
 - Paste the Warp 10™ Platform `exec` endpoint URL ( do not append /api/v0/... )
+
 ![Global Variables](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/screenshot-endpoint.png)
 
 
@@ -24,6 +25,7 @@ You can define variables at datasource level (~ organisation level) which can be
 In case of a macro definition, the variable value must start with *<%* and end with *%>*. In the query you can prepend *@* to the macro name to execute it.
 
 For example, you can store a read token here:
+
 ![Global Variables](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/screenshot-globalvar.png)
 
 
@@ -36,6 +38,7 @@ A user friendly query editor will appear. You can use the global variable you de
 ![First query](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/screenshot-simplifiedquery.png)
 
 It will generate WarpScript for you. The generated WarpScript is visible in your browser console:
+
 ![Console output](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/screenshot-console.png)
 
 You will see at the beginning of the query some special variables set by the plugin.
@@ -48,6 +51,8 @@ You will see at the beginning of the query some special variables set by the plu
 | **$start**    | Timestamp of the less recent point in the Grafana time window | 1498034553276000           |
 | **$startISO** | *start* value in ISO-8601 format                              | '2017-06-21T08:42:33.276Z' |
 | **$interval** | Difference between $end and $start                            | 3600000000                 |
+| **$__interval** | Could be used as a bucket span to display less datapoints on a graph, saving your browser RAM. See [Grafana doc](https://grafana.com/docs/grafana/latest/reference/templating/#the-interval-variable).                            | 3600000000                 |
+
 
 
 Advanced users can check the *WarpScript editor* and write the WarpScript they need.
@@ -114,6 +119,7 @@ WarpScript™ example:
   ]
 }
 ```
+
 ![table output](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/screenshot-table.png)
 
 
@@ -127,6 +133,7 @@ When both `ovh-warp10-datasource` and the `grafana-worldmap-panel` installed, yo
 with a Warp&nbsp;10 datasource and `json result` as *Location Data* in the *Worlmap* tab:
 
 ![Warp&nbsp;10™ datasource](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-datasource-tab.jpg)
+
 ![`json result` as *Location Data* in the *Worlmap* tab](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/README-worldmap-worldmap-tab.jpg)
 
 Now in your WarpScript™ you can generate data in the JSON format supported by Worldmap, for example :
@@ -166,6 +173,7 @@ NEWGTS
 $end $interval 2 / - NaN DUP DUP 'Restart WebServer' ADDVALUE
 $end $interval 3 / - NaN DUP DUP 'Update v1.0.2' ADDVALUE
 ```
+
 ![annotation output](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/screenshot-annotationFromWarpScript.png)
 
 
@@ -174,6 +182,7 @@ $end $interval 3 / - NaN DUP DUP 'Update v1.0.2' ADDVALUE
 You can make a WarpScript query to build the choice list of your templating variables.
 In the dashboard settings, select Variables, and create a new one from a Query, with Warp10 as datasource.
 You can write any WarpScript in the Query field to build your list of choices:
+
 ![annotation output](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/screenshot-queryForVariable.png)
 
 - If you let several values on the stack, each value will be added to the choice list.
@@ -199,6 +208,7 @@ Each value is transformed into two WarpScript variables you can use in your quer
 In the example below, 
 - testMap has a *custom all value* set to `~custom.*allvalue.*`
 - testList has no defined *custom all value*.
+
 ![annotation output](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/screenshot-customAllValue.png)
 
 
