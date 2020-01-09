@@ -7,8 +7,8 @@
   "alerting": false,
   "info": {
     "description": "Warp 10™ Platform datasource plugin",
-    "version": "2.1.1",
-    "updated": "2018-04-25",
+    "version": "2.1.2",
+    "updated": "2020-01-09",
     "author": {
       "name": "ovh",
       "url": "https://github.com/ovh/ovh-warp10-datasource"
