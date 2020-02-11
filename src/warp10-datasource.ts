@@ -49,7 +49,8 @@ export default class Warp10Datasource {
       .then((responses) => {
         // Grafana formated GTS
         let data = []
-        responses.forEach((res, i) => {
+        responses.forEach((response, i) => {
+          const res = response.result
           if (res.data.type === 'error') {
             console.error(res.data.value)
             return
@@ -74,7 +75,8 @@ export default class Warp10Datasource {
           GTS.stackFilter(res.data).forEach(gts => {
             let grafanaGts = {
               target: (opts.targets[i].hideLabels) ? gts.c : gts.nameWithLabels,
-              datapoints: []
+              datapoints: [],
+              refId: (response.query || {}).refId
             }
             // show attributes
             if (opts.targets[i].hideAttributes !== undefined && !opts.targets[i].hideAttributes) {
@@ -90,7 +92,7 @@ export default class Warp10Datasource {
         return { data }
       })
       .catch((err) => {
-        const headers = err.headers();
+        const headers = err.headers ? err.headers(): {};
         // security: ensure both error description headers are here.
         let errorline: number = -1;
         let errorMessage: String = "Unable to read x-warp10-error-line and x-warp10-error-line headers in server answer";
@@ -115,7 +117,8 @@ export default class Warp10Datasource {
    */
   testDatasource(): Promise<any> {
     return this.executeExec({ ws: '1 2 +' })
-      .then(res => {
+      .then(response => {
+        const res = response.result
         if (res.data[0] !== 3) {
           return {
             status: 'error',
@@ -149,7 +152,8 @@ export default class Warp10Datasource {
     let ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query
 
     return this.executeExec({ ws })
-      .then((res) => {
+      .then((response) => {
+        const res = response.result
         const annotations = []
         /*if (!) {
           console.error(`An annotation query must return exactly 1 GTS on top of the stack, annotation: ${ opts.annotation.name }`)
@@ -190,13 +194,14 @@ export default class Warp10Datasource {
    */
   metricFindQuery(ws: string): Promise<any> {
     return this.executeExec({ ws: this.computeGrafanaContext() + ws })
-      .then(res => {
+      .then(response => {
+        const res = response.result
         if (!Array.isArray(res.data)) {
           throw new Error('Warp 10 expects the response to be a stack (an array), it isn\'t')
         }
 
         // Grafana can handle different text/value for the variable drop list. User has three possibilites in the WarpScript result:
-        // 1 - let a list on the stack : text = value for each entry. 
+        // 1 - let a list on the stack : text = value for each entry.
         // 2 - let a map on the stack : text = map key, value = map value. value will be used in the WarpScript variable.
         // 3 - let some strings or numbers on the stack : it will be considered as a list, refer to case 1.
         // Values could be strings or number, ignore other objects.
@@ -218,7 +223,7 @@ export default class Warp10Datasource {
             const value = res.data[0][key];
             if (typeof value === 'string' || value instanceof String || typeof value === 'number') {
               entries.push({
-                text: key.toString(), // in WarpScript, key might not be a string. 
+                text: key.toString(), // in WarpScript, key might not be a string.
                 value: value.toString() // Grafana will turn every value to strings anyway !
               })
             }
@@ -261,6 +266,11 @@ export default class Warp10Datasource {
       headers: {
         'Accept': undefined,
         'Content-Type': undefined
+      }
+    }).then(res => {
+      return {
+        result: res,
+        query: query
       }
     })
   }
@@ -313,7 +323,7 @@ export default class Warp10Datasource {
           wsHeader += ` '${customValue}' '${myVar.name}' STORE\n`
         } else {
           // if no custom all value is defined :
-          // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value. 
+          // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value.
           const allValues: String[] = myVar.options.filter(o => o.value !== "$__all").map(o => o.value);
           wsHeader += `[ ${allValues.map(s => `'${s}'`).join(" ")} ] '${myVar.name}_list' STORE\n`; // all is stored as string in generated WarpScript.
           // create a ready to use regexp in the variable
