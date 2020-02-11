@@ -60,7 +60,8 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         .then(function (responses) {
                         // Grafana formated GTS
                         var data = [];
-                        responses.forEach(function (res, i) {
+                        responses.forEach(function (response, i) {
+                            var res = response.result;
                             if (res.data.type === 'error') {
                                 console.error(res.data.value);
                                 return;
@@ -82,7 +83,8 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                             gts_1.default.stackFilter(res.data).forEach(function (gts) {
                                 var grafanaGts = {
                                     target: (opts.targets[i].hideLabels) ? gts.c : gts.nameWithLabels,
-                                    datapoints: []
+                                    datapoints: [],
+                                    refId: (response.query || {}).refId
                                 };
                                 // show attributes
                                 if (opts.targets[i].hideAttributes !== undefined && !opts.targets[i].hideAttributes) {
@@ -97,7 +99,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         return { data: data };
                     })
                         .catch(function (err) {
-                        var headers = err.headers();
+                        var headers = err.headers ? err.headers() : {};
                         // security: ensure both error description headers are here.
                         var errorline = -1;
                         var errorMessage = "Unable to read x-warp10-error-line and x-warp10-error-line headers in server answer";
@@ -121,7 +123,8 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                  */
                 Warp10Datasource.prototype.testDatasource = function () {
                     return this.executeExec({ ws: '1 2 +' })
-                        .then(function (res) {
+                        .then(function (response) {
+                        var res = response.result;
                         if (res.data[0] !== 3) {
                             return {
                                 status: 'error',
@@ -155,7 +158,8 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     var _this = this;
                     var ws = this.computeTimeVars(opts) + this.computeGrafanaContext() + opts.annotation.query;
                     return this.executeExec({ ws: ws })
-                        .then(function (res) {
+                        .then(function (response) {
+                        var res = response.result;
                         var annotations = [];
                         var _loop_1 = function (gts) {
                             var tags = [];
@@ -196,12 +200,13 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                  */
                 Warp10Datasource.prototype.metricFindQuery = function (ws) {
                     return this.executeExec({ ws: this.computeGrafanaContext() + ws })
-                        .then(function (res) {
+                        .then(function (response) {
+                        var res = response.result;
                         if (!Array.isArray(res.data)) {
                             throw new Error('Warp 10 expects the response to be a stack (an array), it isn\'t');
                         }
                         // Grafana can handle different text/value for the variable drop list. User has three possibilites in the WarpScript result:
-                        // 1 - let a list on the stack : text = value for each entry. 
+                        // 1 - let a list on the stack : text = value for each entry.
                         // 2 - let a map on the stack : text = map key, value = map value. value will be used in the WarpScript variable.
                         // 3 - let some strings or numbers on the stack : it will be considered as a list, refer to case 1.
                         // Values could be strings or number, ignore other objects.
@@ -264,6 +269,11 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                             'Accept': undefined,
                             'Content-Type': undefined
                         }
+                    }).then(function (res) {
+                        return {
+                            result: res,
+                            query: query
+                        };
                     });
                 };
                 /**
@@ -313,7 +323,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                             }
                             else {
                                 // if no custom all value is defined :
-                                // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value. 
+                                // it means we shall create a list of all the values in WarpScript from options, ignoring "$__all" special option value.
                                 var allValues = myVar.options.filter(function (o) { return o.value !== "$__all"; }).map(function (o) { return o.value; });
                                 wsHeader += "[ " + allValues.map(function (s) { return "'" + s + "'"; }).join(" ") + " ] '" + myVar.name + "_list' STORE\n"; // all is stored as string in generated WarpScript.
                                 // create a ready to use regexp in the variable
