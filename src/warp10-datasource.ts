@@ -7,6 +7,7 @@ import Query from './query'
 
 export default class Warp10Datasource {
 
+
   constructor(private instanceSettings: any,
     private $q: any,
     private backendSrv: any,
@@ -265,7 +266,7 @@ export default class Warp10Datasource {
       data: query.ws,
       headers: {
         'Accept': undefined,
-        'Content-Type': undefined
+        'Content-Type': 'text/plain; charset=UTF-8',
       }
     }).then(res => {
       return {

@@ -5,7 +5,7 @@ export default class GTS {
     la?: number;
     v: any[][];
     constructor();
-    readonly nameWithLabels: string;
+    get nameWithLabels(): string;
     /**
      * Determine if an object is a GTS
      * @param {Object} g object to test
@@ -28,5 +28,5 @@ export default class GTS {
      * Return all GTS attributes
      * @return {string} all GTS
      */
-    readonly formatedAttributes: string;
+    get formatedAttributes(): string;
 }

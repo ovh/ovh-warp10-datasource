@@ -267,7 +267,7 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         data: query.ws,
                         headers: {
                             'Accept': undefined,
-                            'Content-Type': undefined
+                            'Content-Type': 'text/plain; charset=UTF-8',
                         }
                     }).then(function (res) {
                         return {
