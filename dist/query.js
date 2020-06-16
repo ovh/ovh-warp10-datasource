@@ -111,7 +111,7 @@ System.register([], function (exports_1, context_1) {
                         q += "// END OF GENERATED QUERY \n";
                         return q;
                     },
-                    enumerable: true,
+                    enumerable: false,
                     configurable: true
                 });
                 return Warp10Query;

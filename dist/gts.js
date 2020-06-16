@@ -16,7 +16,7 @@ System.register([], function (exports_1, context_1) {
                         }
                         return this.c + "{" + keyValues.join(',') + "}";
                     },
-                    enumerable: true,
+                    enumerable: false,
                     configurable: true
                 });
                 /**
@@ -79,7 +79,7 @@ System.register([], function (exports_1, context_1) {
                         }
                         return "{" + attrs.join(',') + "}";
                     },
-                    enumerable: true,
+                    enumerable: false,
                     configurable: true
                 });
                 return GTS;
