@@ -9,6 +9,13 @@ git clone git@github.com:ovh/ovh-warp10-datasource.git /var/lib/grafana/plugins/
 ```
 Grafana will use the *dist/* folder by default
 
+# Grafana 7.0 troubleshooting 
+
+As mentioned in [#71](https://github.com/ovh/ovh-warp10-datasource/issues/71), "CORS" issues can occurs with a Warp10 datasource. To fix it:
+
+- Or set `x_content_type_options` to false in Grafana servers configuration settings,
+- Or whitelist `content-type` in allow headers of Warp10 with the configuration key `cors.header`.
+
 # Add a new Warp 10™ Datasource
 
 - Go to the Grafana menu (top left) > "datasources" > "add data source"
