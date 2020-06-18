@@ -211,7 +211,27 @@ In the example below,
 
 ![annotation output](https://raw.githubusercontent.com/ovh/ovh-warp10-datasource/master/dist/assets/screenshot-customAllValue.png)
 
+## Query returning Labels
 
+A variable can contain values for a defined Label. For example, to get all the unique values for the key `hostname`, you can specify a query like this in the templating variable *Query* setting.
+```
+[ $ReadToken '~.*' { 'hostname' '~.*' } ] FIND
+<% DROP LABELS 'hostname' GET %> LMAP
+UNIQUE
+```
+You can also create nested variables. For example if you had another variable, for example `$region`. Then you could have the hosts variable only show hosts from the current selected region with a query like this:
+```
+[ $ReadToken '~.*' { 'region' $region } ] FIND
+<% DROP LABELS 'hostname' GET %> LMAP
+UNIQUE
+```
+You can fetch keys for a given Class.
+```
+[ $ReadToken '<class_name>' { } ] FIND
+<% DROP LABELS KEYLIST %> LMAP
+FLATTEN
+UNIQUE
+```
 
 # Templating variable evaluation
 
