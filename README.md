@@ -215,7 +215,7 @@ In the example below,
 
 A variable can contain values for a defined Label. For example, to get all the unique values for the key `hostname`, you can specify a query like this in the templating variable *Query* setting.
 ```
-[ $ReadToken '~.*' { } ] FIND
+[ $ReadToken '~.*' { 'hostname' '~.*' } ] FIND
 <% DROP LABELS 'hostname' GET %> LMAP
 UNIQUE
 ```
