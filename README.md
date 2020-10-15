@@ -3,6 +3,21 @@ Grafana Warp 10™ Datasource Plugin
 
 # Install the plugin
 
+## Using grafana-cli
+
+```
+sudo grafana-cli plugins install ovh-warp10-datasource
+installing ovh-warp10-datasource @ 2.2.0
+from: https://grafana.com/api/plugins/ovh-warp10-datasource/versions/2.2.0/download
+into: /var/lib/grafana/plugins
+
+✔ Installed ovh-warp10-datasource successfully 
+
+Restart grafana after installing plugins . <service grafana-server restart>
+```
+
+## Cloning the repository
+
 Just clone the repository in the Grafana *plugins* folder
 ```sh
 git clone git@github.com:ovh/ovh-warp10-datasource.git /var/lib/grafana/plugins/ovh-warp10-datasource
