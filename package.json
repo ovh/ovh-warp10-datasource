@@ -15,7 +15,8 @@
     "start": "npx gulp"
   },
   "dependencies": {
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "del": "^3.0.0",

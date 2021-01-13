@@ -99,14 +99,13 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         return { data: data };
                     })
                         .catch(function (err) {
-                        var headers = err.headers ? err.headers() : {};
                         // security: ensure both error description headers are here.
                         var errorline = -1;
                         var errorMessage = "Unable to read x-warp10-error-line and x-warp10-error-line headers in server answer";
-                        if (headers['x-warp10-error-line'] !== undefined && headers['x-warp10-error-message'] !== undefined) {
+                        if (err.headers.has('x-warp10-error-line') && err.headers.has('x-warp10-error-message')) {
                             var wsHeadersOffset_1 = wsHeader.split('\n').length;
-                            errorline = Number.parseInt(headers['x-warp10-error-line']) - wsHeadersOffset_1;
-                            errorMessage = headers['x-warp10-error-message'];
+                            errorline = Number.parseInt(err.headers.get('x-warp10-error-line')) - wsHeadersOffset_1;
+                            errorMessage = err.headers.get('x-warp10-error-message');
                             // We must substract the generated header size everywhere in the error message.
                             errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, function (match, group1) { return '[Line #' + (Number.parseInt(group1) - wsHeadersOffset_1).toString() + ']'; });
                             // Also print the full error in the console
@@ -261,19 +260,27 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                     if (endpoint.charAt(endpoint.length - 1) === '/') {
                         endpoint = endpoint.substr(0, endpoint.length - 1);
                     }
-                    return this.backendSrv.datasourceRequest({
-                        method: 'POST',
-                        url: endpoint + '/api/v0/exec',
-                        data: query.ws,
+                    return fetch(endpoint + '/api/v0/exec', {
+                        method: 'post',
+                        body: query.ws,
                         headers: {
                             'Accept': undefined,
-                            'Content-Type': 'text/plain; charset=UTF-8',
-                        }
+                            'Content-Type': 'text/plain; charset=UTF-8'
+                        },
                     }).then(function (res) {
-                        return {
-                            result: res,
-                            query: query
-                        };
+                        if (res.status == 200) {
+                            return res.json().then(function (data) {
+                                return {
+                                    result: {
+                                        data: data
+                                    },
+                                    query: query
+                                };
+                            });
+                        }
+                        else {
+                            throw (res);
+                        }
                     });
                 };
                 /**
