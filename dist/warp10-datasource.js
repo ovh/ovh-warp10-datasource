@@ -102,10 +102,11 @@ System.register(["./gts", "./table", "./geo", "./query"], function (exports_1, c
                         // security: ensure both error description headers are here.
                         var errorline = -1;
                         var errorMessage = "Unable to read x-warp10-error-line and x-warp10-error-line headers in server answer";
-                        if (err.headers.has('x-warp10-error-line') && err.headers.has('x-warp10-error-message')) {
+                        var headers = err.headers ? err.headers : new Headers({});
+                        if (headers.has('x-warp10-error-line') && headers.has('x-warp10-error-message')) {
                             var wsHeadersOffset_1 = wsHeader.split('\n').length;
-                            errorline = Number.parseInt(err.headers.get('x-warp10-error-line')) - wsHeadersOffset_1;
-                            errorMessage = err.headers.get('x-warp10-error-message');
+                            errorline = Number.parseInt(headers.get('x-warp10-error-line')) - wsHeadersOffset_1;
+                            errorMessage = headers.get('x-warp10-error-message');
                             // We must substract the generated header size everywhere in the error message.
                             errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, function (match, group1) { return '[Line #' + (Number.parseInt(group1) - wsHeadersOffset_1).toString() + ']'; });
                             // Also print the full error in the console

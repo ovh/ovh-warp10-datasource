@@ -96,10 +96,11 @@ export default class Warp10Datasource {
         // security: ensure both error description headers are here.
         let errorline: number = -1;
         let errorMessage: String = "Unable to read x-warp10-error-line and x-warp10-error-line headers in server answer";
-        if (err.headers.has('x-warp10-error-line') && err.headers.has('x-warp10-error-message')) {
+        let headers = err.headers ? err.headers : new Headers({});
+        if (headers.has('x-warp10-error-line') && headers.has('x-warp10-error-message')) {
           const wsHeadersOffset: number = wsHeader.split('\n').length;
-          errorline = Number.parseInt(err.headers.get('x-warp10-error-line')) - wsHeadersOffset;
-          errorMessage = err.headers.get('x-warp10-error-message');
+          errorline = Number.parseInt(headers.get('x-warp10-error-line')) - wsHeadersOffset;
+          errorMessage = headers.get('x-warp10-error-message');
           // We must substract the generated header size everywhere in the error message.
           errorMessage = errorMessage.replace(/\[Line #(\d+)\]/g, (match, group1) => '[Line #' + (Number.parseInt(group1) - wsHeadersOffset).toString() + ']');
           // Also print the full error in the console
