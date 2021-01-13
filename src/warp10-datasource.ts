@@ -135,9 +135,13 @@ export default class Warp10Datasource {
       })
       .catch((res) => {
         console.debug('Error', res)
+        let errorMessage = 'could not be loaded, see details in the console'
+        if (res.statusText != undefined) {
+          errorMessage = res.statusText
+        }
         return {
           status: 'error',
-          message: `Status code: ${res.err.status}`,
+          message: `Error message: ${errorMessage}`,
           title: 'Failed to contact Warp 10 Platform'
         }
       })
